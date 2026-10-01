@@ -1,0 +1,477 @@
+% Transcrito de Documento_Visao_MotivaFit_Completo_e_Detalhado.pdf
+\clearpage
+\section{TESTES DE SOFTWARE}
+
+A estratégia de qualidade foca em garantir uma experiência fluida e livre de falhas lógicas. A abordagem engloba testes unitários rigorosos (especialmente para a lógica de pontuação e serviços do back-end), testes funcionais de integração da API (Application Programming Interface, interface de programação de aplicações) e avaliações de desempenho. O objetivo é assegurar não apenas o funcionamento correto, mas também garantir que as interfaces respondam rapidamente.
+
+\subsection{ESTRATÉGIA DE TESTES}
+
+Níveis de testes abordados:
+
+\begin{itemize}
+\item Unitário: Testes isolados de funções e componentes.
+
+\item Integração: Testes da comunicação entre módulos, com foco na interação das rotas da API com a base de dados (PostgreSQL) e na integração das telas do frontend com os endpoints do backend.
+
+\item Sistema: Testes que simulam o fluxo completo do usuário, desde a interação na interface móvel até a resposta do servidor e persistência dos dados.
+
+\end{itemize}
+
+Tipos de testes abordados: o foco principal reside nos testes funcionais: validação das regras de negócio (criação de treinos, evolução de cargas), fluxos de autenticação com e-mail e senha no MVP e, nas Sprints finais, login opcional com o Google e operações de CRUD (Create, Read, Update, Delete: criar, consultar, atualizar e excluir) no sistema. Adicionalmente, são planejados testes não funcionais focados na usabilidade da interface móvel e na sua adaptação a diferentes telas.
+
+Ambientes de testes usados:
+
+O processo de testes obedece à política de branches e commits estabelecida para o projeto no GitHub:
+
+\begin{itemize}
+\item Ambiente Local: ambiente utilizado pela equipe de desenvolvimento para a criação e execução dos testes na respectiva branch da funcionalidade antes de solicitar a integração.
+
+\item Ambiente de Integração Contínua (CI): ao abrir um Pull Request para a branch principal, os fluxos do GitHub Actions são acionados automaticamente, executando os testes unitários e de integração em containers Docker. O merge só é autorizado se toda a pipeline de testes for aprovada sem falhas.
+
+\end{itemize}
+
+\textbf{FORMAS DE ANÁLISE DOS TESTES PROPOSTOS}
+
+Os testes são avaliados através dos relatórios de execução local e dos logs de execução do GitHub Actions. Em caso de falha, o Analista de Qualidade (Bernardo) examina o erro em conjunto com os desenvolvedores responsáveis pela funcionalidade, garantindo o reparo e acompanhando a correção através de inspeções de código até a nova aprovação dos testes.
+
+\textbf{RESULTADOS OBTIDOS}
+
+Até esta revisão, os casos estão planejados e não há resultados de execução ou evidências registrados neste documento. O registro de execução da seção 6.2 apresenta essa situação explicitamente, com zero ciclos executados. Cada caso de teste possui um resultado esperado (previsto), detalhado no roteiro de testes (seção 6.2). Qualquer divergência frente ao comportamento real (realizado) da aplicação é identificada como um defeito. Esse defeito deve ser reparado e o ciclo de teste repetido até que o resultado realizado corresponda ao previsto (Previsto = Realizado), atingindo o critério de aprovação do caso executado. Casos apenas planejados não constituem evidência de ausência de defeitos.
+
+\subsection{ROTEIRO DE TESTE}
+
+Os códigos T identificam os casos de teste.
+
+O roteiro documenta os cenários de validação planejados (Test Plan). O resultado obtido, a referência da evidência, os reparos e o número de ciclos devem ser atualizados no registro de execução após cada teste. Evidências externas devem ser identificadas por caminho ou URL (Uniform Resource Locator, endereço de um recurso), versão do código e data. Casos apenas planejados não garantem ausência de defeitos, mas estabelecem o critério de sucesso.
+
+O roteiro é organizado em duas tabelas vinculadas pelo ID: planejamento (tipo, nível, pré-condições e resultado previsto) e execução (resultado obtido, evidência, reparos e ciclos). O detalhamento apresenta o objetivo e, nos novos casos, os procedimentos. T2 e T3 validam e-mail e senha do MVP; não testam a senha do Google. O consentimento cancelado é tratado em T13, tokens inválidos ou expirados em T21 e acesso sem sessão em T22.
+
+Os casos T1 a T8, T14 a T18 e T22 devem ser executados nas Sprints 3 e 4; T20 valida o conjunto do MVP na Sprint 4. T9 será executado na Sprint 5, T19 na Sprint 8 e T10 na Sprint 9. T11 acompanha a entrega das funcionalidades administrativas. T12, T13 e T21 dependem da implementação de RF-24 nas Sprints 9 e 10. Os casos funcionais ainda não detalhados de RF-13 a RF-19, RF-21 e RF-23 deverão ser definidos antes da Sprint de implementação de cada requisito, com atualização da matriz. O teste de acesso T11 não substitui os testes funcionais do painel administrativo.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.19\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.15\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.12\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.24\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.3\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\caption{Planejamento dos testes}\\
+\hline
+\textbf{ID / nome} & \textbf{Tipo} & \textbf{Nível} & \textbf{Pré-condições} & \textbf{Resultado previsto} \\ \hline
+\endfirsthead
+\textbf{ID / nome} & \textbf{Tipo} & \textbf{Nível} & \textbf{Pré-condições} & \textbf{Resultado previsto} \\ \hline
+\endhead
+T1 Cadastro de usuário com e-mail e senha & Funcional & Integração & Usuário ainda não cadastrado; acesso à tela de cadastro; e-mail e senha válidos para o cadastro & A conta e o perfil do usuário são criados. O usuário pode acessar a tela de login para se autenticar com o e-mail e a senha cadastrados \\ \hline
+T2 Login com credencial válida & Funcional & Sistema & Usuário previamente cadastrado; e-mail e senha válidos & O sistema autentica o usuário e exibe a tela principal correspondente ao perfil \\ \hline
+T3 Login com dados inválidos & Funcional / Segurança & Sistema & Usuário cadastrado; senha ou e-mail incorreto & O sistema nega o acesso e apresenta uma mensagem clara, sem revelar informação sensível \\ \hline
+T4 Cadastro de treino personalizado & Funcional & Integração & Usuário autenticado; acesso ao formulário de treino; nome e tipo válidos & O treino é validado, salvo no banco de dados e exibido na lista de treinos do usuário \\ \hline
+T5 Validação de treino incompleto & Funcional / Validação & Integração & Usuário autenticado; acesso à tela de criação de treino & O sistema impede o salvamento e informa quais campos precisam ser preenchidos. Nenhum registro incompleto é criado \\ \hline
+T6 Alteração de treino existente & Funcional & Integração & Usuário autenticado; existência de um treino salvo & As alterações são salvas e aparecem corretamente na visualização do treino \\ \hline
+T7 Exclusão de treino & Funcional & Sistema & Usuário autenticado; existência de treino salvo & O sistema solicita confirmação, exclui o treino após a confirmação e remove o item da listagem. Se o usuário cancelar, o treino permanece salvo \\ \hline
+T8 Registro de exercício realizado & Funcional & Integração & Usuário autenticado; existência de treino cadastrado & O exercício é marcado como realizado, o histórico é atualizado e as informações são persistidas pelo banco de dados \\ \hline
+T9 Atualização de métricas de evolução & Funcional & Sistema & Usuário autenticado; existência de exercícios realizados com datas e cargas registradas & Os gráficos e indicadores apresentam os dados correspondentes aos exercícios realizados \\ \hline
+T10 Pontuação e conquista por assiduidade & Funcional / Gamificação & Integração & Usuário autenticado; critérios de conquista definidos; registros de assiduidade preparados & O sistema exibe a conquista no perfil somente quando os critérios de assiduidade são atingidos \\ \hline
+T11 Restrição do painel de admin & Não funcional / Segurança & Integração & Existência de um usuário comum e um usuário administrador & O usuário comum não consegue acessar o painel administrativo. O administrador consegue acessá-lo normalmente \\ \hline
+T12 Login com google & Funcional / Autenticação & Integração & Integração com o Google implementada e configurada; conta Google válida; serviço de autenticação disponível & Após autorização e validação da autenticação com o Google, o usuário acessa o sistema com seu perfil. O login com e-mail e senha permanece disponível \\ \hline
+T13 Falha ou cancelamento no login com google & Funcional / Segurança & Integração & Integração com o Google implementada; falha de autenticação, indisponibilidade do serviço ou cancelamento pelo usuário; conta local válida para verificar o acesso com e-mail e senha & O sistema não autentica o usuário pelo Google, informa a falha ou cancelamento e mantém disponível o acesso com e-mail e senha. Credenciais locais válidas permitem acessar o sistema \\ \hline
+T14 Listagem de treinos & Funcional & Sistema & Usuário autenticado; treinos próprios e de outro usuário cadastrados & Exibir os treinos próprios e permitir adicionar um treino já montado; não expor treinos privados de outro usuário \\ \hline
+T15 Cadastro de exercício no treino & Funcional & Integração & Usuário autenticado; treino próprio cadastrado; exercício predefinido disponível & Exercício válido vinculado ao treino com a meta informada; dados obrigatórios ausentes impedem o cadastro \\ \hline
+T16 Listagem de exercícios & Funcional & Sistema & Usuário autenticado; treino com exercícios e treino sem exercícios & Exibir os nomes e metas corretos de cada treino; apresentar estado vazio quando não houver exercícios \\ \hline
+T17 Alteração de exercício & Funcional & Integração & Usuário autenticado; exercício vinculado a treino próprio & Informações alteradas persistidas e exibidas; demais exercícios mantidos \\ \hline
+T18 Exclusão de exercício & Funcional & Sistema & Usuário autenticado; treino próprio com dois exercícios & Exercício removido da lista do treino; outro exercício mantido \\ \hline
+T19 Recorde pessoal & Funcional & Sistema & Usuário autenticado; funcionalidade de PR implementada; exercício com meta de recorde pessoal & Meta e acompanhamento de recorde pessoal persistidos e exibidos corretamente, sem alterar registros de outros exercícios \\ \hline
+T20 Usabilidade do MVP & Não funcional / Usabilidade & Sistema & MVP disponível; conta de teste; navegador em telas móvel e desktop & Fluxos concluídos sem bloqueios de navegação, campos ou botões inacessíveis, texto ilegível ou sobreposição; mensagens orientam a correção de entradas inválidas \\ \hline
+T21 Token Google inválido ou expirado & Funcional / Segurança & Integração & RF-24 implementado; resposta de autenticação simulável com token inválido e expirado & Tokens rejeitados sem criação de sessão; acesso protegido negado; login local permanece disponível \\ \hline
+T22 Rota protegida sem sessão & Funcional / Segurança & Integração & Aplicação disponível; nenhuma sessão autenticada & Acesso negado sem exposição de dados; interface encaminha ao login e API retorna resposta de não autorização \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.1\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.26\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.25\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.25\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.14\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\caption{Registro de execução dos testes}\\
+\hline
+\textbf{ID} & \textbf{Resultado obtido} & \textbf{Evidência} & \textbf{Reparos} & \textbf{Ciclos} \\ \hline
+\endfirsthead
+\textbf{ID} & \textbf{Resultado obtido} & \textbf{Evidência} & \textbf{Reparos} & \textbf{Ciclos} \\ \hline
+\endhead
+T1 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T2 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T3 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T4 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T5 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T6 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T7 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T8 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T9 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T10 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T11 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T12 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T13 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T14 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T15 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T16 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T17 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T18 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T19 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T20 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T21 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+T22 & Não executado & Não disponível & Não registrados & 0 \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\subsubsection{DETALHAMENTO DOS CASOS DE TESTE}
+
+\textbf{T1 -- CADASTRO DE USUÁRIO COM E-MAIL E SENHA}
+
+\noindent\textbf{Objetivo do teste:} Verificar se um novo usuário consegue criar uma conta informando e-mail e senha (RF-01, CF-01).
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário ainda não cadastrado; acesso à tela de cadastro; e-mail e senha válidos para o cadastro.
+
+\noindent\textbf{Procedimento:} Preencher e-mail e senha válidos, enviar o cadastro e verificar a conta criada; repetir com e-mail já cadastrado e dados obrigatórios ausentes.
+
+\noindent\textbf{Resultado esperado:} A conta e o perfil do usuário são criados. O usuário pode acessar a tela de login para se autenticar com o e-mail e a senha cadastrados.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Após a execução, registrar se foi aprovado, reprovado ou bloqueado. Se houver falha, informar a correção realizada e o número da execução.
+
+\textbf{T2 -- LOGIN COM CREDENCIAL VÁLIDA}
+
+\noindent\textbf{Objetivo do teste:} Verificar se um usuário cadastrado consegue acessar o sistema com e-mail e senha válidos (RF-02, CF-02).
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário previamente cadastrado; e-mail e senha válidos.
+
+\noindent\textbf{Procedimento:} Informar e-mail e senha corretos, confirmar o login e acessar a tela principal.
+
+\noindent\textbf{Resultado esperado:} O sistema autentica o usuário e exibe a tela principal correspondente ao perfil.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Registrar o resultado real e eventuais correções.
+
+\textbf{T3 -- LOGIN COM DADOS INVÁLIDOS}
+
+\noindent\textbf{Objetivo do teste:} Verificar se o sistema impede o acesso quando o usuário informa e-mail ou senha incorretos (RF-02, CF-02).
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Funcional / Segurança
+
+\noindent\textbf{Pré-condições:} Usuário cadastrado; senha ou e-mail incorreto.
+
+\noindent\textbf{Procedimento:} Informar senha incorreta e depois e-mail não cadastrado; tentar acessar uma rota protegida após cada tentativa.
+
+\noindent\textbf{Resultado esperado:} O sistema nega o acesso e apresenta uma mensagem clara, sem revelar informação sensível.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Registrar se o bloqueio ocorreu corretamente. Corrigir mensagens ou regras de autenticação caso necessário.
+
+\textbf{T4 -- CADASTRO DE TREINO PERSONALIZADO}
+
+\noindent\textbf{Objetivo do teste:} Verificar o cadastro de treino com nome e tipo (RF-03, CF-03). A inclusão de exercícios e metas é validada em T15.
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; acesso ao formulário de treino; nome e tipo válidos.
+
+\noindent\textbf{Procedimento:} Informar nome e tipo de treino, salvar e conferir os dados na lista do usuário.
+
+\noindent\textbf{Resultado esperado:} O treino é validado, salvo no banco de dados e exibido na lista de treinos do usuário.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Caso o treino não seja salvo ou apresente dados incorretos, registrar o defeito e a correção aplicada.
+
+\textbf{T5 -- VALIDAÇÃO DE TREINO INCOMPLETO}
+
+\noindent\textbf{Objetivo do teste:} Verificar se o sistema impede o cadastro de um treino sem informações obrigatórias.
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional / Validação
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; acesso à tela de criação de treino.
+
+\noindent\textbf{Procedimento:} Deixar nome ou tipo obrigatório vazio, tentar salvar e verificar a mensagem e a ausência de persistência.
+
+\noindent\textbf{Resultado esperado:} O sistema impede o salvamento e informa quais campos precisam ser preenchidos. Nenhum registro incompleto é criado.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Registrar o resultado e corrigir validações ausentes, se necessário.
+
+\textbf{T6 -- ALTERAÇÃO DE TREINO EXISTENTE}
+
+\noindent\textbf{Objetivo do teste:} Verificar se o usuário consegue alterar as informações de um treino já cadastrado.
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; existência de um treino salvo.
+
+\noindent\textbf{Procedimento:} Editar nome e tipo do treino, salvar e recarregar a visualização.
+
+\noindent\textbf{Resultado esperado:} As alterações são salvas e aparecem corretamente na visualização do treino.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Registrar o resultado e eventuais correções na tela ou na API.
+
+\textbf{T7 -- EXCLUSÃO DE TREINO}
+
+\noindent\textbf{Objetivo do teste:} Verificar se o usuário consegue excluir um treino já cadastrado.
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; existência de treino salvo.
+
+\noindent\textbf{Procedimento:} Cancelar uma exclusão e verificar a permanência do treino; repetir confirmando a exclusão e consultar a lista.
+
+\noindent\textbf{Resultado esperado:} O sistema solicita confirmação, exclui o treino após a confirmação e remove o item da listagem. Se o usuário cancelar, o treino permanece salvo.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Registrar se a confirmação e a exclusão funcionaram corretamente.
+
+\textbf{T8 -- REGISTRO DE EXERCÍCIO REALIZADO}
+
+\noindent\textbf{Objetivo do teste:} Verificar o registro da execução de um exercício, com carga, repetições, séries e tempo (RF-11, CF-04).
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; existência de treino cadastrado.
+
+\noindent\textbf{Procedimento:} Registrar a execução do exercício com os valores de carga, repetições, séries e tempo; recarregar o histórico e comparar os valores.
+
+\noindent\textbf{Resultado esperado:} O exercício é marcado como realizado, o histórico é atualizado e as informações são persistidas pelo banco de dados.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Registrar o resultado e corrigir problemas de persistência ou duplicidade, caso encontrados.
+
+\textbf{T9 -- ATUALIZAÇÃO DE MÉTRICAS DE EVOLUÇÃO}
+
+\noindent\textbf{Objetivo do teste:} Verificar se o registro de exercícios atualiza corretamente a frequência, cargas e demais estatísticas.
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; existência de exercícios realizados com datas e cargas registradas.
+
+\noindent\textbf{Procedimento:} Inserir registros com datas e cargas conhecidas, consultar as métricas e comparar os indicadores com os registros de origem.
+
+\noindent\textbf{Resultado esperado:} Os gráficos e indicadores apresentam os dados correspondentes aos exercícios realizados.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Comparar os dados exibidos com os dados armazenados e registrar eventuais correções.
+
+\textbf{T10 -- PONTUAÇÃO E CONQUISTA POR ASSIDUIDADE}
+
+\noindent\textbf{Objetivo do teste:} Verificar se o sistema libera conquistas por assiduidade de acordo com os critérios definidos para RF-22.
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional / Gamificação
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; critérios de conquista definidos; registros de assiduidade preparados.
+
+\noindent\textbf{Procedimento:} Preparar registros que atendam e que não atendam aos critérios de conquista definidos para RF-22; processar a assiduidade e conferir o perfil.
+
+\noindent\textbf{Resultado esperado:} O sistema exibe a conquista no perfil somente quando os critérios de assiduidade são atingidos.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Conferir os cálculos e registrar correções em caso de pontuação incorreta.
+
+\textbf{T11 -- RESTRIÇÃO DO PAINEL DE ADMIN}
+
+\noindent\textbf{Objetivo do teste:} Verificar se somente os usuários autorizados conseguem acessar funcionalidades administrativas.
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Não funcional / Segurança / Autorização
+
+\noindent\textbf{Pré-condições:} Existência de um usuário comum e um usuário administrador.
+
+\noindent\textbf{Procedimento:} Tentar acessar painel e rotas administrativas com usuário comum; repetir com administrador autorizado.
+
+\noindent\textbf{Resultado esperado:} O usuário comum não consegue acessar o painel administrativo. O administrador consegue acessá-lo normalmente.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Registrar o resultado e corrigir permissões ou validações de acesso, caso necessário.
+
+\textbf{T12 -- LOGIN COM GOOGLE}
+
+\noindent\textbf{Objetivo do teste:} Verificar a autenticação opcional com o Google (RF-24, CF-09), após a implementação prevista nas Sprints finais.
+
+\noindent\textbf{Nível do teste:} Integração.
+
+\noindent\textbf{Tipo de teste:} Funcional / Autenticação.
+
+\noindent\textbf{Pré-condições:} Integração com o Google implementada e configurada; conta Google válida; serviço de autenticação disponível.
+
+\noindent\textbf{Procedimento:} Iniciar o login pelo Google, autorizar o consentimento e conferir o acesso; verificar que o login local continua disponível.
+
+\noindent\textbf{Resultado esperado:} Após autorização e validação da autenticação com o Google, o usuário acessa o sistema com seu perfil. O login com e-mail e senha permanece disponível.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Execução prevista nas Sprints finais, caso RF-24 seja implementado. Registrar resultado observado, correções e reexecuções.
+
+\textbf{T13 -- FALHA OU CANCELAMENTO NO LOGIN COM GOOGLE}
+
+\noindent\textbf{Objetivo do teste:} Verificar que falhas ou cancelamento na autenticação com o Google não liberam acesso e não impedem o uso do login com e-mail e senha (RF-24, CF-09).
+
+\noindent\textbf{Nível do teste:} Integração.
+
+\noindent\textbf{Tipo de teste:} Funcional / Segurança.
+
+\noindent\textbf{Pré-condições:} Integração com o Google implementada; falha de autenticação, indisponibilidade do serviço ou cancelamento pelo usuário; conta local válida para verificar o acesso com e-mail e senha.
+
+\noindent\textbf{Procedimento:} Iniciar o login pelo Google, cancelar o consentimento e conferir a ausência de sessão; simular indisponibilidade do provedor e verificar o login local.
+
+\noindent\textbf{Resultado esperado:} O sistema não autentica o usuário pelo Google, informa a falha ou cancelamento e mantém disponível o acesso com e-mail e senha. Credenciais locais válidas permitem acessar o sistema.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado. Execução prevista nas Sprints finais, caso RF-24 seja implementado. Registrar resultado observado, correções e reexecuções.
+
+\textbf{T14 -- LISTAGEM DE TREINOS}
+
+\noindent\textbf{Objetivo do teste:} Validar listagem de treinos (RF-04, CF-03).
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; treinos próprios e de outro usuário cadastrados.
+
+\noindent\textbf{Procedimento:} Abrir a lista de treinos; comparar com os registros do usuário; selecionar um treino já montado e adicioná-lo à lista.
+
+\noindent\textbf{Resultado esperado:} Exibir os treinos próprios e permitir adicionar um treino já montado; não expor treinos privados de outro usuário.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
+
+\textbf{T15 -- CADASTRO DE EXERCÍCIO NO TREINO}
+
+\noindent\textbf{Objetivo do teste:} Validar cadastro de exercício no treino (RF-07, CF-04).
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; treino próprio cadastrado; exercício predefinido disponível.
+
+\noindent\textbf{Procedimento:} Selecionar o exercício, informar a meta e salvar; repetir sem exercício ou meta obrigatória.
+
+\noindent\textbf{Resultado esperado:} Exercício válido vinculado ao treino com a meta informada; dados obrigatórios ausentes impedem o cadastro.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
+
+\textbf{T16 -- LISTAGEM DE EXERCÍCIOS}
+
+\noindent\textbf{Objetivo do teste:} Validar listagem de exercícios (RF-08, CF-04).
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; treino com exercícios e treino sem exercícios.
+
+\noindent\textbf{Procedimento:} Abrir os dois treinos e conferir os exercícios exibidos.
+
+\noindent\textbf{Resultado esperado:} Exibir os nomes e metas corretos de cada treino; apresentar estado vazio quando não houver exercícios.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
+
+\textbf{T17 -- ALTERAÇÃO DE EXERCÍCIO}
+
+\noindent\textbf{Objetivo do teste:} Validar alteração de exercício (RF-09, CF-04).
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; exercício vinculado a treino próprio.
+
+\noindent\textbf{Procedimento:} Alterar as metas, salvar e recarregar a tela.
+
+\noindent\textbf{Resultado esperado:} Informações alteradas persistidas e exibidas; demais exercícios mantidos.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
+
+\textbf{T18 -- EXCLUSÃO DE EXERCÍCIO}
+
+\noindent\textbf{Objetivo do teste:} Validar exclusão de exercício (RF-10, CF-04).
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; treino próprio com dois exercícios.
+
+\noindent\textbf{Procedimento:} Remover um exercício e recarregar a lista.
+
+\noindent\textbf{Resultado esperado:} Exercício removido da lista do treino; outro exercício mantido.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
+
+\textbf{T19 -- ACOMPANHAMENTO DE RECORDE PESSOAL}
+
+\noindent\textbf{Objetivo do teste:} Validar acompanhamento de recorde pessoal (RF-20, CF-05).
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Funcional
+
+\noindent\textbf{Pré-condições:} Usuário autenticado; funcionalidade de PR implementada; exercício com meta de recorde pessoal.
+
+\noindent\textbf{Procedimento:} Cadastrar a meta de recorde pessoal no campo do exercício, salvar, consultar e atualizar o acompanhamento.
+
+\noindent\textbf{Resultado esperado:} Meta e acompanhamento de recorde pessoal persistidos e exibidos corretamente, sem alterar registros de outros exercícios.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
+
+\textbf{T20 -- USABILIDADE DO MVP}
+
+\noindent\textbf{Objetivo do teste:} Validar usabilidade do mvp (RF-01 a RF-11).
+
+\noindent\textbf{Nível do teste:} Sistema
+
+\noindent\textbf{Tipo de teste:} Não funcional / Usabilidade
+
+\noindent\textbf{Pré-condições:} MVP disponível; conta de teste; navegador em telas móvel e desktop.
+
+\noindent\textbf{Procedimento:} Executar cadastro, login, criação de treino, inclusão de exercício e registro de execução; verificar navegação por teclado, legibilidade, mensagens e adaptação da tela.
+
+\noindent\textbf{Resultado esperado:} Fluxos concluídos sem bloqueios de navegação, campos ou botões inacessíveis, texto ilegível ou sobreposição; mensagens orientam a correção de entradas inválidas.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
+
+\textbf{T21 -- TOKEN GOOGLE INVÁLIDO OU EXPIRADO}
+
+\noindent\textbf{Objetivo do teste:} Validar token google inválido ou expirado (RF-24, CF-09).
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional / Segurança
+
+\noindent\textbf{Pré-condições:} RF-24 implementado; resposta de autenticação simulável com token inválido e expirado.
+
+\noindent\textbf{Procedimento:} Enviar cada token ao retorno da autenticação Google e tentar acessar rota protegida.
+
+\noindent\textbf{Resultado esperado:} Tokens rejeitados sem criação de sessão; acesso protegido negado; login local permanece disponível.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
+
+\textbf{T22 -- ROTA PROTEGIDA SEM SESSÃO}
+
+\noindent\textbf{Objetivo do teste:} Validar rota protegida sem sessão (RF-02, CF-02; RF-24, CF-09 quando implementado).
+
+\noindent\textbf{Nível do teste:} Integração
+
+\noindent\textbf{Tipo de teste:} Funcional / Segurança
+
+\noindent\textbf{Pré-condições:} Aplicação disponível; nenhuma sessão autenticada.
+
+\noindent\textbf{Procedimento:} Acessar diretamente uma rota protegida pela interface e pela API, sem sessão; repetir após encerramento da sessão.
+
+\noindent\textbf{Resultado esperado:} Acesso negado sem exposição de dados; interface encaminha ao login e API retorna resposta de não autorização.
+
+\noindent\textbf{Resultado da execução e correções:} Não executado; evidência não disponível; reparos não registrados; zero ciclos executados.
