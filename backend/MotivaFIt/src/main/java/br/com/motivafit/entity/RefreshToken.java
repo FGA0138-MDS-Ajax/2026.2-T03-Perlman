@@ -26,7 +26,7 @@ public class RefreshToken {
     @Column(nullable = false)
     private Date validade;
 
-    private OffsetDateTime revogacao;
+    private Date revogacao;
 
     public RefreshToken(){}
 
@@ -66,11 +66,11 @@ public class RefreshToken {
         this.validade = validade;
     }
 
-    public OffsetDateTime getRevogacao() {
+    public Date getRevogacao() {
         return revogacao;
     }
 
-    public void setRevogacao(OffsetDateTime revogacao) {
+    public void setRevogacao(Date revogacao) {
         this.revogacao = revogacao;
     }
 

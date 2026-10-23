@@ -85,6 +85,15 @@ public class JwtService {
                 .getExpiration();
     }
 
+    public String extractEmail(String token){
+        return Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
     public boolean isTokenValid(String token) {
         try {
             Jwts.parser()
