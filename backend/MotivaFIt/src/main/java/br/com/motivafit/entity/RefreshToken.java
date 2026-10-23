@@ -3,13 +3,14 @@ package br.com.motivafit.entity;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
 @Table(name = "refresh_token")
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -23,7 +24,7 @@ public class RefreshToken {
     private Usuario usuarioId;
 
     @Column(nullable = false)
-    private OffsetDateTime validade;
+    private Date validade;
 
     private OffsetDateTime revogacao;
 
@@ -57,11 +58,11 @@ public class RefreshToken {
         this.usuarioId = usuarioId;
     }
 
-    public OffsetDateTime getValidade() {
+    public Date getValidade() {
         return validade;
     }
 
-    public void setValidade(OffsetDateTime validade) {
+    public void setValidade(Date validade) {
         this.validade = validade;
     }
 
