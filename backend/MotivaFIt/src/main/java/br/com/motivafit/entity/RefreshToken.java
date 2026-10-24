@@ -2,7 +2,6 @@ package br.com.motivafit.entity;
 
 import jakarta.persistence.*;
 
-import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.Objects;
 
