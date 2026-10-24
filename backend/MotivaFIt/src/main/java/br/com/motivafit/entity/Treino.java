@@ -9,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "treinos")
+@Table(name = "treino")
 public class Treino {
 
     @Id
