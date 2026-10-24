@@ -10,8 +10,7 @@ import br.com.motivafit.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import br.com.motivafit.exception.NaoAutorizadoException;
 
 import java.util.Date;
 import java.util.UUID;
@@ -36,23 +35,23 @@ public class LoginService {
         Usuario usuario = usuarios.findByEmail(body.email())
                 .filter(u -> u.getAtivo() != null && u.getAtivo())
                 .filter(u -> passwordEncoder.matches(body.senha(), u.getSenhaHash()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou senha incorretos"));
+                .orElseThrow(() -> new NaoAutorizadoException("CREDENCIAIS_INVALIDAS", "E-mail ou senha incorretos"));
 
         String refreshToken = jwtService.gerarRefreshToken();
         salvarRefresh(refreshToken, usuario, UUID.randomUUID().toString());
         return new LoginResult(resposta(usuario), refreshToken);
     }
 
-    @Transactional(noRollbackFor = ResponseStatusException.class)
+    @Transactional(noRollbackFor = NaoAutorizadoException.class)
     public LoginResult refresh(String rawToken) {
         RefreshToken atual = localizar(rawToken);
         if (atual.getRevogacao() != null || !atual.getValidade().after(new Date())) {
             revogarFamilia(atual.getFamilia());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token inválido ou expirado");
+            throw new NaoAutorizadoException("REFRESH_TOKEN_INVALIDO", "Token de renovação inválido ou expirado");
         }
         if (atual.getUsuarioId().getAtivo() == null || !atual.getUsuarioId().getAtivo()) {
             revogarFamilia(atual.getFamilia());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Conta inativa");
+            throw new NaoAutorizadoException("CONTA_INATIVA", "A conta está inativa");
         }
 
         revogar(atual);
@@ -76,9 +75,9 @@ public class LoginService {
 
     private RefreshToken localizar(String rawToken) {
         if (rawToken == null || rawToken.isBlank())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token ausente");
+            throw new NaoAutorizadoException("REFRESH_TOKEN_AUSENTE", "Token de renovação não informado");
         return refreshTokens.findByHash(jwtService.hashRefreshToken(rawToken))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token inválido"));
+                .orElseThrow(() -> new NaoAutorizadoException("REFRESH_TOKEN_INVALIDO", "Token de renovação inválido"));
     }
 
     private void salvarRefresh(String rawToken, Usuario usuario, String familia) {

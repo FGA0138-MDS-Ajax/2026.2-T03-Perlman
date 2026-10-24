@@ -7,6 +7,7 @@ import br.com.motivafit.entity.Usuario;
 import br.com.motivafit.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import br.com.motivafit.exception.ConflitoException;
 
 @Service
 public class UsuarioService {
@@ -18,12 +19,9 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO create(UsuarioRequestDTO body){
-        try {
-            if(repository.existsByEmail(body.email())) throw new IllegalArgumentException("Email já cadastrado");
-            Usuario userEntity = repository.save(UsuarioMapper.toEntity(body));
-            return UsuarioMapper.toDto(userEntity);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        if(repository.existsByEmail(body.email()))
+            throw new ConflitoException("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado");
+        Usuario userEntity = repository.save(UsuarioMapper.toEntity(body));
+        return UsuarioMapper.toDto(userEntity);
     }
 }

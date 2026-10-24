@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.security.SecureRandom;
 import java.util.Base64;
+import br.com.motivafit.exception.ErroInternoException;
+import br.com.motivafit.exception.RequisicaoInvalidaException;
 
 
 @Service
@@ -33,10 +35,13 @@ public class JwtService {
             @Value("${security.jwt.refresh-expiration-days}") long expirationDays
     ) {
         if (secretKey.length() < 32) {
-            throw new IllegalStateException("security.jwt.secret deve possuir pelo menos 32 caracteres");
+            throw new RequisicaoInvalidaException("CONFIGURACAO_JWT_INVALIDA", "A chave JWT deve possuir pelo menos 32 caracteres");
         }
         if (expirationMinutes <= 0) {
-            throw new IllegalStateException("security.jwt.expiration-minutes deve ser maior que zero");
+            throw new RequisicaoInvalidaException("CONFIGURACAO_JWT_INVALIDA", "A validade do token de acesso deve ser maior que zero");
+        }
+        if (expirationDays <= 0) {
+            throw new RequisicaoInvalidaException("CONFIGURACAO_JWT_INVALIDA", "A validade do token de renovação deve ser maior que zero");
         }
         this.secretKey = secretKey;
         this.issuer = issuer;
@@ -72,7 +77,7 @@ public class JwtService {
                     .digest(refreshToken.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(digest);
         } catch (java.security.NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 indisponível", e);
+            throw new ErroInternoException("HASH_INDISPONIVEL", "Não foi possível processar o token de renovação");
         }
     }
 

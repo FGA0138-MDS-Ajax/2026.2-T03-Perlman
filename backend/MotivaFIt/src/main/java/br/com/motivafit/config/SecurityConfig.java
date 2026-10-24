@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
+import java.time.OffsetDateTime;
 
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -43,6 +44,17 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/auth/cadastro", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout", "/api/auth/google").permitAll()
                                 .anyRequest().authenticated()
                 )
+                .exceptionHandling(errors -> errors
+                        .authenticationEntryPoint((request, response, exception) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"codigo\":\"AUTENTICACAO_NECESSARIA\",\"mensagem\":\"Autenticação necessária\",\"dataHora\":\"" + OffsetDateTime.now() + "\"}");
+                        })
+                        .accessDeniedHandler((request, response, exception) -> {
+                            response.setStatus(403);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"codigo\":\"ACESSO_NEGADO\",\"mensagem\":\"Você não tem permissão para acessar este recurso\",\"dataHora\":\"" + OffsetDateTime.now() + "\"}");
+                        }))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

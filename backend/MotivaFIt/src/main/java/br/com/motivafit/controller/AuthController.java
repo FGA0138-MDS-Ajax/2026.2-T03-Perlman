@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.SecureRandom;
 import java.util.Base64;
+import br.com.motivafit.exception.AcessoNegadoException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -80,8 +81,7 @@ public class AuthController {
         String csrfCookie = cookie(request, "csrfToken");
         String csrfHeader = request.getHeader("X-CSRF-TOKEN");
         if (!allowedOrigin.equals(origin) || csrfCookie == null || !csrfCookie.equals(csrfHeader))
-            throw new org.springframework.web.server.ResponseStatusException(
-                    org.springframework.http.HttpStatus.FORBIDDEN, "Origem ou token CSRF inválido");
+            throw new AcessoNegadoException("CSRF_INVALIDO", "Origem ou token de segurança inválido");
     }
 
     private String cookie(HttpServletRequest request, String name) {
