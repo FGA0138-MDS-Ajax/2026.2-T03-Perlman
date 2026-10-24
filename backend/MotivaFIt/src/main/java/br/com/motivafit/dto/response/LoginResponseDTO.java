@@ -4,7 +4,6 @@ import java.util.Date;
 
 public record LoginResponseDTO(
         String token,
-        String refreshToken,
         Date expirationAt
 ) {
 }

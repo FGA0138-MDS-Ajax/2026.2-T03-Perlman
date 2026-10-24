@@ -6,6 +6,7 @@ import br.com.motivafit.dto.response.UsuarioResponseDTO;
 import br.com.motivafit.entity.Usuario;
 import br.com.motivafit.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioService {
@@ -15,6 +16,7 @@ public class UsuarioService {
         this.repository = repository;
     }
 
+    @Transactional
     public UsuarioResponseDTO create(UsuarioRequestDTO body){
         try {
             if(repository.existsByEmail(body.email())) throw new IllegalArgumentException("Email já cadastrado");

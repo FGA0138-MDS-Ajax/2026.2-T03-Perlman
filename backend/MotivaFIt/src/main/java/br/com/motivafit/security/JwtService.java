@@ -14,6 +14,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 
 @Service
@@ -22,6 +24,7 @@ public class JwtService {
     private final String issuer;
     private final long expirationMinutes;
     private final long expirationDays;
+    private final SecureRandom secureRandom = new SecureRandom();
 
     public JwtService(
             @Value("${security.jwt.secret-key}") String secretKey,
@@ -57,20 +60,26 @@ public class JwtService {
                 .compact();
     }
 
-    public String gerarRefrshToken(Usuario usuario) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("token_type", "Refresh");
-        Instant agora = Instant.now();
-
-        return Jwts.builder()
-                .claims(claims)
-                .subject(usuario.getEmail())
-                .issuedAt(Date.from(agora))
-                .expiration(Date.from(agora.plus(expirationDays, ChronoUnit.DAYS)))
-                .signWith(getSignInKey(), Jwts.SIG.HS256)
-                .issuer(issuer)
-                .compact();
+    public String gerarRefreshToken() {
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
+
+    public String hashRefreshToken(String refreshToken) {
+        try {
+            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(refreshToken.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(digest);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 indisponível", e);
+        }
+    }
+
+    public Date refreshExpiration() {
+        return Date.from(Instant.now().plus(expirationDays, ChronoUnit.DAYS));
+    }
+
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
@@ -108,4 +117,3 @@ public class JwtService {
         }
     }
 }
-

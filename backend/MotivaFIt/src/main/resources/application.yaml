@@ -16,11 +16,12 @@ spring:
         hibernate:
           dialect: org.hibernate.dialect.PostgreSQLDialect
 
-    security:
-      jwt:
-        secret: ${JWT_SECRET}
-        issuer: ${JWT_ISSUER}
-        expiration-minutes: ${JWT_EXPIRATION_MINUTES}
-        refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS}
-
+security:
+  jwt:
+    secret-key: ${JWT_SECRET}
+    issuer: ${JWT_ISSUER}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}
+    refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:7}
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:3000}
 
