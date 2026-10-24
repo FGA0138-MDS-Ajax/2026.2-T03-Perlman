@@ -12,16 +12,18 @@ import br.com.motivafit.exception.ConflitoException;
 @Service
 public class UsuarioService {
     private final UsuarioRepository repository;
+    private final UsuarioMapper usuarioMapper;
 
-    public UsuarioService(UsuarioRepository repository) {
+    public UsuarioService(UsuarioRepository repository, UsuarioMapper usuarioMapper) {
         this.repository = repository;
+        this.usuarioMapper = usuarioMapper;
     }
 
     @Transactional
     public UsuarioResponseDTO create(UsuarioRequestDTO body){
         if(repository.existsByEmail(body.email()))
             throw new ConflitoException("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado");
-        Usuario userEntity = repository.save(UsuarioMapper.toEntity(body));
-        return UsuarioMapper.toDto(userEntity);
+        Usuario userEntity = repository.save(usuarioMapper.toEntity(body));
+        return usuarioMapper.toDto(userEntity);
     }
 }

@@ -20,10 +20,10 @@ class DtoMapperTest {
     void converteCadastroParaEntidadeEResposta() {
         PasswordEncoder encoder = mock(PasswordEncoder.class);
         when(encoder.encode("senha-plana")).thenReturn("hash-senha");
-        new UsuarioMapper(encoder);
+        UsuarioMapper mapper = new UsuarioMapper(encoder);
 
-        Usuario entity = UsuarioMapper.toEntity(new UsuarioRequestDTO("user@test.com", "senha-plana"));
-        UsuarioResponseDTO dto = UsuarioMapper.toDto(entity);
+        Usuario entity = mapper.toEntity(new UsuarioRequestDTO("user@test.com", "senha-plana"));
+        UsuarioResponseDTO dto = mapper.toDto(entity);
 
         assertEquals("user@test.com", entity.getEmail());
         assertEquals("hash-senha", entity.getSenhaHash());

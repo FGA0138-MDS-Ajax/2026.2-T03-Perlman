@@ -20,8 +20,8 @@ class UsuarioServiceTest {
     @BeforeEach
     void setup() {
         repository = mock(UsuarioRepository.class);
-        new UsuarioMapper(mock(PasswordEncoder.class));
-        service = new UsuarioService(repository);
+        UsuarioMapper mapper = new UsuarioMapper(mock(PasswordEncoder.class));
+        service = new UsuarioService(repository, mapper);
     }
 
     @Test

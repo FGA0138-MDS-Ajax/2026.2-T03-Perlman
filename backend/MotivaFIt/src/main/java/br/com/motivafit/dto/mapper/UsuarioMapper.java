@@ -5,15 +5,17 @@ import br.com.motivafit.dto.response.UsuarioResponseDTO;
 import br.com.motivafit.entity.Usuario;
 import br.com.motivafit.enums.Perfil;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UsuarioMapper {
-    private static PasswordEncoder encoder = null;
+    private final PasswordEncoder encoder;
 
     public UsuarioMapper(PasswordEncoder passwordEncoder) {
-        encoder = passwordEncoder;
+        this.encoder = passwordEncoder;
     }
 
-    static public Usuario toEntity(UsuarioRequestDTO dto){
+    public Usuario toEntity(UsuarioRequestDTO dto){
         Usuario usuario = new Usuario();
         usuario.setEmail(dto.email());
         usuario.setAtivo(true);
@@ -22,7 +24,7 @@ public class UsuarioMapper {
         return usuario;
     }
 
-    static public UsuarioResponseDTO toDto(Usuario entity){
+    public UsuarioResponseDTO toDto(Usuario entity){
         return new UsuarioResponseDTO(entity.getId(), entity.getEmail(), entity.getPerfil(), entity.getAtivo());
     }
 }

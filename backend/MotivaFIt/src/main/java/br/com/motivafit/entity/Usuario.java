@@ -14,7 +14,7 @@ import java.util.Objects;
 @Table(name = "usuario")
 public class Usuario implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -26,6 +26,7 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Boolean ativo;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "perfil")
     private Perfil perfil;
 
