@@ -67,7 +67,7 @@ class TreinoServiceTest {
     void listaApenasOsTreinosAtivosDoUsuario() {
         Treino a = treino(1L, "Treino A", TipoTreino.MUSCULACAO, Visibilidade.PRIVADO);
         Treino b = treino(2L, "Treino B", TipoTreino.AEROBICO, Visibilidade.PUBLICO);
-        when(repository.findAllByUsuarioIdAndExcluidoEmIsNull(USUARIO_ID)).thenReturn(List.of(a, b));
+        when(repository.findAllByUsuarioIdAndExcluidoEmIsNullOrVisibilidadeAndExcluidoEmIsNull(USUARIO_ID, Visibilidade.PUBLICO)).thenReturn(List.of(a, b));
 
         List<TreinoResponseDTO> response = service.findAll(USUARIO_ID);
 
@@ -80,7 +80,7 @@ class TreinoServiceTest {
 
     @Test
     void listaVaziaQuandoUsuarioNaoTemTreinos() {
-        when(repository.findAllByUsuarioIdAndExcluidoEmIsNull(USUARIO_ID)).thenReturn(List.of());
+        when(repository.findAllByUsuarioIdAndExcluidoEmIsNullOrVisibilidadeAndExcluidoEmIsNull(USUARIO_ID, Visibilidade.PUBLICO)).thenReturn(List.of());
 
         assertTrue(service.findAll(USUARIO_ID).isEmpty());
     }
@@ -89,7 +89,7 @@ class TreinoServiceTest {
     @Test
     void buscaTreinoDoUsuarioPorId() {
         Treino existente = treino(TREINO_ID, "Treino A", TipoTreino.MUSCULACAO, Visibilidade.PRIVADO);
-        when(repository.findByIdAndUsuarioIdAndExcluidoEmIsNull(TREINO_ID, USUARIO_ID))
+        when(repository.findByIdEUsuarioOuPublico(TREINO_ID, USUARIO_ID, Visibilidade.PUBLICO))
                 .thenReturn(Optional.of(existente));
 
         TreinoResponseDTO response = service.findById(USUARIO_ID, TREINO_ID);
@@ -100,7 +100,7 @@ class TreinoServiceTest {
 
     @Test
     void treinoInexistenteOuDeOutroUsuarioGeraNaoEncontrado() {
-        when(repository.findByIdAndUsuarioIdAndExcluidoEmIsNull(TREINO_ID, USUARIO_ID))
+        when(repository.findByIdEUsuarioOuPublico(TREINO_ID, USUARIO_ID, Visibilidade.PUBLICO))
                 .thenReturn(Optional.empty());
 
         NaoEncontradoException erro = assertThrows(NaoEncontradoException.class,
@@ -115,7 +115,7 @@ class TreinoServiceTest {
     @Test
     void alteraTreinoExistente() {
         Treino existente = treino(TREINO_ID, "Antigo", TipoTreino.MUSCULACAO, Visibilidade.PRIVADO);
-        when(repository.findByIdAndUsuarioIdAndExcluidoEmIsNull(TREINO_ID, USUARIO_ID))
+        when(repository.findByIdEUsuarioOuPublico(TREINO_ID, USUARIO_ID, Visibilidade.PUBLICO))
                 .thenReturn(Optional.of(existente));
         when(repository.saveAndFlush(existente)).thenReturn(existente);
 
@@ -131,7 +131,7 @@ class TreinoServiceTest {
     @Test
     void alteracaoSemVisibilidadeMantemAVisibilidadeAtual() {
         Treino existente = treino(TREINO_ID, "Antigo", TipoTreino.MUSCULACAO, Visibilidade.PUBLICO);
-        when(repository.findByIdAndUsuarioIdAndExcluidoEmIsNull(TREINO_ID, USUARIO_ID))
+        when(repository.findByIdEUsuarioOuPublico(TREINO_ID, USUARIO_ID, Visibilidade.PUBLICO))
                 .thenReturn(Optional.of(existente));
         when(repository.saveAndFlush(existente)).thenReturn(existente);
 
@@ -143,7 +143,7 @@ class TreinoServiceTest {
 
     @Test
     void alterarTreinoInexistenteGeraNaoEncontradoSemSalvar() {
-        when(repository.findByIdAndUsuarioIdAndExcluidoEmIsNull(TREINO_ID, USUARIO_ID))
+        when(repository.findByIdEUsuarioOuPublico(TREINO_ID, USUARIO_ID, Visibilidade.PUBLICO))
                 .thenReturn(Optional.empty());
 
         assertThrows(NaoEncontradoException.class, () -> service.update(USUARIO_ID, TREINO_ID,
@@ -156,7 +156,7 @@ class TreinoServiceTest {
     @Test
     void excluirArquivaOTreinoSemApagarALinha() {
         Treino existente = treino(TREINO_ID, "Treino A", TipoTreino.MUSCULACAO, Visibilidade.PRIVADO);
-        when(repository.findByIdAndUsuarioIdAndExcluidoEmIsNull(TREINO_ID, USUARIO_ID))
+        when(repository.findByIdEUsuarioOuPublico(TREINO_ID, USUARIO_ID, Visibilidade.PUBLICO))
                 .thenReturn(Optional.of(existente));
 
         service.delete(USUARIO_ID, TREINO_ID);
@@ -169,7 +169,7 @@ class TreinoServiceTest {
 
     @Test
     void excluirTreinoInexistenteGeraNaoEncontradoSemSalvar() {
-        when(repository.findByIdAndUsuarioIdAndExcluidoEmIsNull(TREINO_ID, USUARIO_ID))
+        when(repository.findByIdEUsuarioOuPublico(TREINO_ID, USUARIO_ID, Visibilidade.PUBLICO))
                 .thenReturn(Optional.empty());
 
         assertThrows(NaoEncontradoException.class, () -> service.delete(USUARIO_ID, TREINO_ID));
