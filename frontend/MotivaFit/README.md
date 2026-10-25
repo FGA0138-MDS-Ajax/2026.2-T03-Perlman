@@ -1,32 +1,89 @@
-# React + TypeScript + Vite
+# MotivaFit - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicação web do projeto **MotivaFit**, desenvolvida com **React**, **TypeScript**, **Vite**, **Tailwind CSS** e **Shadcn/UI**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Como Executar o Projeto com Docker
 
-## React Compiler
+O projeto possui configurações prontas para execução em contêineres Docker tanto para **desenvolvimento** quanto para **produção**.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the Oxlint configuration
+### 🛠️ 1. Modo Desenvolvimento
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+Neste modo, o contêiner utiliza a imagem do Node.js com mapeamento de volume para habilitar o **Hot Module Replacement (HMR)**. Qualquer alteração no código-fonte é refletida imediatamente no navegador.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+- **URL de acesso:** [http://localhost:5173](http://localhost:5173)
+
+#### Iniciar a aplicação:
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+*(ou adicione a flag `-d` para rodar em segundo plano)*
+
+#### Parar a aplicação:
+- Se estiver rodando no terminal sem `-d`, pressione:
+  ```bash
+  Ctrl + C
+  ```
+- Para parar e remover os contêineres e a rede:
+  ```bash
+  docker compose -f docker-compose.dev.yml down
+  ```
+
+---
+
+### 🏭 2. Modo Produção
+
+Neste modo, a aplicação passa por um processo de compilação (*multi-stage build*) com Node.js e os arquivos estáticos gerados são servidos através de um servidor **Nginx** otimizado, com compressão Gzip e suporte a rotas SPA (*Single Page Application*).
+
+- **URL de acesso:** [http://localhost:4173](http://localhost:4173)
+
+#### Iniciar a aplicação:
+```bash
+docker compose up -d --build
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+#### Parar a aplicação:
+```bash
+docker compose down
+```
+
+---
+
+## 💻 Execução Local (sem Docker)
+
+Caso prefira rodar diretamente na sua máquina via Node.js (necessário Node.js 22+):
+
+### Instalação das dependências:
+```bash
+npm install
+```
+
+### Desenvolvimento:
+- **Iniciar:**
+  ```bash
+  npm run dev
+  ```
+- **Parar:** Pressione `Ctrl + C` no terminal.
+
+### Produção:
+- **Build e Pré-visualização:**
+  ```bash
+  npm run build
+  npm run preview
+  ```
+- **Parar:** Pressione `Ctrl + C` no terminal.
+
+---
+
+## 🧭 Rotas Principais da Aplicação
+
+| Rota | Descrição |
+| :--- | :--- |
+| `/` | Página inicial / Apresentação |
+| `/login` | Página de autenticação |
+| `/cadastro` | Formulário de registro |
+| `/principal` | Dashboard principal do usuário |
+| `/admin` | Painel administrativo e catálogo de exercícios |
