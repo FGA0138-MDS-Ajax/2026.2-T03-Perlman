@@ -11,7 +11,9 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { Dumbbell, ArrowLeft, Check, AlertCircle } from "lucide-react";
+import { Dumbbell, ArrowLeft, AlertCircle } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth, isEmailAdmin } from "@/lib/auth-context";
 
 export default function PaginaCadastro() {
     const [nome, setNome] = useState("");
@@ -20,6 +22,7 @@ export default function PaginaCadastro() {
     const [confirmarSenha, setConfirmarSenha] = useState("");
     const [erro, setErro] = useState("");
     const navigate = useNavigate();
+    const { cadastro, admins } = useAuth();
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -35,13 +38,21 @@ export default function PaginaCadastro() {
             return;
         }
 
-        // TODO: integrar com backend de autenticação
-        console.log("Cadastro:", { nome, email, senha });
-        navigate("/principal");
+        cadastro(nome, email, senha);
+
+        if (isEmailAdmin(email, admins)) {
+            navigate("/admin", { replace: true });
+        } else {
+            navigate("/principal", { replace: true });
+        }
     }
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4 py-8">
+        <div className="relative flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4 py-8">
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+                <ThemeToggle variant="outline" className="h-9 w-9" />
+            </div>
+
             <Link
                 to="/"
                 className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -118,16 +129,7 @@ export default function PaginaCadastro() {
                             />
                         </div>
 
-                        <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground space-y-1">
-                            <div className="flex items-center gap-1.5">
-                                <Check className="h-3.5 w-3.5 text-primary" />
-                                <span>Acompanhamento diário de metas</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <Check className="h-3.5 w-3.5 text-primary" />
-                                <span>Planos e rotinas inteligentes</span>
-                            </div>
-                        </div>
+                        
                     </CardContent>
 
                     <CardFooter className="flex flex-col gap-3 pt-2">

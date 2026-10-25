@@ -23,9 +23,19 @@ import {
     Zap,
     Shield
 } from "lucide-react";
+import { ThemeToggle, ThemeSelector } from "@/components/theme-toggle";
+import { useAuth } from "@/lib/auth-context";
+
+interface Exercicio {
+    id: number;
+    nome: string;
+    series: string;
+    carga: string;
+}
 
 export default function PaginaPrincipal() {
     const navigate = useNavigate();
+    const { user, logout, isAdmin } = useAuth();
     const [treinosConcluidos, setTreinosConcluidos] = useState<number[]>([1]);
 
     function alternarTreino(id: number) {
@@ -36,12 +46,12 @@ export default function PaginaPrincipal() {
         }
     }
 
-    const exerciciosHoje = [
-        { id: 1, nome: "Supino Reto com Barra", series: "4 séries x 10-12 reps", carga: "30 kg cada lado" },
-        { id: 2, nome: "Crucifixo Inclinado com Halteres", series: "3 séries x 12 reps", carga: "18 kg haltere" },
-        { id: 3, nome: "Desenvolvimento Militar", series: "4 séries x 10 reps", carga: "20 kg barra" },
-        { id: 4, nome: "Tríceps Corda na Polia", series: "3 séries x 15 reps", carga: "25 kg placa" },
-    ];
+    function handleLogout() {
+        logout();
+        navigate("/login");
+    }
+
+    const exerciciosHoje: Exercicio[] = [];
 
     return (
         <div className="flex min-h-screen bg-background">
@@ -74,19 +84,31 @@ export default function PaginaPrincipal() {
 
                     <Separator className="my-3" />
 
-                    <Button variant="outline" size="sm" className="justify-start gap-2 text-xs" asChild>
-                        <Link to="/admin">
-                            <Shield className="h-3.5 w-3.5" />
-                            Painel Administrativo
-                        </Link>
-                    </Button>
+                    <div className="space-y-1.5 px-0.5">
+                        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block px-1">
+                            Tema
+                        </span>
+                        <ThemeSelector className="w-full" />
+                    </div>
+
+                    {isAdmin && (
+                        <>
+                            <Separator className="my-3" />
+                            <Button variant="outline" size="sm" className="justify-start gap-2 text-xs" asChild>
+                                <Link to="/admin">
+                                    <Shield className="h-3.5 w-3.5" />
+                                    Painel Administrativo
+                                </Link>
+                            </Button>
+                        </>
+                    )}
                 </nav>
 
                 <Separator className="my-4" />
                 <Button
                     variant="ghost"
                     className="justify-start gap-2 text-destructive hover:bg-destructive/10"
-                    onClick={() => navigate("/")}
+                    onClick={handleLogout}
                 >
                     <LogOut className="h-4 w-4" />
                     Sair
@@ -99,17 +121,20 @@ export default function PaginaPrincipal() {
                 <header className="flex items-center justify-between border-b px-6 py-4 bg-background/60 backdrop-blur">
                     <div>
                         <h1 className="text-xl font-heading font-bold">Painel do Aluno</h1>
-                        <p className="text-xs text-muted-foreground">Foco de hoje: Peito, Ombros e Tríceps</p>
+                        <p className="text-xs text-muted-foreground">Foco de hoje: Treino personalizado</p>
                     </div>
 
                     <div className="flex items-center gap-3">
+                        <ThemeToggle variant="outline" className="h-9 w-9" />
                         <div className="text-right hidden sm:block">
-                            <span className="block text-sm font-medium">Carlos Eduardo</span>
-                            <span className="block text-xs text-muted-foreground">Plano Pro • 12 treinos no mês</span>
+                            <span className="block text-sm font-medium">{user?.nome || "Aluno"}</span>
+                            <span className="block text-xs text-muted-foreground">{user?.email || "aluno@motivafit.com"}</span>
                         </div>
                         <Avatar className="h-9 w-9 border border-primary/20">
                             <AvatarImage src="" alt="Avatar do usuário" />
-                            <AvatarFallback className="bg-primary/10 text-primary font-bold">CE</AvatarFallback>
+                            <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                {user?.nome ? user.nome.slice(0, 2).toUpperCase() : "AL"}
+                            </AvatarFallback>
                         </Avatar>
                     </div>
                 </header>

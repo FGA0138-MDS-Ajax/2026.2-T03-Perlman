@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Dumbbell, BarChart3, Flame, Shield, ArrowRight, Sparkles } from "lucide-react";
+import { Dumbbell, BarChart3, Flame, ArrowRight, Sparkles } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function PaginaInterfaceInicial() {
     return (
@@ -25,17 +26,12 @@ export default function PaginaInterfaceInicial() {
                     </div>
 
                     <nav className="flex items-center gap-2">
+                        <ThemeToggle variant="outline" className="h-9 w-9" />
                         <Button variant="ghost" asChild>
                             <Link to="/login">Entrar</Link>
                         </Button>
                         <Button asChild>
                             <Link to="/cadastro">Criar Conta</Link>
-                        </Button>
-                        <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
-                            <Link to="/admin">
-                                <Shield className="h-3.5 w-3.5 mr-1" />
-                                Admin
-                            </Link>
                         </Button>
                     </nav>
                 </div>
@@ -50,11 +46,11 @@ export default function PaginaInterfaceInicial() {
                     </Badge>
 
                     <h2 className="text-4xl font-heading font-extrabold tracking-tight sm:text-6xl text-balance">
-                        Transforme sua rotina e conquiste sua <span className="text-primary underline decoration-primary/40 decoration-wavy decoration-2">melhor versão</span>
+                        Transforme sua rotina e conquiste sua <span className="text-primary decoration-wavy decoration-2">melhor versão</span>
                     </h2>
 
                     <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-                        O MotivaFit é o ecossistema definitivo para você planejar, monitorar seu progresso e se manter motivado a cada repetição.
+                        O MotivaFit é o ecossistema definitivo para você planejar, monitorar seu progresso e se manter motivado a cada dia, para buscar suas metas fitness.
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
@@ -79,7 +75,7 @@ export default function PaginaInterfaceInicial() {
                             </div>
                             <CardTitle className="text-lg font-heading">Acompanhamento Métrico</CardTitle>
                             <CardDescription>
-                                Visualize evolução de cargas, frequência e calorias com métricas detalhadas e claras.
+                                Visualize evolução de cargas e frequência com métricas detalhadas e claras.
                             </CardDescription>
                         </CardHeader>
                     </Card>
@@ -91,7 +87,7 @@ export default function PaginaInterfaceInicial() {
                             </div>
                             <CardTitle className="text-lg font-heading">Treinos Personalizados</CardTitle>
                             <CardDescription>
-                                Fichas divididas por grupamento e adaptadas aos seus objetivos (Hipertrofia, Força ou HIIT).
+                                Fichas divididas por grupamento e adaptadas aos seus objetivos.
                             </CardDescription>
                         </CardHeader>
                     </Card>
@@ -113,11 +109,10 @@ export default function PaginaInterfaceInicial() {
             {/* Footer */}
             <footer className="border-t px-6 py-6 text-center text-sm text-muted-foreground bg-muted/20">
                 <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <span>© 2026 MotivaFit — MDS / UnB. Todos os direitos reservados.</span>
+                    <span>© 2026 MotivaFit — Grupo Perlman & UnB. Todos os direitos reservados.</span>
                     <div className="flex items-center gap-4 text-xs">
                         <Link to="/login" className="hover:text-foreground">Login</Link>
                         <Link to="/cadastro" className="hover:text-foreground">Cadastro</Link>
-                        <Link to="/admin" className="hover:text-foreground">Painel Admin</Link>
                     </div>
                 </div>
             </footer>
