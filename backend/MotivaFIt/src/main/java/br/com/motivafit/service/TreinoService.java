@@ -4,6 +4,7 @@ import br.com.motivafit.dto.mapper.TreinoMapper;
 import br.com.motivafit.dto.request.TreinoRequestDTO;
 import br.com.motivafit.dto.response.TreinoResponseDTO;
 import br.com.motivafit.entity.Treino;
+import br.com.motivafit.enums.Visibilidade;
 import br.com.motivafit.exception.NaoEncontradoException;
 import br.com.motivafit.repository.TreinoRepository;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class TreinoService {
 
     @Transactional(readOnly = true)
     public List<TreinoResponseDTO> findAll(Long usuarioId) {
-        return treinoRepository.findAllByUsuarioIdAndExcluidoEmIsNull(usuarioId)
+        return treinoRepository.findAllByUsuarioIdAndExcluidoEmIsNullOrVisibilidadeAndExcluidoEmIsNull(usuarioId, Visibilidade.PUBLICO)
                 .stream()
                 .map(TreinoMapper::toDto)
                 .toList();
@@ -55,7 +56,7 @@ public class TreinoService {
     }
 
     private Treino buscarTreinoDoUsuario(Long usuarioId, Long id) {
-        return treinoRepository.findByIdAndUsuarioIdAndExcluidoEmIsNull(id, usuarioId)
+        return treinoRepository.findByIdEUsuarioOuPublico(id, usuarioId, Visibilidade.PUBLICO)
                 .orElseThrow(() -> new NaoEncontradoException(
                         "TREINO_NAO_ENCONTRADO", "Treino não encontrado"));
     }
