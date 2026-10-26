@@ -86,4 +86,5 @@ npm install
 | `/login` | Página de autenticação |
 | `/cadastro` | Formulário de registro |
 | `/principal` | Dashboard principal do usuário |
+| `/treinos` | Gestão de Treinos (CRUD, templates MotivaFit e exercícios do usuário) |
 | `/admin` | Painel administrativo e catálogo de exercícios |

@@ -3,6 +3,7 @@ import PaginaInterfaceInicial from "@/pages-user/pagina-interface-inicial";
 import PaginaLogin from "@/pages-user/pagina-login";
 import PaginaCadastro from "@/pages-user/pagina-cadastro";
 import PaginaPrincipal from "@/pages-user/pagina-principal";
+import PaginaTreinos from "@/pages-user/pagina-treinos";
 import PaginaPainelAdmin from "@/pages-admin/pagina-painel-admin";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
                 <Route path="/login" element={<PaginaLogin />} />
                 <Route path="/cadastro" element={<PaginaCadastro />} />
                 <Route path="/principal" element={<PaginaPrincipal />} />
+                <Route path="/treinos" element={<PaginaTreinos />} />
                 <Route path="/admin" element={<PaginaPainelAdmin />} />
             </Routes>
         </Router>

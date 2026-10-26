@@ -59,9 +59,11 @@ export default function PaginaPrincipal() {
                         <Home className="h-4 w-4" />
                         Início
                     </Button>
-                    <Button variant="ghost" className="justify-start gap-2.5">
-                        <Dumbbell className="h-4 w-4" />
-                        Meus Treinos
+                    <Button variant="ghost" className="justify-start gap-2.5" asChild>
+                        <Link to="/treinos">
+                            <Dumbbell className="h-4 w-4" />
+                            Meus Treinos
+                        </Link>
                     </Button>
                     <Button variant="ghost" className="justify-start gap-2.5">
                         <LineChart className="h-4 w-4" />
