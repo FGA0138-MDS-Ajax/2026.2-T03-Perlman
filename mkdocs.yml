@@ -1,9 +1,16 @@
 site_name: Documentação
 
-nav:
-  - Instruções mkdocs: "index.md"
-  - Atas de Reunião:
-    - Ata 1: "atas-reuniao/ata-reuniao-1.md"
-
 theme:
   name: material
+
+nav:
+  - Instruções mkdocs: index.md
+  - Produto:
+    - Documento de Visão: produto/visao.md
+    - Documento de Arquitetura: produto/arquitetura.md
+  - Atas de Reunião:
+    - Ata 1: atas-reuniao/ata-reuniao-1.md
+    - Ata 2: atas-reuniao/ata-reuniao-2.md
+    - Ata 3: atas-reuniao/ata-reuniao-3.md
+    - Ata 4: atas-reuniao/ata-reuniao-4.md
+    - Ata 5: atas-reuniao/ata-reuniao-5.md
