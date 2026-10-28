@@ -1,0 +1,187 @@
+/* ==========================================================
+   MotivaFit — tema verde e cinza para o Material for MkDocs
+   ========================================================== */
+
+/* ---------- Modo claro ---------- */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:        #1f6f4a;  /* verde principal (cabeçalho) */
+  --md-primary-fg-color--light: #2e8b5e;
+  --md-primary-fg-color--dark:  #14503a;
+  --md-primary-bg-color:        #ffffff;
+  --md-accent-fg-color:         #1fa463;  /* verde de destaque (links, hover) */
+
+  --md-default-bg-color:        #f3f5f4;  /* fundo cinza-esverdeado claro */
+  --md-default-fg-color:        #1f2724;
+  --md-default-fg-color--light: #4a5753;
+  --md-typeset-color:           #1f2724;
+  --md-typeset-a-color:         #1a6a45;
+
+  --md-code-bg-color:           #e8edeb;
+  --md-code-fg-color:           #25312c;
+
+  --mf-card-bg:                 #ffffff;
+  --mf-border:                  #d6ded9;
+  --mf-table-head:              #e1ebe5;
+  --mf-table-zebra:             #f4f7f5;
+  --mf-hero-from:               #14503a;
+  --mf-hero-to:                 #3a4742;
+}
+
+/* ---------- Modo escuro ---------- */
+[data-md-color-scheme="slate"] {
+  --md-hue: 160;
+  --md-primary-fg-color:        #1b2b24;  /* cabeçalho grafite-esverdeado */
+  --md-primary-fg-color--light: #2a3d34;
+  --md-primary-fg-color--dark:  #121c17;
+  --md-accent-fg-color:         #4ade80;  /* verde vivo */
+
+  --md-default-bg-color:        #151a18;
+  --md-default-fg-color:        #e4eae7;
+  --md-default-fg-color--light: #aab6b0;
+  --md-typeset-color:           #dfe6e2;
+  --md-typeset-a-color:         #5fdc92;
+
+  --md-code-bg-color:           #202823;
+  --md-code-fg-color:           #dfe6e2;
+
+  --mf-card-bg:                 #1d2421;
+  --mf-border:                  #2e3a35;
+  --mf-table-head:              #25322c;
+  --mf-table-zebra:             #1a211e;
+  --mf-hero-from:               #1f6f4a;
+  --mf-hero-to:                 #222a26;
+}
+
+/* ---------- Cabeçalho e abas ---------- */
+.md-header {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .12), 0 4px 12px rgba(0, 0, 0, .10);
+}
+.md-tabs {
+  background-color: var(--md-primary-fg-color--dark);
+  border-bottom: 2px solid var(--md-accent-fg-color);
+}
+[data-md-color-scheme="slate"] .md-tabs { background-color: #101714; }
+.md-tabs__link { opacity: .78; font-weight: 500; }
+.md-tabs__link--active, .md-tabs__link:hover { opacity: 1; }
+.md-header__title { font-weight: 600; letter-spacing: .01em; }
+
+/* ---------- Menu lateral ---------- */
+.md-nav__title { font-weight: 700; }
+.md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav__link {
+  color: var(--md-default-fg-color--light);
+  text-transform: uppercase;
+  font-size: .62rem;
+  letter-spacing: .08em;
+}
+.md-nav__item .md-nav__link { border-radius: 6px; padding: .2rem .5rem; margin-right: .4rem; }
+.md-nav__item .md-nav__link--active {
+  color: var(--md-typeset-a-color);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--md-accent-fg-color) 12%, transparent);
+}
+.md-nav__item .md-nav__link:hover { color: var(--md-accent-fg-color); }
+
+/* ---------- Conteúdo ---------- */
+.md-typeset h1 { font-weight: 700; color: var(--md-default-fg-color); letter-spacing: -.01em; }
+.md-typeset h2 {
+  font-weight: 650;
+  padding-bottom: .3rem;
+  border-bottom: 2px solid var(--mf-border);
+}
+.md-typeset h2::before {
+  content: "";
+  display: inline-block;
+  width: .35rem; height: 1em;
+  margin-right: .55rem;
+  border-radius: 3px;
+  background: var(--md-accent-fg-color);
+  vertical-align: -.12em;
+}
+.md-typeset blockquote {
+  border-left: 4px solid var(--md-accent-fg-color);
+  background: color-mix(in srgb, var(--md-accent-fg-color) 7%, transparent);
+  padding: .6rem 1rem;
+  border-radius: 0 8px 8px 0;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset hr { border-bottom: 2px solid var(--mf-border); }
+
+/* ---------- Tabelas ---------- */
+.md-typeset table:not([class]) {
+  font-size: .72rem;
+  background: var(--mf-card-bg);
+  border: 1px solid var(--mf-border);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+  overflow: hidden;
+}
+.md-typeset table:not([class]) th {
+  background: var(--mf-table-head);
+  color: var(--md-default-fg-color);
+  font-weight: 650;
+  border-bottom: 2px solid var(--md-accent-fg-color);
+}
+.md-typeset table:not([class]) td { border-top: 1px solid var(--mf-border); }
+.md-typeset table:not([class]) tbody tr:nth-child(even) { background: var(--mf-table-zebra); }
+.md-typeset table:not([class]) tbody tr:hover {
+  background: color-mix(in srgb, var(--md-accent-fg-color) 10%, transparent);
+}
+
+/* ---------- Imagens e figuras ---------- */
+.md-typeset img {
+  border-radius: 10px;
+  border: 1px solid var(--mf-border);
+  background: #ffffff;           /* os diagramas têm fundo branco */
+  padding: .4rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+}
+
+/* ---------- Código ---------- */
+.md-typeset code { border-radius: 5px; }
+.md-typeset pre > code { border-radius: 8px; }
+
+/* ---------- Admonitions ---------- */
+.md-typeset .admonition, .md-typeset details {
+  border-radius: 8px;
+  border-width: 0 0 0 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+}
+
+/* ---------- Página inicial ---------- */
+.mf-hero {
+  background: linear-gradient(135deg, var(--mf-hero-from), var(--mf-hero-to));
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 2rem 2.2rem;
+  margin: .5rem 0 1.6rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
+}
+.mf-hero h1, .mf-hero p { color: #ffffff; margin: 0; }
+.mf-hero h1 { font-size: 2.1rem; margin-bottom: .4rem; }
+.mf-hero p { opacity: .92; font-size: .95rem; max-width: 40rem; }
+.mf-hero .md-button { margin-top: 1.1rem; margin-right: .5rem; }
+.mf-hero .md-button--primary {
+  background: #ffffff; color: #14503a; border-color: #ffffff;
+}
+.mf-hero .md-button:not(.md-button--primary) {
+  color: #ffffff; border-color: rgba(255, 255, 255, .7);
+}
+
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid > .card {
+  background: var(--mf-card-bg);
+  border: 1px solid var(--mf-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.md-typeset .grid.cards > ul > li:hover {
+  transform: translateY(-2px);
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .12);
+}
+.md-typeset .grid.cards > ul > li > hr { border-color: var(--mf-border); }
+
+/* ---------- Rodapé ---------- */
+.md-footer { background: var(--md-primary-fg-color--dark); }
+.md-footer-meta { background: #101714; }

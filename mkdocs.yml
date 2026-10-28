@@ -1,16 +1,93 @@
-site_name: Documentação
+site_name: MotivaFit — Documentação
+site_description: Documentação do projeto MotivaFit (Grupo Perlman — T03, Métodos de Desenvolvimento de Software, UnB)
+site_author: Grupo Perlman — T03
+copyright: Grupo Perlman — T03 · Universidade de Brasília · MDS 2026
+
+# Preencha depois de publicar no GitHub Pages:
+# site_url: https://SEU-USUARIO-OU-ORG.github.io/NOME-DO-REPOSITORIO/
+# repo_url: https://github.com/SEU-USUARIO-OU-ORG/NOME-DO-REPOSITORIO
+# repo_name: NOME-DO-REPOSITORIO
 
 theme:
   name: material
+  language: pt-BR
+  icon:
+    logo: material/dumbbell
+    repo: fontawesome/brands/github
+  favicon: assets/img/favicon.svg
+  palette:
+    # Modo claro: verde + cinza
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Mudar para o modo escuro
+    # Modo escuro: cinza-grafite + verde
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Mudar para o modo claro
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+plugins:
+  - search:
+      lang: pt
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra_css:
+  - stylesheets/extra.css
 
 nav:
-  - Instruções mkdocs: index.md
+  - Início: index.md
   - Produto:
-    - Documento de Visão: produto/visao.md
-    - Documento de Arquitetura: produto/arquitetura.md
+      - Documento de Visão: produto/visao.md
+      - Documento de Arquitetura: produto/arquitetura.md
   - Atas de Reunião:
-    - Ata 1: atas-reuniao/ata-reuniao-1.md
-    - Ata 2: atas-reuniao/ata-reuniao-2.md
-    - Ata 3: atas-reuniao/ata-reuniao-3.md
-    - Ata 4: atas-reuniao/ata-reuniao-4.md
-    - Ata 5: atas-reuniao/ata-reuniao-5.md
+      - Ata 1: atas-reuniao/ata-reuniao-1.md
+      - Ata 2: atas-reuniao/ata-reuniao-2.md
+      - Ata 3: atas-reuniao/ata-reuniao-3.md
+      - Ata 4: atas-reuniao/ata-reuniao-4.md
+      - Ata 5: atas-reuniao/ata-reuniao-5.md
+      - Ata 6: atas-reuniao/ata-reuniao-6.md
