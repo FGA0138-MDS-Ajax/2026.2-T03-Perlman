@@ -1,0 +1,4180 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentação do projeto MotivaFit (Grupo Perlman — T03, Métodos de Desenvolvimento de Software, UnB)">
+      
+      
+        <meta name="author" content="Grupo Perlman — T03">
+      
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../arquitetura/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Documento de Visão - MotivaFit — Documentação</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#documento-de-visao-do-produto-e-do-projeto-motivafit" class="md-skip">
+          Pular para conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="../.." title="MotivaFit — Documentação" class="md-header__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MotivaFit — Documentação
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Documento de Visão
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo escuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo escuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando busca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Produto
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../atas-reuniao/ata-reuniao-1/" class="md-tabs__link">
+          
+  
+  
+  Atas de Reunião
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MotivaFit — Documentação" class="md-nav__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    MotivaFit — Documentação
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Produto
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Produto
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Visão
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Visão
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#integrantes-da-equipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integrantes da equipe
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historico-de-revisoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Histórico de revisões
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-visao-geral-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 Visão geral do produto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1 Visão geral do produto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-problema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Problema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-declaracao-de-posicao-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Declaração de posição do produto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-objetivos-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Objetivos do produto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.3 Objetivos do produto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#131-objetivo-principal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.1 Objetivo principal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#132-objetivos-secundarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.2 Objetivos secundários
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#133-objetivos-da-gamificacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.3 Objetivos da gamificação
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-tecnologias-a-serem-utilizadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Tecnologias a serem utilizadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-visao-geral-do-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 Visão geral do projeto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2 Visão geral do projeto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ciclo-de-vida-do-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Ciclo de vida do projeto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-organizacao-do-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Organização do projeto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Organização do projeto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#221-analise-causal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.1 Análise causal
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-planejamento-das-fases-sprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Planejamento das fases (Sprints)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-matriz-de-comunicacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Matriz de comunicação
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-gerenciamento-de-riscos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Gerenciamento de riscos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-criterios-de-replanejamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Critérios de replanejamento
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-processo-de-desenvolvimento-de-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Processo de desenvolvimento de software
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-declaracao-de-escopo-do-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 Declaração de escopo do projeto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4 Declaração de escopo do projeto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-backlog-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Backlog do produto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Backlog do produto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411-classificacao-de-prioridade-moscow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.1 Classificação de prioridade (MoSCoW)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-perfis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Perfis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-cenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Cenários
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-tabela-de-backlog-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Tabela de backlog do produto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.4 Tabela de backlog do produto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#441-descricao-dos-requisitos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4.1 Descrição dos requisitos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-matriz-de-rastreabilidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Matriz de rastreabilidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-metricas-e-medicoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 Métricas e medições
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5 Métricas e medições">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-o-quadro-gqm-estruturado-e-questoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 O quadro GQM estruturado e questões
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-fichas-de-detalhamento-das-metricas-5w1h-escalas-e-analises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Fichas de detalhamento das métricas (5W1H, escalas e análises)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2 Fichas de detalhamento das métricas (5W1H, escalas e análises)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metrica-1-m1-throughput-vazao-de-issues-por-sprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métrica 1 (M1): throughput (vazão) de issues por Sprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrica-2-m2-densidade-de-defeitos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métrica 2 (M2): densidade de defeitos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrica-3-m3-percentual-de-cobertura-de-testes-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métrica 3 (M3): percentual de cobertura de testes (coverage)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrica-4-m4-divida-tecnica-debito-tecnico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métrica 4 (M4): dívida técnica (débito técnico)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-testes-de-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6 Testes de software
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6 Testes de software">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-estrategia-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Estratégia de testes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-roteiro-de-teste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Roteiro de teste
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2 Roteiro de teste">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#621-detalhamento-dos-casos-de-teste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2.1 Detalhamento dos casos de teste
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2.1 Detalhamento dos casos de teste">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#t1-cadastro-de-usuario-com-e-mail-e-senha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T1 – Cadastro de usuário com e-mail e senha
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t2-login-com-credencial-valida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T2 – Login com credencial válida
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t3-login-com-dados-invalidos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T3 – Login com dados inválidos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t4-cadastro-de-treino-personalizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T4 – Cadastro de treino personalizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t5-validacao-de-treino-incompleto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T5 – Validação de treino incompleto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t6-alteracao-de-treino-existente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T6 – Alteração de treino existente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t7-exclusao-de-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T7 – Exclusão de treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t8-registro-de-exercicio-realizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T8 – Registro de exercício realizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t9-atualizacao-de-metricas-de-evolucao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T9 – Atualização de métricas de evolução
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t10-pontuacao-e-conquista-por-assiduidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T10 – Pontuação e conquista por assiduidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t11-restricao-do-painel-de-admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T11 – Restrição do painel de admin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t12-login-com-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T12 – Login com Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t13-falha-ou-cancelamento-no-login-com-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T13 – Falha ou cancelamento no login com Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t14-listagem-de-treinos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T14 – Listagem de treinos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t15-cadastro-de-exercicio-no-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T15 – Cadastro de exercício no treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t16-listagem-de-exercicios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T16 – Listagem de exercícios
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t17-alteracao-de-exercicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T17 – Alteração de exercício
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t18-exclusao-de-exercicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T18 – Exclusão de exercício
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t19-acompanhamento-de-recorde-pessoal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T19 – Acompanhamento de recorde pessoal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t20-usabilidade-do-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T20 – Usabilidade do MVP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t21-token-google-invalido-ou-expirado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T21 – Token Google inválido ou expirado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t22-rota-protegida-sem-sessao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T22 – Rota protegida sem sessão
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referências
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../arquitetura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Atas de Reunião
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Atas de Reunião
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 6
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#integrantes-da-equipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integrantes da equipe
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historico-de-revisoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Histórico de revisões
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-visao-geral-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 Visão geral do produto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1 Visão geral do produto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-problema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Problema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-declaracao-de-posicao-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Declaração de posição do produto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-objetivos-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Objetivos do produto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.3 Objetivos do produto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#131-objetivo-principal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.1 Objetivo principal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#132-objetivos-secundarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.2 Objetivos secundários
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#133-objetivos-da-gamificacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3.3 Objetivos da gamificação
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-tecnologias-a-serem-utilizadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Tecnologias a serem utilizadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-visao-geral-do-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 Visão geral do projeto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2 Visão geral do projeto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ciclo-de-vida-do-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Ciclo de vida do projeto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-organizacao-do-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Organização do projeto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Organização do projeto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#221-analise-causal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.1 Análise causal
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-planejamento-das-fases-sprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Planejamento das fases (Sprints)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-matriz-de-comunicacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Matriz de comunicação
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-gerenciamento-de-riscos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Gerenciamento de riscos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-criterios-de-replanejamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Critérios de replanejamento
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-processo-de-desenvolvimento-de-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Processo de desenvolvimento de software
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-declaracao-de-escopo-do-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4 Declaração de escopo do projeto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4 Declaração de escopo do projeto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-backlog-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Backlog do produto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Backlog do produto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#411-classificacao-de-prioridade-moscow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.1 Classificação de prioridade (MoSCoW)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-perfis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Perfis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-cenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Cenários
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-tabela-de-backlog-do-produto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Tabela de backlog do produto
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.4 Tabela de backlog do produto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#441-descricao-dos-requisitos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4.1 Descrição dos requisitos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-matriz-de-rastreabilidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Matriz de rastreabilidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-metricas-e-medicoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5 Métricas e medições
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5 Métricas e medições">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-o-quadro-gqm-estruturado-e-questoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 O quadro GQM estruturado e questões
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-fichas-de-detalhamento-das-metricas-5w1h-escalas-e-analises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Fichas de detalhamento das métricas (5W1H, escalas e análises)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2 Fichas de detalhamento das métricas (5W1H, escalas e análises)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metrica-1-m1-throughput-vazao-de-issues-por-sprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métrica 1 (M1): throughput (vazão) de issues por Sprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrica-2-m2-densidade-de-defeitos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métrica 2 (M2): densidade de defeitos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrica-3-m3-percentual-de-cobertura-de-testes-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métrica 3 (M3): percentual de cobertura de testes (coverage)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrica-4-m4-divida-tecnica-debito-tecnico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Métrica 4 (M4): dívida técnica (débito técnico)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-testes-de-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6 Testes de software
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6 Testes de software">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-estrategia-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Estratégia de testes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-roteiro-de-teste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Roteiro de teste
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2 Roteiro de teste">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#621-detalhamento-dos-casos-de-teste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2.1 Detalhamento dos casos de teste
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2.1 Detalhamento dos casos de teste">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#t1-cadastro-de-usuario-com-e-mail-e-senha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T1 – Cadastro de usuário com e-mail e senha
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t2-login-com-credencial-valida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T2 – Login com credencial válida
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t3-login-com-dados-invalidos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T3 – Login com dados inválidos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t4-cadastro-de-treino-personalizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T4 – Cadastro de treino personalizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t5-validacao-de-treino-incompleto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T5 – Validação de treino incompleto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t6-alteracao-de-treino-existente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T6 – Alteração de treino existente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t7-exclusao-de-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T7 – Exclusão de treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t8-registro-de-exercicio-realizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T8 – Registro de exercício realizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t9-atualizacao-de-metricas-de-evolucao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T9 – Atualização de métricas de evolução
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t10-pontuacao-e-conquista-por-assiduidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T10 – Pontuação e conquista por assiduidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t11-restricao-do-painel-de-admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T11 – Restrição do painel de admin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t12-login-com-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T12 – Login com Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t13-falha-ou-cancelamento-no-login-com-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T13 – Falha ou cancelamento no login com Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t14-listagem-de-treinos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T14 – Listagem de treinos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t15-cadastro-de-exercicio-no-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T15 – Cadastro de exercício no treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t16-listagem-de-exercicios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T16 – Listagem de exercícios
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t17-alteracao-de-exercicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T17 – Alteração de exercício
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t18-exclusao-de-exercicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T18 – Exclusão de exercício
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t19-acompanhamento-de-recorde-pessoal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T19 – Acompanhamento de recorde pessoal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t20-usabilidade-do-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T20 – Usabilidade do MVP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t21-token-google-invalido-ou-expirado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T21 – Token Google inválido ou expirado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t22-rota-protegida-sem-sessao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T22 – Rota protegida sem sessão
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referências
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="documento-de-visao-do-produto-e-do-projeto-motivafit">Documento de Visão do Produto e do Projeto — MotivaFit<a class="headerlink" href="#documento-de-visao-do-produto-e-do-projeto-motivafit" title="Permanent link">&para;</a></h1>
+<p><strong>Universidade de Brasília · Grupo Perlman — T03</strong><strong>Versão 1.0.0 · Brasília, 2026</strong></p>
+<blockquote>
+<p>Documento de visão do produto e do projeto MotivaFit, elaborado pelo Grupo Perlman — T03, na disciplina de Métodos de Desenvolvimento de Software (MDS), Universidade de Brasília.</p>
+</blockquote>
+<h2 id="integrantes-da-equipe">Integrantes da equipe<a class="headerlink" href="#integrantes-da-equipe" title="Permanent link">&para;</a></h2>
+<p><strong>Tabela 1 – Integrantes do grupo</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Matrícula</th>
+<th style="text-align: left;">Nome</th>
+<th style="text-align: left;">Função</th>
+<th style="text-align: right;">Pontos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">232024966</td>
+<td style="text-align: left;">Bernardo Campos Caxito Silveira</td>
+<td style="text-align: left;">GQM</td>
+<td style="text-align: right;">14,28</td>
+</tr>
+<tr>
+<td style="text-align: left;">251039442</td>
+<td style="text-align: left;">Bruno Cruvinel Barros da Silva</td>
+<td style="text-align: left;">Documentação</td>
+<td style="text-align: right;">14,29</td>
+</tr>
+<tr>
+<td style="text-align: left;">252004290</td>
+<td style="text-align: left;">Lucas Venâncio Pereira</td>
+<td style="text-align: left;">Back-end</td>
+<td style="text-align: right;">14,28</td>
+</tr>
+<tr>
+<td style="text-align: left;">252023741</td>
+<td style="text-align: left;">Luís Felipe Pontes Vieira Andrade</td>
+<td style="text-align: left;">Back-end</td>
+<td style="text-align: right;">14,28</td>
+</tr>
+<tr>
+<td style="text-align: left;">251026248</td>
+<td style="text-align: left;">Mateus Fernandes Dantas*</td>
+<td style="text-align: left;">Front-end</td>
+<td style="text-align: right;">14,29</td>
+</tr>
+<tr>
+<td style="text-align: left;">251013651</td>
+<td style="text-align: left;">Matheus Estevam Ferreira</td>
+<td style="text-align: left;">Back-end</td>
+<td style="text-align: right;">14,29</td>
+</tr>
+<tr>
+<td style="text-align: left;">211062428</td>
+<td style="text-align: left;">Rafael Souto Lopes Laube</td>
+<td style="text-align: left;">Front-end</td>
+<td style="text-align: right;">14,29</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><strong>Total</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"><strong>100,00</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em>
+* Líder da equipe. GQM: Goal-Question-Metric (objetivo–questão–métrica). Os pontos devem fechar 100 para toda a equipe.</p>
+<h2 id="historico-de-revisoes">Histórico de revisões<a class="headerlink" href="#historico-de-revisoes" title="Permanent link">&para;</a></h2>
+<p><strong>Tabela 2 – Histórico de revisões</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Data</th>
+<th style="text-align: left;">Versão</th>
+<th style="text-align: left;">Descrição</th>
+<th style="text-align: left;">Autor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">22/09/2026</td>
+<td style="text-align: left;">0.1.0</td>
+<td style="text-align: left;">Elaboração inicial do documento</td>
+<td style="text-align: left;">Equipe Perlman</td>
+</tr>
+<tr>
+<td style="text-align: left;">30/09/2026</td>
+<td style="text-align: left;">1.0.0</td>
+<td style="text-align: left;">Revisão conforme apontamentos da síntese</td>
+<td style="text-align: left;">Equipe Perlman</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<hr />
+<h2 id="1-visao-geral-do-produto">1 Visão geral do produto<a class="headerlink" href="#1-visao-geral-do-produto" title="Permanent link">&para;</a></h2>
+<p>O MotivaFit é um aplicativo web voltado para praticantes de exercícios físicos que buscam organização e constância. A solução simplifica a montagem de treinos e utiliza a gamificação, com sistemas de conquistas e recompensas, para engajar o usuário, dando visibilidade à sua evolução e combatendo a desmotivação.</p>
+<h3 id="11-problema">1.1 Problema<a class="headerlink" href="#11-problema" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Contexto:</strong> muitas pessoas desejam praticar exercícios físicos de forma regular, mas enfrentam grandes dificuldades na organização de suas rotinas (como estruturar corretamente a divisão de grupos musculares), no acompanhamento de seu progresso e na manutenção da consistência a longo prazo.</li>
+<li><strong>Problema encontrado:</strong> a falta de planejamento claro e a ausência de percepção de evolução rápida geram desmotivação e levam ao abandono das atividades.</li>
+</ul>
+<h3 id="12-declaracao-de-posicao-do-produto">1.2 Declaração de posição do produto<a class="headerlink" href="#12-declaracao-de-posicao-do-produto" title="Permanent link">&para;</a></h3>
+<p>O MotivaFit é um aplicativo web de saúde e fitness. A declaração a seguir segue o modelo de posicionamento de Moore [1]. O produto propõe reunir organização de treinos, registro de exercícios, acompanhamento da evolução e conquistas por assiduidade.</p>
+<p>A análise de concorrência considera aplicativos de registro de treinos: o Hevy oferece acompanhamento do progresso [9]; o Strong oferece registro de treinos [10]; o JEFIT oferece registro de exercícios e sessões de treino [11]. Esses aplicativos atendem necessidades próximas às do MotivaFit. A combinação de organização, motivação e interação social é a proposta do projeto, sem pressupor exclusividade dessas funcionalidades no mercado.</p>
+<p>O web app é voltado tanto para quem está iniciando sua rotina de treinos quanto para quem já está familiarizado com os exercícios, mas gostaria de acompanhar métricas e comparar seu desempenho com seus amigos (semelhante a aplicativos como Strava e GymRats).</p>
+<p><strong>Tabela 3 – Declaração de posição do produto</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Campo</th>
+<th style="text-align: left;">Declaração</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Para</strong></td>
+<td style="text-align: left;">Praticantes de exercícios físicos, frequentadores de academia e iniciantes.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Necessidade</strong></td>
+<td style="text-align: left;">Organizar treinos, acompanhar a evolução de cargas e manter a constância diária.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>O nome do produto</strong></td>
+<td style="text-align: left;">MotivaFit é um aplicativo web de saúde e fitness.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Que</strong></td>
+<td style="text-align: left;">Gamifica a rotina de exercícios e organiza as divisões de treino, oferecendo um acompanhamento prático, recompensas por assiduidade e métricas claras de evolução, além da liberdade para montar seus próprios treinos com foco no seu objetivo.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ao contrário</strong></td>
+<td style="text-align: left;">Planilhas, blocos de notas e aplicativos de registro de treinos, como Hevy, Strong e JEFIT [9–11].</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Nosso produto</strong></td>
+<td style="text-align: left;">Foca na retenção e motivação do usuário por meio de um sistema de conquistas (gamificação) aliado a uma interface intuitiva e simplificada para a gestão dos treinos diários e do progresso.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="13-objetivos-do-produto">1.3 Objetivos do produto<a class="headerlink" href="#13-objetivos-do-produto" title="Permanent link">&para;</a></h3>
+<h4 id="131-objetivo-principal">1.3.1 Objetivo principal<a class="headerlink" href="#131-objetivo-principal" title="Permanent link">&para;</a></h4>
+<p>Apoiar e motivar os usuários na manutenção da regularidade das atividades físicas por meio de gamificação, recompensas visuais, organização simplificada e liberdade para montar os seus treinos, focando em aumentar a percepção de evolução e auxiliar no controle dos treinos executados.</p>
+<h4 id="132-objetivos-secundarios">1.3.2 Objetivos secundários<a class="headerlink" href="#132-objetivos-secundarios" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Facilitar a criação de rotinas de treinos com foco em hipertrofia, permitindo a correta divisão muscular (por exemplo, isolar o treino de quadríceps e grupos sinergistas).</li>
+<li>Fornecer gráficos e estatísticas de frequência e evolução de cargas ao longo do tempo.</li>
+</ul>
+<h4 id="133-objetivos-da-gamificacao">1.3.3 Objetivos da gamificação<a class="headerlink" href="#133-objetivos-da-gamificacao" title="Permanent link">&para;</a></h4>
+<p>Buscando atender todos os usuários do modelo Hexad de gamificação [2, 3], serão implementadas funcionalidades justificando a cadeia <strong>motivação → mecânica → requisito</strong>:</p>
+<ul>
+<li><strong>ACHIEVER (motivado por Mastery)</strong></li>
+<li><em>Elemento:</em> foco absoluto em progressão (PR – Personal Record). O aplicativo fornece gráficos detalhados de evolução para cada elemento do treino do usuário, recompensando a maestria na execução técnica e a superação contínua de limites.</li>
+<li><em>Rastreabilidade:</em> RF-12 e RF-20; testes planejados T9 e T19.</li>
+<li><strong>PHILANTHROPIST (motivado por Purpose)</strong></li>
+<li><em>Elemento:</em> sistema de compartilhamento comunitário. Usuários podem compartilhar seus resultados em um espaço público para apoiar a motivação dos demais, conforme RF-21.</li>
+<li><em>Rastreabilidade:</em> RF-21; sem teste planejado no MVP (Minimum Viable Product, produto mínimo viável).</li>
+<li><strong>FREE SPIRIT (motivado por Autonomy)</strong></li>
+<li><em>Elemento:</em> personalização da rotina. O usuário pode criar e alterar seus treinos e selecionar exercícios predefinidos para compor a rotina e ajustar suas metas. A autonomia é atendida pelas operações existentes de gerenciamento de treinos e exercícios; não há um modo separado de Treino Livre ou um requisito de catálogo exploratório no escopo.</li>
+<li><em>Rastreabilidade:</em> RF-03, RF-05, RF-07 e RF-09; testes planejados T4, T6, T15 e T17.</li>
+<li><strong>PLAYER (motivado por Reward)</strong></li>
+<li><em>Elemento:</em> programa de recompensas diretas. A assiduidade nos treinos libera conquistas visuais no perfil, conforme os critérios definidos para RF-22.</li>
+<li><em>Rastreabilidade:</em> RF-22; teste planejado T10.</li>
+<li><strong>SOCIALISER (motivado por Relatedness)</strong></li>
+<li><em>Elemento:</em> feed de atividades interativo. O aplicativo permite a criação de pequenos grupos de treino onde os membros podem curtir, comentar e celebrar os resultados diários uns dos outros, fortalecendo as relações.</li>
+<li><em>Rastreabilidade:</em> RF-23; sem teste planejado no MVP.</li>
+<li><strong>DISRUPTOR (motivado por Change)</strong></li>
+<li><em>Elemento:</em> submissão de desafios. Espaço para que esses usuários criem desafios fora do padrão (como "Desafio de 100 repetições") para testar os limites de cada um, além de ter um grupo próprio para as pessoas colocarem seus resultados desses desafios.</li>
+<li><em>Rastreabilidade:</em> RF-18; sem teste planejado no MVP.</li>
+</ul>
+<h3 id="14-tecnologias-a-serem-utilizadas">1.4 Tecnologias a serem utilizadas<a class="headerlink" href="#14-tecnologias-a-serem-utilizadas" title="Permanent link">&para;</a></h3>
+<p><strong>Tabela 4 – Tecnologias utilizadas</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Tecnologia</th>
+<th style="text-align: left;">Requisito / Motivação</th>
+<th style="text-align: left;">Alternativa considerada</th>
+<th style="text-align: left;">Custo aceito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Java / Spring Boot</td>
+<td style="text-align: left;">Robustez para regras de negócio (back-end).</td>
+<td style="text-align: left;">Node.js / Express</td>
+<td style="text-align: left;">Maior verbosidade em troca de tipagem forte.</td>
+</tr>
+<tr>
+<td style="text-align: left;">React</td>
+<td style="text-align: left;">Criação de interface web interativa (front-end).</td>
+<td style="text-align: left;">Vue.js</td>
+<td style="text-align: left;">Curva de aprendizado da equipe em troca de ecossistema.</td>
+</tr>
+<tr>
+<td style="text-align: left;">PostgreSQL</td>
+<td style="text-align: left;">Estruturação relacional de treinos e usuários.</td>
+<td style="text-align: left;">MongoDB</td>
+<td style="text-align: left;">Rigidez do schema em troca de integridade ACID (atomicidade, consistência, isolamento e durabilidade).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Docker / GitHub Actions</td>
+<td style="text-align: left;">Automação da esteira de CI/CD (integração contínua e entrega contínua).</td>
+<td style="text-align: left;">Implantação manual</td>
+<td style="text-align: left;">Tempo de configuração em troca de confiabilidade.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Git / GitHub</td>
+<td style="text-align: left;">Versionamento colaborativo.</td>
+<td style="text-align: left;">GitLab</td>
+<td style="text-align: left;">Padrão de mercado adotado pela equipe.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<ul>
+<li><strong>Ambiente e infraestrutura:</strong> suporte contínuo a ambientes operacionais baseados em Linux e implantação via containers Docker.</li>
+<li><strong>Gerenciamento do projeto:</strong> reuniões realizadas pelo Discord/Teams e grupo no WhatsApp.</li>
+</ul>
+<hr />
+<h2 id="2-visao-geral-do-projeto">2 Visão geral do projeto<a class="headerlink" href="#2-visao-geral-do-projeto" title="Permanent link">&para;</a></h2>
+<p>O desenvolvimento do projeto é conduzido sob uma abordagem ágil e iterativa, unindo a estrutura de gestão do Scrum (focada em Sprints curtas e entregas contínuas de valor) às práticas de engenharia do eXtreme Programming (XP) [4, 5]. O trabalho é sustentado por Pair Programming, revisões de código e uma esteira automatizada de Integração Contínua (CI) para garantir entregas seguras e alinhadas às necessidades do usuário.</p>
+<h3 id="21-ciclo-de-vida-do-projeto">2.1 Ciclo de vida do projeto<a class="headerlink" href="#21-ciclo-de-vida-do-projeto" title="Permanent link">&para;</a></h3>
+<p>O projeto adotará metodologias ágeis baseadas no framework Scrum, com iterações (Sprints) de uma semana. Essa abordagem visa entregas incrementais focadas em valor, permitindo a validação contínua de funcionalidades motivacionais com os usuários.</p>
+<p>A Figura 1 apresenta a sequência adotada: o Product Backlog reúne as necessidades do produto; na Sprint Planning, a equipe seleciona os itens e define o Sprint Backlog. A execução ocorre em uma Sprint de uma semana. Ao final, a Review avalia a entrega com os interessados e a Retrospectiva identifica melhorias no processo. O incremento representa a funcionalidade concluída que amplia o produto. Embora a imagem apresente uma sequência linear, o processo é repetido a cada Sprint, com atualização do backlog e incorporação das melhorias identificadas [5].</p>
+<p><img alt="Figura 1 – Ciclo de vida do projeto: Pair Programming, Commit, Code Review (PR), Merge e Deploy" src="../assets/img/visao-fig1-ciclo-de-vida.png" /></p>
+<p><em>Figura 1 – Ciclo de vida do projeto. Fonte: elaborado pelos autores (2026), com base no Guia do Scrum [5].</em></p>
+<p><strong>Tabela 5 – Aspectos do processo</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Aspecto</th>
+<th style="text-align: left;">Definição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Metodologia</td>
+<td style="text-align: left;">Desenvolvimento Ágil.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Processo</td>
+<td style="text-align: left;">Scrum.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Procedimentos</td>
+<td style="text-align: left;">Sprint Planning, Code Review, Pair Programming, Integração Contínua, Refinamento do Backlog e Sprint Reviews.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Métodos</td>
+<td style="text-align: left;">UML (Unified Modeling Language, linguagem de modelagem unificada), User Stories, Planning Poker, MoSCoW, Análise de Pontos de Função.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ferramentas</td>
+<td style="text-align: left;">Git, GitHub, Figma, VS Code, IntelliJ, Docker, Postman, Maven.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="22-organizacao-do-projeto">2.2 Organização do projeto<a class="headerlink" href="#22-organizacao-do-projeto" title="Permanent link">&para;</a></h3>
+<p><strong>Tabela 6 – Papéis e responsabilidades</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Papel</th>
+<th style="text-align: left;">Atribuições</th>
+<th style="text-align: left;">Responsável</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Desenvolvedor Backend</td>
+<td style="text-align: left;">Codificar o produto, codificar testes unitários, realizar refatoração. Estruturar a lógica de funcionamento do app.</td>
+<td style="text-align: left;">Matheus Estevam, Luís, Lucas</td>
+</tr>
+<tr>
+<td style="text-align: left;">Desenvolvedor Frontend</td>
+<td style="text-align: left;">Codificar o produto, codificar testes unitários, realizar refatoração. Desenvolver a interface de usuário do app.</td>
+<td style="text-align: left;">Rafael Laube, Mateus Fernandes</td>
+</tr>
+<tr>
+<td style="text-align: left;">Documentação</td>
+<td style="text-align: left;">Confecção dos documentos para entrega.</td>
+<td style="text-align: left;">Bruno</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dono do Produto</td>
+<td style="text-align: left;">Atualizar o escopo do produto, organizar o escopo das sprints, validar as entregas.</td>
+<td style="text-align: left;">Monitor Daniel</td>
+</tr>
+<tr>
+<td style="text-align: left;">Analista de Qualidade</td>
+<td style="text-align: left;">Garantir a qualidade do produto, garantir o cumprimento do conceito de pronto, realizar inspeções de código.</td>
+<td style="text-align: left;">Bernardo</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cliente</td>
+<td style="text-align: left;">Validar negócio e expectativas.</td>
+<td style="text-align: left;">Ricardo Ajax</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h4 id="221-analise-causal">2.2.1 Análise causal<a class="headerlink" href="#221-analise-causal" title="Permanent link">&para;</a></h4>
+<p>O diagrama de Ishikawa organiza possíveis causas de um problema em categorias, relacionando-as ao efeito analisado [12]. Na Figura 2, o efeito é o abandono de atividades físicas e a desmotivação. Os ramos apresentam falta de planejamento, ausência de engajamento e falta de percepção de evolução, com suas causas específicas e os requisitos propostos para enfrentá-las:</p>
+<ul>
+<li><strong>Falta de planejamento:</strong> desorganização de rotinas e divisões musculares inadequadas. Origina a necessidade de cadastro de treino (RF-03).</li>
+<li><strong>Ausência de engajamento:</strong> treinos monótonos, tédio e falta de incentivo social. Origina as conquistas (RF-22) e a submissão de desafios (RF-18).</li>
+<li><strong>Falta de percepção de evolução:</strong> dificuldade em perceber resultados rápidos. Origina o acompanhamento de métricas (RF-12).</li>
+</ul>
+<p><img alt="Figura 2 – Diagrama de Ishikawa: efeito " src="../assets/img/visao-fig2-ishikawa.png" /></p>
+<p><em>Figura 2 – Diagrama de Ishikawa. Fonte: elaborado pelos autores (2026), utilizando a técnica de causa e efeito descrita pela ASQ [12].</em></p>
+<h3 id="23-planejamento-das-fases-sprints">2.3 Planejamento das fases (Sprints)<a class="headerlink" href="#23-planejamento-das-fases-sprints" title="Permanent link">&para;</a></h3>
+<p><strong>Abreviações da tabela:</strong> Resp.: responsáveis; % acum.: percentual acumulado.</p>
+<p>O percentual acumulado representa a cobertura funcional planejada, ponderada pelas estimativas preliminares do backlog, e não o progresso real de execução. RF-01 a RF-23 somam 47 unidades estimadas. As Sprints 3 a 9 acrescentam, respectivamente, 7, 6, 8, 6, 7, 7 e 6 unidades: o acumulado arredondado é 15%, 28%, 45%, 57%, 72%, 87% e 100%. As Sprints 1 e 2 são preparatórias; a Sprint 10 estabiliza as entregas. RF-24 permanece fora do cálculo até receber uma estimativa. O progresso realizado deverá considerar somente funcionalidades concluídas, testadas e aceitas; as estimativas ainda não constituem uma contagem formal de PF.</p>
+<p><strong>Tabela 7 – Planejamento das sprints</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Sprint</th>
+<th style="text-align: left;">Produto (entrega)</th>
+<th style="text-align: left;">Período</th>
+<th style="text-align: left;">Entregáveis</th>
+<th style="text-align: center;">Resp.</th>
+<th style="text-align: center;">% acum.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Definição do Produto, Documento de Visão, definição do MVP e Planejamento do Projeto.</td>
+<td style="text-align: left;">22/09/2026 a 27/09/2026</td>
+<td style="text-align: left;">Documento de visão.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Documento de Arquitetura, base estrutural de projeto e testes.</td>
+<td style="text-align: left;">28/09/2026 a 04/10/2026</td>
+<td style="text-align: left;">Documento de Arquitetura, estrutura base e testes, slides das apresentações.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Cadastro de usuário e autenticação com e-mail e senha e treinos (cadastro, listagem, alteração e exclusão de treino).</td>
+<td style="text-align: left;">05/10/2026 a 11/10/2026</td>
+<td style="text-align: left;">Backend, Banco de Dados e interfaces base.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">15%</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">Manter exercícios (cadastrar, listar, alterar, excluir e marcar exercício como realizado). Conclusão e validação do MVP com cadastro e login por e-mail e senha, treinos e exercícios.</td>
+<td style="text-align: left;">12/10/2026 a 18/10/2026</td>
+<td style="text-align: left;">Testes unitários aprovados e documentação.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">28%</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">Acompanhamento de métricas do usuário, convite de usuário administrador com e-mail. Painel administrativo: visualizar usuários ativos nos últimos 30 dias.</td>
+<td style="text-align: left;">19/10/2026 a 25/10/2026</td>
+<td style="text-align: left;">Testes unitários aprovados e documentação.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">45%</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">Painel administrativo: frequência média de treinos, ranking de treinos.</td>
+<td style="text-align: left;">26/10/2026 a 01/11/2026</td>
+<td style="text-align: left;">Testes unitários aprovados e documentação.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">57%</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">Painel administrativo: exibir os três exercícios mais realizados pelos usuários. Painel do usuário: submissão de desafios, remoção de desafios.</td>
+<td style="text-align: left;">02/11/2026 a 08/11/2026</td>
+<td style="text-align: left;">Testes unitários aprovados e documentação.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">72%</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: left;">Criação do botão de recorde pessoal, sistema de compartilhamento comunitário.</td>
+<td style="text-align: left;">09/11/2026 a 15/11/2026</td>
+<td style="text-align: left;">Testes unitários aprovados e documentação.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">87%</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: left;">Inspeções, streak diário, feed de atividades interativo. Integração opcional do login com o Google (RF-24, Could have), conforme a capacidade da equipe.</td>
+<td style="text-align: left;">16/11/2026 a 22/11/2026</td>
+<td style="text-align: left;">Testes unitários aprovados e documentação.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">100%</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: left;">Estabilização e entrega: testes, correções de bugs e entrega do produto final. Validação do login com o Google (RF-24, Could have), caso implementado.</td>
+<td style="text-align: left;">23/11/2026 a 29/11/2026</td>
+<td style="text-align: left;">Entrega do produto final, documentação final e testes totais.</td>
+<td style="text-align: center;">Todos</td>
+<td style="text-align: center;">100%</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="24-matriz-de-comunicacao">2.4 Matriz de comunicação<a class="headerlink" href="#24-matriz-de-comunicacao" title="Permanent link">&para;</a></h3>
+<p><strong>Tabela 8 – Matriz de comunicação</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Descrição</th>
+<th style="text-align: left;">Envolvidos</th>
+<th style="text-align: left;">Periodicidade</th>
+<th style="text-align: left;">Produtos gerados</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Acompanhamento das atividades em andamento</td>
+<td style="text-align: left;">Toda a equipe do projeto</td>
+<td style="text-align: left;">Semanal</td>
+<td style="text-align: left;">Ata de reunião, relatório de situação do projeto.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Acompanhamento dos riscos, compromissos, ações pendentes, indicadores</td>
+<td style="text-align: left;">Toda a equipe do projeto</td>
+<td style="text-align: left;">Semanal</td>
+<td style="text-align: left;">Relatórios focados na resolução de pendências e riscos.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Comunicar situação do projeto</td>
+<td style="text-align: left;">Toda a equipe, Professor e Monitor</td>
+<td style="text-align: left;">Diária</td>
+<td style="text-align: left;">Alinhamentos quanto ao progresso do projeto.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="25-gerenciamento-de-riscos">2.5 Gerenciamento de riscos<a class="headerlink" href="#25-gerenciamento-de-riscos" title="Permanent link">&para;</a></h3>
+<p><strong>Tabela 9 – Riscos</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Risco</th>
+<th style="text-align: left;">Fase do projeto</th>
+<th style="text-align: center;">Grau</th>
+<th style="text-align: left;">Mitigação (prevenção)</th>
+<th style="text-align: left;">Contingência (reação)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Atraso nas entregas devido ao ciclo curto de 1 semana</td>
+<td style="text-align: left;">Todas as Sprints</td>
+<td style="text-align: center;">Alto</td>
+<td style="text-align: left;">Realizar reuniões de Sprint Planning rigorosas.</td>
+<td style="text-align: left;">Não negociar o aumento da duração da Sprint. As tarefas não concluídas devem ser interrompidas, retornar para o backlog e ser replanejadas para entrega na Sprint imediatamente seguinte.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Abandono/saída de membro da equipe</td>
+<td style="text-align: left;">Todas as Sprints</td>
+<td style="text-align: center;">Baixo</td>
+<td style="text-align: left;">Fomentar a prática de Pair Programming para evitar que apenas uma pessoa saiba mexer numa parte do código e manter a documentação sempre atualizada.</td>
+<td style="text-align: left;">Redistribuir imediatamente as tarefas críticas pelos restantes membros da equipe e reportar ao P.O. (Monitor Daniel) para reduzir a carga de trabalho (story points) planejada para as Sprints seguintes.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Falha na integração com serviços externos (autenticação Google)</td>
+<td style="text-align: left;">Sprints 9 e 10 (RF-24, Could have)</td>
+<td style="text-align: center;">Médio</td>
+<td style="text-align: left;">Iniciar os testes de requisição isoladamente via Postman antes de integrar o código ao front-end e ao back-end.</td>
+<td style="text-align: left;">Manter o cadastro e login com e-mail e senha já disponíveis no MVP (CF-01 e CF-02). Replanejar a integração opcional com o Google (CF-09) sem bloquear as funcionalidades obrigatórias ou comprometer a entrega final.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Desalinhamento com as expectativas do cliente</td>
+<td style="text-align: left;">Sprints de ponto de controle</td>
+<td style="text-align: center;">Baixo</td>
+<td style="text-align: left;">Envolver o cliente nas Sprint Reviews, reforçando a cada reunião o cronograma de entregas e deixando claro que o software é entregue em incrementos e ainda se encontra em fase de construção.</td>
+<td style="text-align: left;">Agendar uma reunião extraordinária de alinhamento para relembrar os prazos estritos das Sprints, esclarecendo que qualquer nova exigência não negociada irá para o Backlog para não comprometer o prazo da Sprint atual.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="26-criterios-de-replanejamento">2.6 Critérios de replanejamento<a class="headerlink" href="#26-criterios-de-replanejamento" title="Permanent link">&para;</a></h3>
+<p>Os critérios de replanejamento definem os cenários críticos que inviabilizam o cronograma atual. Para o projeto MotivaFit, utilizando a metodologia Scrum, qualquer replanejamento causará o versionamento deste documento. Os critérios adotados são:</p>
+<ul>
+<li><strong>Abandono da equipe</strong> por parte de algum membro, exigindo a readequação dos pontos de esforço da Sprint.</li>
+<li><strong>Alterações de escopo:</strong> se o cliente ou o Dono do Produto solicitarem mudanças estruturais nos cenários funcionais que ultrapassem a capacidade de entrega semanal da equipe.</li>
+<li><strong>Atraso crítico em requisitos MUST:</strong> caso a equipe atrase e não consiga entregar funcionalidades obrigatórias.</li>
+<li><strong>Acumulação de dívida técnica (débito técnico):</strong> quando a métrica de débito técnico (falta de refatoração, código não documentado ou ausência de testes) atingir um nível crítico que torne a base de código insustentável, impedindo a equipe de desenvolver e integrar novas funcionalidades com segurança.</li>
+</ul>
+<hr />
+<h2 id="3-processo-de-desenvolvimento-de-software">3 Processo de desenvolvimento de software<a class="headerlink" href="#3-processo-de-desenvolvimento-de-software" title="Permanent link">&para;</a></h2>
+<p>O fluxo de trabalho unifica a estrutura de gestão do Scrum com práticas de engenharia do eXtreme Programming (XP) [4, 5]. O gerenciamento estrutura entregas em Sprints iterativas curtas. O desenvolvimento é guiado por Testes Contínuos e Pair Programming. A esteira técnica utiliza Code Review constante entre a equipe e Integração Contínua (CI) via GitHub Actions, com aplicação contínua de princípios SOLID (responsabilidade única, aberto/fechado, substituição de Liskov, segregação de interfaces e inversão de dependência) e Clean Code no desenvolvimento em Java/Spring Boot.</p>
+<p>A equipe não adotará a Daily Scrum, pois a disponibilidade dos integrantes impossibilita a realização de encontros diários. Essa decisão representa uma adaptação do processo em relação ao Scrum descrito em [5]. O acompanhamento das atividades e a comunicação de impedimentos ocorrerão pelos canais de comunicação do grupo e nas reuniões semanais de acompanhamento.</p>
+<p>A Figura 3 mostra o fluxo de trabalho no nível de gestão das entregas. Os requisitos partem do Product Backlog e são selecionados durante a Sprint Planning, formando o Sprint Backlog. Durante a Sprint de uma semana, a equipe implementa os itens selecionados, aplica os testes e realiza as revisões de código e a integração contínua descritas nesta seção. Essas práticas técnicas ocorrem dentro da etapa Sprint, embora não estejam detalhadas na imagem.</p>
+<p>A etapa Review &amp; Retro reúne a avaliação da entrega e a reflexão sobre o processo. A Review verifica o resultado com os interessados; a Retrospectiva orienta ajustes para o próximo ciclo. O incremento corresponde à parte concluída do produto. Os itens pendentes ou as novas necessidades retornam ao planejamento das próximas Sprints [5].</p>
+<p><img alt="Figura 3 – Fluxo de trabalho: Product Backlog, Sprint Planning, Sprint Backlog, Sprint (1 semana), Review &amp; Retro, Incremento" src="../assets/img/visao-fig3-fluxo-de-trabalho.png" /></p>
+<p><em>Figura 3 – Fluxo de trabalho do projeto. Fonte: elaborado pelos autores (2026), com base no Guia do Scrum [5].</em></p>
+<hr />
+<h2 id="4-declaracao-de-escopo-do-projeto">4 Declaração de escopo do projeto<a class="headerlink" href="#4-declaracao-de-escopo-do-projeto" title="Permanent link">&para;</a></h2>
+<p>O escopo central do projeto abrange a criação de uma plataforma interativa onde o "Atleta Amador" pode criar fichas de treino personalizadas, registrar a conclusão diária de exercícios (check-ins) e acompanhar seu progresso estatístico. Estão inclusas no escopo as lógicas de gamificação (Hexad) para recompensar a assiduidade do usuário, além de um painel administrativo para gestão global do sistema.</p>
+<h3 id="41-backlog-do-produto">4.1 Backlog do produto<a class="headerlink" href="#41-backlog-do-produto" title="Permanent link">&para;</a></h3>
+<p>A elicitação dos requisitos e a construção deste backlog foram realizadas majoritariamente por meio de brainstorming entre os membros da equipe e análise do problema, com base nas dificuldades reais de praticantes de exercícios físicos em manter a constância.</p>
+<h4 id="411-classificacao-de-prioridade-moscow">4.1.1 Classificação de prioridade (MoSCoW)<a class="headerlink" href="#411-classificacao-de-prioridade-moscow" title="Permanent link">&para;</a></h4>
+<p>MoSCoW reúne as categorias Must have (obrigatório), Should have (importante), Could have (desejável) e Won't have (fora da entrega atual).</p>
+<p>A priorização dos itens foi definida da seguinte forma (visão da equipe, a ser validada pelo Dono do Produto, P.O.):</p>
+<ul>
+<li><strong>MUST (obrigatório):</strong> requisitos essenciais ao produto. O MVP da Sprint 4 reúne RF-01 a RF-11; RF-12 também é obrigatório para o produto, mas sua entrega está prevista para a Sprint 5, após o MVP.</li>
+<li><strong>SHOULD (importante):</strong> requisitos de alto valor agregado (como funcionalidades de gamificação e gráficos). São fundamentais para a retenção e proposta de valor do aplicativo, mas não impedem o fluxo básico de uso se entregues em um segundo momento.</li>
+<li><strong>COULD (desejável):</strong> funcionalidades que ampliam a experiência de uso, como a integração de login com o Google, mas que possuem menor prioridade e não são necessárias para a entrega do MVP. Sua implementação depende da capacidade disponível nas Sprints finais.</li>
+</ul>
+<h3 id="42-perfis">4.2 Perfis<a class="headerlink" href="#42-perfis" title="Permanent link">&para;</a></h3>
+<p>Haverá dois perfis de acesso, o usuário e o administrador. O usuário poderá acessar todas as funcionalidades referentes ao uso do aplicativo, ficando livre para testar as funcionalidades, enquanto o perfil administrador acompanhará as métricas e informações do aplicativo, como número de usuários, funcionalidades mais usadas e tempo médio de usuário no app, dentre outros.</p>
+<p><strong>Tabela 10 – Perfis de acesso</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Perfil</th>
+<th style="text-align: left;">Características</th>
+<th style="text-align: left;">Permissões</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Administrador</td>
+<td style="text-align: left;">Acompanham as métricas de uso do aplicativo: quantos usuários acessaram nos últimos 30 dias, qual a frequência média de treino, quem está no topo das atividades e quais atividades estão sendo mais utilizadas.</td>
+<td style="text-align: left;">Painel Admin (métricas).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">Atletas ou iniciantes em atividades físicas. Buscam registrar seus desempenhos individuais e comparar com seus amigos.</td>
+<td style="text-align: left;">Uso do app e métricas individuais.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="43-cenarios">4.3 Cenários<a class="headerlink" href="#43-cenarios" title="Permanent link">&para;</a></h3>
+<p><strong>Tabela 11 – Cenários funcionais</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID</th>
+<th style="text-align: left;">Cenário</th>
+<th style="text-align: center;">Sprints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">CF-01</td>
+<td style="text-align: left;">Novo usuário cria sua conta com e-mail e senha</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF-02</td>
+<td style="text-align: left;">Usuário cadastrado deseja autenticar-se com e-mail e senha</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF-03</td>
+<td style="text-align: left;">Usuário deseja cadastrar, listar, alterar ou excluir seus treinos</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF-04</td>
+<td style="text-align: left;">Usuário deseja cadastrar, listar, alterar e excluir exercícios de um treino e registrar sua execução</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF-05</td>
+<td style="text-align: left;">Usuário já possui acesso ao sistema e deseja acompanhar sua evolução nos treinos</td>
+<td style="text-align: center;">5, 8</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF-06</td>
+<td style="text-align: left;">Usuário já possui acesso ao sistema, já possui registros de exercícios, busca novos desafios e deseja comparar sua evolução com a de seu grupo de amigos</td>
+<td style="text-align: center;">7, 8, 9</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF-07</td>
+<td style="text-align: left;">Administrador não possui acesso, mas pode receber um e-mail de convite para realizar seu cadastro</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF-08</td>
+<td style="text-align: left;">Administrador já tem acesso ao sistema e deseja acessar o painel de acompanhamento de métricas</td>
+<td style="text-align: center;">5, 6, 7</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF-09</td>
+<td style="text-align: left;">Usuário deseja autenticar-se pelo Google como alternativa ao acesso com e-mail e senha, após a entrega do MVP</td>
+<td style="text-align: center;">9, 10</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="44-tabela-de-backlog-do-produto">4.4 Tabela de backlog do produto<a class="headerlink" href="#44-tabela-de-backlog-do-produto" title="Permanent link">&para;</a></h3>
+<p><strong>Abreviações da tabela:</strong> Est.: estimativa preliminar de planejamento do requisito, sem equivalência direta em horas ou contagem formal de PF; US: User Story (história de usuário); ID: identificador. O símbolo "–" indica estimativa ainda não definida.</p>
+<p>O backlog identifica cada requisito funcional pelo código RF e o cenário de uso correspondente pelo código CF. Um cenário pode reunir vários requisitos: por exemplo, CF-03 corresponde ao gerenciamento de treinos e está associado a cadastro (RF-03), listagem (RF-04), alteração (RF-05) e exclusão (RF-06). Essa identificação permite relacionar cada funcionalidade ao planejamento e aos testes.</p>
+<p>Pontos de função (PF) são uma unidade de medida do tamanho funcional do software, considerando as funcionalidades oferecidas ao usuário, independentemente da linguagem ou tecnologia utilizada [8]. A contagem considera funções de dados e transações, como entradas, saídas e consultas, classificadas conforme sua complexidade. PF não representa diretamente horas de trabalho nem pontos de esforço da Sprint.</p>
+<p>O MVP será concluído ao final da Sprint 4 e compreenderá o cadastro e o login com e-mail e senha, o gerenciamento de treinos e o gerenciamento e registro de exercícios. O acesso inicial está dividido em cadastro de usuário com e-mail e senha (RF-01, cenário CF-01) e autenticação com e-mail e senha (RF-02, cenário CF-02), ambos obrigatórios (Must have). O backlog atribui o valor inicial de 1 a cada requisito, totalizando 2 unidades estimadas para cadastro e autenticação. Esses valores são estimativas preliminares de planejamento; a contagem formal em PF depende do detalhamento das funções, dos dados envolvidos e da aplicação das regras de contagem [8]. O desenvolvimento dessas funcionalidades está distribuído entre as Sprints 3 e 4, com a conclusão e validação do conjunto de login, treinos e exercícios na Sprint 4, conforme os casos de teste previstos.</p>
+<p>A integração de login com o Google corresponde ao requisito RF-24, associado ao cenário CF-09, com prioridade Could have. Está prevista para as Sprints finais: implementação na Sprint 9 e validação na Sprint 10, conforme a capacidade da equipe. O acesso com e-mail e senha permanece disponível independentemente dessa integração. A estimativa funcional de RF-24 será definida no refinamento do requisito.</p>
+<p><strong>Tabela 12 – Backlog detalhado</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Requisito</th>
+<th style="text-align: center;">Cenário</th>
+<th style="text-align: center;">Sprint</th>
+<th style="text-align: center;">Prioridade</th>
+<th style="text-align: center;">Est.</th>
+<th style="text-align: left;">Descrição sucinta</th>
+<th style="text-align: left;">User story associada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>RF-01</strong> Cadastro com e-mail e senha</td>
+<td style="text-align: center;">CF-01</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Criar conta com e-mail e senha.</td>
+<td style="text-align: left;">US-01: Como visitante, quero criar minha conta com e-mail e senha para acessar o aplicativo.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-02</strong> Login com e-mail e senha</td>
+<td style="text-align: center;">CF-02</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Autenticar com e-mail e senha e rejeitar credenciais inválidas.</td>
+<td style="text-align: left;">US-02: Como usuário cadastrado, quero entrar com e-mail e senha para acessar meus treinos.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-03</strong> Cadastro de treino</td>
+<td style="text-align: center;">CF-03</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Cadastrar treino com nome e tipo.</td>
+<td style="text-align: left;">US-03: Como usuário, quero cadastrar meu treino para organizar minha rotina.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-04</strong> Listagem de treinos</td>
+<td style="text-align: center;">CF-03</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Listar os treinos do usuário e permitir adicionar treinos já montados.</td>
+<td style="text-align: left;">US-04: Como usuário, quero visualizar meus treinos e adicionar treinos já montados para organizar minhas opções.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-05</strong> Alteração de treino</td>
+<td style="text-align: center;">CF-03</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Alterar nome e tipo de treino.</td>
+<td style="text-align: left;">US-05: Como usuário, quero alterar meu treino para adaptar minha rotina.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-06</strong> Exclusão de treino</td>
+<td style="text-align: center;">CF-03</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Excluir treino do usuário.</td>
+<td style="text-align: left;">US-06: Como usuário, quero excluir um treino para remover rotinas que não utilizo.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-07</strong> Cadastrar exercício no treino</td>
+<td style="text-align: center;">CF-04</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Adicionar exercício predefinido a um treino e definir metas.</td>
+<td style="text-align: left;">US-07: Como usuário, quero adicionar exercícios e metas ao treino para planejar a sessão.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-08</strong> Listar exercícios</td>
+<td style="text-align: center;">CF-04</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Listar exercícios e metas de um treino.</td>
+<td style="text-align: left;">US-08: Como usuário, quero consultar exercícios e metas para executar meu treino.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-09</strong> Alterar exercício</td>
+<td style="text-align: center;">CF-04</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Editar informações de exercício vinculado a treino.</td>
+<td style="text-align: left;">US-09: Como usuário, quero ajustar as metas do exercício para adaptar meu treino.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-10</strong> Excluir exercício</td>
+<td style="text-align: center;">CF-04</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Excluir exercício de um treino.</td>
+<td style="text-align: left;">US-10: Como usuário, quero remover um exercício para atualizar minha rotina.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-11</strong> Registrar exercício realizado</td>
+<td style="text-align: center;">CF-04</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Registrar execução, carga, repetições, séries e tempo.</td>
+<td style="text-align: left;">US-11: Como usuário, quero registrar a execução dos exercícios para manter meu histórico.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-12</strong> Métricas de evolução</td>
+<td style="text-align: center;">CF-05</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Exibir indicadores de desempenho e evolução.</td>
+<td style="text-align: left;">US-12: Como usuário, quero acompanhar minhas métricas para perceber minha evolução.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-13</strong> Convite admin por e-mail</td>
+<td style="text-align: center;">CF-07</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">Could</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Enviar convite por e-mail para novo administrador.</td>
+<td style="text-align: left;">US-13: Como superusuário, quero convidar administradores para delegar a gestão do sistema.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-14</strong> Usuários ativos (Admin)</td>
+<td style="text-align: center;">CF-08</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">Should</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Exibir quantidade de usuários ativos nos últimos 30 dias.</td>
+<td style="text-align: left;">US-14: Como administrador, quero consultar usuários ativos para acompanhar a adesão.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-15</strong> Frequência média (Admin)</td>
+<td style="text-align: center;">CF-08</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">Should</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Exibir frequência média de treinos por semana e usuário.</td>
+<td style="text-align: left;">US-15: Como administrador, quero consultar a frequência média para acompanhar a constância.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-16</strong> Ranking usuários (Admin)</td>
+<td style="text-align: center;">CF-08</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">Should</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Exibir os dez usuários com maior tempo de treino nos últimos 30 dias.</td>
+<td style="text-align: left;">US-16: Como administrador, quero consultar o ranking para acompanhar a atividade dos usuários.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-17</strong> Exercícios mais feitos (Admin)</td>
+<td style="text-align: center;">CF-08</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">Should</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Exibir os três exercícios mais realizados nos últimos 30 dias.</td>
+<td style="text-align: left;">US-17: Como administrador, quero consultar exercícios mais realizados para conhecer o uso.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-18</strong> Submissão de desafios</td>
+<td style="text-align: center;">CF-06</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Criar desafios entre amigos com exercícios, metas e prazo.</td>
+<td style="text-align: left;">US-18: Como usuário, quero propor desafios para incentivar meu grupo de amigos.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-19</strong> Remoção de desafios</td>
+<td style="text-align: center;">CF-06</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Remover desafio criado pelo usuário.</td>
+<td style="text-align: left;">US-19: Como usuário, quero remover meus desafios para manter as propostas atualizadas.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-20</strong> PR – Recorde pessoal</td>
+<td style="text-align: center;">CF-05</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Acompanhar metas de recordes pessoais no exercício.</td>
+<td style="text-align: left;">US-20: Como usuário, quero acompanhar meus recordes pessoais para perceber minha evolução.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-21</strong> Partilha de resultados</td>
+<td style="text-align: center;">CF-06</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">Should</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">Compartilhar resultados em espaço comunitário público.</td>
+<td style="text-align: left;">US-21: Como usuário, quero compartilhar meus resultados para motivar a comunidade.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-22</strong> Conquistas (streak)</td>
+<td style="text-align: center;">CF-06</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">Must</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Exibir conquistas de assiduidade no perfil.</td>
+<td style="text-align: left;">US-22: Como usuário, quero visualizar minhas conquistas para reconhecer minha constância.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-23</strong> Feed interativo</td>
+<td style="text-align: center;">CF-06</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">Should</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">Permitir grupos por convite e interação com resultados diários.</td>
+<td style="text-align: left;">US-23: Como usuário, quero curtir e comentar resultados do meu grupo para incentivar meus amigos.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RF-24</strong> Login com Google</td>
+<td style="text-align: center;">CF-09</td>
+<td style="text-align: center;">9, 10</td>
+<td style="text-align: center;">Could</td>
+<td style="text-align: center;">–</td>
+<td style="text-align: left;">Oferecer autenticação opcional com Google após o MVP.</td>
+<td style="text-align: left;">US-24: Como usuário, quero entrar com Google como alternativa para facilitar meu acesso.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026). Todos os requisitos são do tipo funcional.</em></p>
+<h4 id="441-descricao-dos-requisitos">4.4.1 Descrição dos requisitos<a class="headerlink" href="#441-descricao-dos-requisitos" title="Permanent link">&para;</a></h4>
+<p>Todos os requisitos abaixo são do tipo funcional. Os identificadores RF correspondem aos cenários CF apresentados na tabela de backlog.</p>
+<ul>
+<li><strong>RF-01</strong> — Permitir ao usuário não autenticado criar sua conta no sistema informando e-mail e senha. Requisito obrigatório para o MVP, associado ao cenário CF-01.</li>
+<li><strong>RF-02</strong> — Permitir ao usuário cadastrado acessar o sistema com e-mail e senha válidos e impedir o acesso com credenciais inválidas. Requisito obrigatório para o MVP, associado ao cenário CF-02.</li>
+<li><strong>RF-03</strong> — O usuário adiciona o seu novo treino, definindo o nome e tipo de treino (musculação ou aeróbico).</li>
+<li><strong>RF-04</strong> — O usuário irá visualizar o catálogo de treinos dele, permitindo também adicionar treinos já montados (basta o usuário adicionar na sua lista).</li>
+<li><strong>RF-05</strong> — Permite ao usuário fazer alteração no treino (nome e tipo de treino: musculação ou aeróbico).</li>
+<li><strong>RF-06</strong> — Permite ao usuário remover um treino da sua lista de treinos.</li>
+<li><strong>RF-07</strong> — Permite ao usuário cadastrar um novo exercício dentro de um treino, definindo a meta de tempo, repetições e/ou carga deste exercício, além do pace para corrida. Essas metas ficam em um campo de texto, onde o usuário digita a meta. Esse exercício já está predefinido na tabela de exercícios, de forma que o usuário não consegue criar o seu exercício.</li>
+<li><strong>RF-08</strong> — Listar os exercícios de um treino (exibir o nome do exercício e suas metas).</li>
+<li><strong>RF-09</strong> — Permite ao usuário a edição e atualização das informações de um exercício já cadastrado em um treino.</li>
+<li><strong>RF-10</strong> — Permite ao usuário remover um exercício da sua lista de exercícios de um treino.</li>
+<li><strong>RF-11</strong> — Permite ao usuário registrar a execução de um exercício em seu treino, registrando meta de carga, de repetições, de séries e tempo de execução.</li>
+<li><strong>RF-12</strong> — O usuário pode visualizar indicadores de desempenho e evolução física ao longo do tempo.</li>
+<li><strong>RF-13</strong> — Permite ao superusuário enviar um convite de novo administrador pelo e-mail do novo administrador.</li>
+<li><strong>RF-14</strong> — Exibe a quantidade de usuários ativos nos últimos 30 dias.</li>
+<li><strong>RF-15</strong> — Exibe a frequência média de treinos/semana/usuário.</li>
+<li><strong>RF-16</strong> — No painel do administrador, exibe o ranking dos usuários ativos nos últimos 30 dias, listados por maior tempo de treino (top 10).</li>
+<li><strong>RF-17</strong> — No painel do administrador, exibe os 3 exercícios mais realizados pelos usuários nos últimos 30 dias.</li>
+<li><strong>RF-18</strong> — No painel do usuário, criar uma lista de exercícios entre amigos para realizarem dentro de um prazo de tempo. Definindo, para cada exercício, metas de carga, repetições, séries ou tempo de exercício.</li>
+<li><strong>RF-19</strong> — Permite ao usuário remover um desafio criado.</li>
+<li><strong>RF-20</strong> — Opção para a criação de um acompanhamento sobre a evolução do usuário em suas metas de recordes pessoais (campo de texto no exercício).</li>
+<li><strong>RF-21</strong> — Local público para compartilhar os resultados dos usuários para fazer com que eles continuem se motivando.</li>
+<li><strong>RF-22</strong> — Conquistas visuais no perfil de cada usuário para que eles possam mostrar o seu empenho nos seus treinos.</li>
+<li><strong>RF-23</strong> — Criação de pequenos grupos de treino onde os membros podem curtir, comentar e celebrar os resultados diários uns dos outros, fortalecendo as relações (entrada por meio de convite).</li>
+<li><strong>RF-24</strong> — Integrar a autenticação com o Google como alternativa ao login com e-mail e senha. Requisito Could have, associado ao cenário CF-09, previsto para implementação e validação nas Sprints 9 e 10 conforme a capacidade da equipe, após a entrega do MVP. A integração não substitui o acesso com e-mail e senha.</li>
+</ul>
+<h3 id="45-matriz-de-rastreabilidade">4.5 Matriz de rastreabilidade<a class="headerlink" href="#45-matriz-de-rastreabilidade" title="Permanent link">&para;</a></h3>
+<p><strong>Tabela 13 – Matriz de rastreabilidade</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Problema / cenário</th>
+<th style="text-align: left;">Perfil</th>
+<th style="text-align: left;">Requisitos</th>
+<th style="text-align: left;">Testes planejados</th>
+<th style="text-align: left;">Métrica</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Acesso (CF-01, CF-02)</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-01, RF-02</td>
+<td style="text-align: left;">T1, T2, T3, T22</td>
+<td style="text-align: left;">M2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Organização (CF-03)</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-03 a RF-06</td>
+<td style="text-align: left;">T4 a T7, T14</td>
+<td style="text-align: left;">Uso / Throughput</td>
+</tr>
+<tr>
+<td style="text-align: left;">Personalização (CF-04)</td>
+<td style="text-align: left;">Free Spirit</td>
+<td style="text-align: left;">RF-07 a RF-10</td>
+<td style="text-align: left;">T15 a T18</td>
+<td style="text-align: left;">M3</td>
+</tr>
+<tr>
+<td style="text-align: left;">Registro (CF-04)</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-11</td>
+<td style="text-align: left;">T8</td>
+<td style="text-align: left;">Uso / M3</td>
+</tr>
+<tr>
+<td style="text-align: left;">Evolução (CF-05)</td>
+<td style="text-align: left;">Achiever</td>
+<td style="text-align: left;">RF-12, RF-20</td>
+<td style="text-align: left;">T9, T19</td>
+<td style="text-align: left;">Uso / Throughput</td>
+</tr>
+<tr>
+<td style="text-align: left;">Convite (CF-07)</td>
+<td style="text-align: left;">Superusuário</td>
+<td style="text-align: left;">RF-13</td>
+<td style="text-align: left;">A detalhar antes da Sprint 5</td>
+<td style="text-align: left;">M2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gestão (CF-08)</td>
+<td style="text-align: left;">Administrador</td>
+<td style="text-align: left;">RF-14 a RF-17</td>
+<td style="text-align: left;">T11 (acesso); testes funcionais a detalhar antes das Sprints 5 a 7</td>
+<td style="text-align: left;">Throughput</td>
+</tr>
+<tr>
+<td style="text-align: left;">Desafios (CF-06)</td>
+<td style="text-align: left;">Disruptor</td>
+<td style="text-align: left;">RF-18, RF-19</td>
+<td style="text-align: left;">A detalhar antes da Sprint 7</td>
+<td style="text-align: left;">Uso</td>
+</tr>
+<tr>
+<td style="text-align: left;">Compartilhamento (CF-06)</td>
+<td style="text-align: left;">Philanthropist</td>
+<td style="text-align: left;">RF-21</td>
+<td style="text-align: left;">A detalhar antes da Sprint 8</td>
+<td style="text-align: left;">Uso</td>
+</tr>
+<tr>
+<td style="text-align: left;">Conquistas (CF-06)</td>
+<td style="text-align: left;">Player</td>
+<td style="text-align: left;">RF-22</td>
+<td style="text-align: left;">T10</td>
+<td style="text-align: left;">Uso</td>
+</tr>
+<tr>
+<td style="text-align: left;">Interação (CF-06)</td>
+<td style="text-align: left;">Socialiser</td>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: left;">A detalhar antes da Sprint 9</td>
+<td style="text-align: left;">Uso</td>
+</tr>
+<tr>
+<td style="text-align: left;">Acesso alternativo (CF-09)</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-24</td>
+<td style="text-align: left;">T12, T13, T21, T22</td>
+<td style="text-align: left;">M2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Usabilidade do MVP</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-01 a RF-11</td>
+<td style="text-align: left;">T20</td>
+<td style="text-align: left;">Conclusão das tarefas</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<hr />
+<h2 id="5-metricas-e-medicoes">5 Métricas e medições<a class="headerlink" href="#5-metricas-e-medicoes" title="Permanent link">&para;</a></h2>
+<p>Para assegurar a saúde e a transparência do projeto, aplicamos a abordagem GQM (Goal-Question-Metric, objetivo–questão–métrica) estruturada para garantir rastreabilidade entre as metas de negócio e as métricas operacionais coletadas [6].</p>
+<h3 id="51-o-quadro-gqm-estruturado-e-questoes">5.1 O quadro GQM estruturado e questões<a class="headerlink" href="#51-o-quadro-gqm-estruturado-e-questoes" title="Permanent link">&para;</a></h3>
+<p>Os códigos G, Q e M identificam, respectivamente, objetivos (Goals), questões (Questions) e métricas (Metrics).</p>
+<p>A tabela utiliza o padrão explícito do framework GQM (<em>Analisar / com o propósito de / com respeito a / do ponto de vista de / no contexto de</em>) e o relaciona diretamente às respectivas questões e métricas.</p>
+<p><strong>Tabela 14 – Quadro GQM de acompanhamento do projeto</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">ID</th>
+<th style="text-align: left;">Objetivo estruturado (Goal)</th>
+<th style="text-align: left;">Questão (Question)</th>
+<th style="text-align: left;">Métrica (Metric)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">G1</td>
+<td style="text-align: left;">Analisar o processo de desenvolvimento com o propósito de avaliar a cadência de entrega com respeito a produtividade da equipe do ponto de vista de gerenciamento de projeto no contexto das Sprints semanais do MotivaFit.</td>
+<td style="text-align: left;">Q1: Qual a cadência de entrega da equipe por Sprint?</td>
+<td style="text-align: left;">M1: Throughput (vazão) de issues.</td>
+</tr>
+<tr>
+<td style="text-align: center;">G2</td>
+<td style="text-align: left;">Analisar o produto gerado com o propósito de avaliar a estabilidade do software com respeito a ocorrência de falhas do ponto de vista de qualidade no contexto das entregas contínuas do MotivaFit.</td>
+<td style="text-align: left;">Q2: Qual a estabilidade do software entregue na Sprint?</td>
+<td style="text-align: left;">M2: Densidade de defeitos.</td>
+</tr>
+<tr>
+<td style="text-align: center;">G3</td>
+<td style="text-align: left;">Analisar o código-fonte com o propósito de garantir a blindagem contra regressões com respeito a testes automatizados do ponto de vista de engenharia de software no contexto da integração contínua do MotivaFit.</td>
+<td style="text-align: left;">Q3: O código em produção está adequadamente coberto por testes?</td>
+<td style="text-align: left;">M3: Percentual de cobertura.</td>
+</tr>
+<tr>
+<td style="text-align: center;">G4</td>
+<td style="text-align: left;">Analisar a base de código com o propósito de controlar a manutenibilidade com respeito a débito técnico do ponto de vista de desenvolvimento no contexto do repositório do projeto.</td>
+<td style="text-align: left;">Q4: Qual o nível de dívida técnica acumulada no código da aplicação?</td>
+<td style="text-align: left;">M4: Dívida técnica.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="52-fichas-de-detalhamento-das-metricas-5w1h-escalas-e-analises">5.2 Fichas de detalhamento das métricas (5W1H, escalas e análises)<a class="headerlink" href="#52-fichas-de-detalhamento-das-metricas-5w1h-escalas-e-analises" title="Permanent link">&para;</a></h3>
+<p>5W1H reúne seis perguntas: What (o quê), Why (por quê), Who (quem), Where (onde), When (quando) e How (como).</p>
+<h4 id="metrica-1-m1-throughput-vazao-de-issues-por-sprint">Métrica 1 (M1): throughput (vazão) de issues por Sprint<a class="headerlink" href="#metrica-1-m1-throughput-vazao-de-issues-por-sprint" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Campo</th>
+<th style="text-align: left;">Detalhamento</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Definição</td>
+<td style="text-align: left;">Quantidade de histórias (issues) concluídas (Done) ao final de cada iteração.</td>
+</tr>
+<tr>
+<td style="text-align: left;">What (o quê)</td>
+<td style="text-align: left;">Número de issues encerradas por Sprint.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Why (por quê)</td>
+<td style="text-align: left;">Identificar a cadência de entrega para evitar sobrecarga ou ociosidade no time.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Who (quem)</td>
+<td style="text-align: left;">Analista de Qualidade e Desenvolvedores.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Where (onde)</td>
+<td style="text-align: left;">Board do GitHub Projects (aba "Done").</td>
+</tr>
+<tr>
+<td style="text-align: left;">When (quando)</td>
+<td style="text-align: left;">Ao final de cada Sprint (durante a Review).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cálculo / How (como)</td>
+<td style="text-align: left;">Somatório simples absoluto das tarefas movidas para a coluna de finalizadas no período.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Escala de unidade</td>
+<td style="text-align: left;">issues / sprint (número inteiro).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Valor esperado</td>
+<td style="text-align: left;">4 a 6 tarefas por Sprint. Justificativa: baseado na capacidade atual de horas da equipe (estimada via Planning Poker para as aproximadamente 14 horas disponíveis semanais por membro).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Forma de análise</td>
+<td style="text-align: left;">Gráfico de tendência (controle de vazão / burn-up) analisado durante a Retrospectiva. Se o valor ficar abaixo da meta por duas Sprints, o escopo do backlog deve ser renegociado com o cliente.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h4 id="metrica-2-m2-densidade-de-defeitos">Métrica 2 (M2): densidade de defeitos<a class="headerlink" href="#metrica-2-m2-densidade-de-defeitos" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Campo</th>
+<th style="text-align: left;">Detalhamento</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Definição</td>
+<td style="text-align: left;">Relação matemática entre os defeitos válidos registrados e o volume de entregas (issues fechadas).</td>
+</tr>
+<tr>
+<td style="text-align: left;">What (o quê)</td>
+<td style="text-align: left;">Falhas de código ou de regras de negócio identificadas.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Why (por quê)</td>
+<td style="text-align: left;">Avaliar se a velocidade de entrega não está gerando instabilidade na aplicação.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Who (quem)</td>
+<td style="text-align: left;">Analista de Qualidade (registro) e Equipe (resolução).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Where (onde)</td>
+<td style="text-align: left;">Issues do repositório no GitHub (filtradas pela label <code>bug</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;">When (quando)</td>
+<td style="text-align: left;">Fechamento de cada Sprint e eventos de Release.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cálculo / How (como)</td>
+<td style="text-align: left;">D = (nº de bugs registrados na Sprint) / (nº de issues concluídas na Sprint).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Escala de unidade</td>
+<td style="text-align: left;">bugs / issue (número decimal).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Valor esperado</td>
+<td style="text-align: left;">≤ 0,2 bugs/issue.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Forma de análise</td>
+<td style="text-align: left;">Comparação direta com o teto de 0,2. Se o indicador ultrapassar esse limite, a Sprint subsequente deve travar o desenvolvimento de novas features e focar obrigatoriamente na resolução de bugs (hardening).</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h4 id="metrica-3-m3-percentual-de-cobertura-de-testes-coverage">Métrica 3 (M3): percentual de cobertura de testes (coverage)<a class="headerlink" href="#metrica-3-m3-percentual-de-cobertura-de-testes-coverage" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Campo</th>
+<th style="text-align: left;">Detalhamento</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Definição</td>
+<td style="text-align: left;">Proporção de linhas úteis de código validadas e testadas pelos scripts automatizados na esteira de integração.</td>
+</tr>
+<tr>
+<td style="text-align: left;">What (o quê)</td>
+<td style="text-align: left;">Métrica de Line Coverage da aplicação global.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Why (por quê)</td>
+<td style="text-align: left;">Garantir que refatorações não quebrem as lógicas de gamificação e treinos existentes.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Who (quem)</td>
+<td style="text-align: left;">Desenvolvedores responsáveis pelos testes e QA (Quality Assurance, garantia da qualidade) responsável pela auditoria.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Where (onde)</td>
+<td style="text-align: left;">Logs do GitHub Actions e painel de validação de PR.</td>
+</tr>
+<tr>
+<td style="text-align: left;">When (quando)</td>
+<td style="text-align: left;">A cada abertura e atualização de Pull Request (PR) para as branches principais.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cálculo / How (como)</td>
+<td style="text-align: left;">C = [(linhas cobertas back-end + linhas cobertas front-end) / (total de linhas back-end + total de linhas front-end)] × 100.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Escala de unidade</td>
+<td style="text-align: left;">Porcentagem (%).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Valor esperado</td>
+<td style="text-align: left;">≥ 70%. Justificativa: limiar de convenção interna para balancear estabilidade e agilidade na prototipagem inicial.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Forma de análise</td>
+<td style="text-align: left;">Ação automatizada bloqueante no CI. Pull Requests que reduzam o percentual global para baixo da meta de 70% não poderão ser mesclados (merged) sob nenhuma hipótese.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h4 id="metrica-4-m4-divida-tecnica-debito-tecnico">Métrica 4 (M4): dívida técnica (débito técnico)<a class="headerlink" href="#metrica-4-m4-divida-tecnica-debito-tecnico" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Campo</th>
+<th style="text-align: left;">Detalhamento</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Definição</td>
+<td style="text-align: left;">Medição contínua de violações de boas práticas de desenvolvimento e arquitetura, incluindo bad smells, código duplicado e alto acoplamento [7].</td>
+</tr>
+<tr>
+<td style="text-align: left;">What (o quê)</td>
+<td style="text-align: left;">Complexidade ciclomática e code smells.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Why (por quê)</td>
+<td style="text-align: left;">Prevenir o envelhecimento precoce e a insustentabilidade a longo prazo da base de código.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Who (quem)</td>
+<td style="text-align: left;">Todos os membros da equipe de engenharia.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Where (onde)</td>
+<td style="text-align: left;">Dashboard de monitoramento da ferramenta de análise estática (ex.: SonarQube).</td>
+</tr>
+<tr>
+<td style="text-align: left;">When (quando)</td>
+<td style="text-align: left;">Escaneamento diário executado automaticamente pela pipeline.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cálculo / How (como)</td>
+<td style="text-align: left;">Varredura da AST (Abstract Syntax Tree, árvore de sintaxe abstrata) da aplicação identificando anti-patterns pré-configurados.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Escala de unidade</td>
+<td style="text-align: left;">Número absoluto de code smells e avaliação em letras (A, B, C, D) para manutenibilidade.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Valor esperado</td>
+<td style="text-align: left;">Zero (0) falhas críticas / classificação "A".</td>
+</tr>
+<tr>
+<td style="text-align: left;">Forma de análise</td>
+<td style="text-align: left;">Acompanhamento visual via badge no repositório. O aparecimento de qualquer defeito de nível "Crítico" ou "Blocker" instaura prioridade máxima de refatoração para a dupla de desenvolvimento (Pair Programming) do dia.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<hr />
+<h2 id="6-testes-de-software">6 Testes de software<a class="headerlink" href="#6-testes-de-software" title="Permanent link">&para;</a></h2>
+<p>A estratégia de qualidade foca em garantir uma experiência fluida e livre de falhas lógicas. A abordagem engloba testes unitários rigorosos (especialmente para a lógica de pontuação e serviços do back-end), testes funcionais de integração da API (Application Programming Interface, interface de programação de aplicações) e avaliações de desempenho. O objetivo é assegurar não apenas o funcionamento correto, mas também garantir que as interfaces respondam rapidamente.</p>
+<h3 id="61-estrategia-de-testes">6.1 Estratégia de testes<a class="headerlink" href="#61-estrategia-de-testes" title="Permanent link">&para;</a></h3>
+<p><strong>Níveis de testes abordados</strong></p>
+<ul>
+<li><strong>Unitário:</strong> testes isolados de funções e componentes.</li>
+<li><strong>Integração:</strong> testes da comunicação entre módulos, com foco na interação das rotas da API com a base de dados (PostgreSQL) e na integração das telas do front-end com os endpoints do back-end.</li>
+<li><strong>Sistema:</strong> testes que simulam o fluxo completo do usuário, desde a interação na interface móvel até a resposta do servidor e a persistência dos dados.</li>
+</ul>
+<p><strong>Tipos de testes abordados:</strong> o foco principal reside nos testes funcionais: validação das regras de negócio (criação de treinos, evolução de cargas), fluxos de autenticação com e-mail e senha no MVP e, nas Sprints finais, login opcional com o Google e operações de CRUD (Create, Read, Update, Delete: criar, consultar, atualizar e excluir) no sistema. Adicionalmente, são planejados testes não funcionais focados na usabilidade da interface móvel e na sua adaptação a diferentes telas.</p>
+<p><strong>Ambientes de testes usados</strong></p>
+<p>O processo de testes obedece à política de branches e commits estabelecida para o projeto no GitHub:</p>
+<ul>
+<li><strong>Ambiente local:</strong> ambiente utilizado pela equipe de desenvolvimento para a criação e execução dos testes na respectiva branch da funcionalidade antes de solicitar a integração.</li>
+<li><strong>Ambiente de Integração Contínua (CI):</strong> ao abrir um Pull Request para a branch principal, os fluxos do GitHub Actions são acionados automaticamente, executando os testes unitários e de integração em containers Docker. O merge só é autorizado se toda a pipeline de testes for aprovada sem falhas.</li>
+</ul>
+<p><strong>Formas de análise dos testes propostos</strong></p>
+<p>Os testes são avaliados por meio dos relatórios de execução local e dos logs de execução do GitHub Actions. Em caso de falha, o Analista de Qualidade (Bernardo) examina o erro em conjunto com os desenvolvedores responsáveis pela funcionalidade, garantindo o reparo e acompanhando a correção por meio de inspeções de código até a nova aprovação dos testes.</p>
+<p><strong>Resultados obtidos</strong></p>
+<p>Até esta revisão, os casos estão planejados e não há resultados de execução ou evidências registrados neste documento. O registro de execução da seção 6.2 apresenta essa situação explicitamente, com zero ciclos executados. Cada caso de teste possui um resultado esperado (previsto), detalhado no roteiro de testes (seção 6.2). Qualquer divergência frente ao comportamento real (realizado) da aplicação é identificada como um defeito. Esse defeito deve ser reparado e o ciclo de teste repetido até que o resultado realizado corresponda ao previsto (<strong>Previsto = Realizado</strong>), atingindo o critério de aprovação do caso executado. Casos apenas planejados não constituem evidência de ausência de defeitos.</p>
+<h3 id="62-roteiro-de-teste">6.2 Roteiro de teste<a class="headerlink" href="#62-roteiro-de-teste" title="Permanent link">&para;</a></h3>
+<p>Os códigos T identificam os casos de teste.</p>
+<p>O roteiro documenta os cenários de validação planejados (Test Plan). O resultado obtido, a referência da evidência, os reparos e o número de ciclos devem ser atualizados no registro de execução após cada teste. Evidências externas devem ser identificadas por caminho ou URL (Uniform Resource Locator, endereço de um recurso), versão do código e data. Casos apenas planejados não garantem ausência de defeitos, mas estabelecem o critério de sucesso.</p>
+<p>O roteiro é organizado em duas tabelas vinculadas pelo ID: planejamento (tipo, nível, pré-condições e resultado previsto) e execução (resultado obtido, evidência, reparos e ciclos). O detalhamento apresenta o objetivo e, nos novos casos, os procedimentos. T2 e T3 validam e-mail e senha do MVP; não testam a senha do Google. O consentimento cancelado é tratado em T13, tokens inválidos ou expirados em T21 e acesso sem sessão em T22.</p>
+<p>Os casos T1 a T8, T14 a T18 e T22 devem ser executados nas Sprints 3 e 4; T20 valida o conjunto do MVP na Sprint 4. T9 será executado na Sprint 5, T19 na Sprint 8 e T10 na Sprint 9. T11 acompanha a entrega das funcionalidades administrativas. T12, T13 e T21 dependem da implementação de RF-24 nas Sprints 9 e 10. Os casos funcionais ainda não detalhados de RF-13 a RF-19, RF-21 e RF-23 deverão ser definidos antes da Sprint de implementação de cada requisito, com atualização da matriz. O teste de acesso T11 não substitui os testes funcionais do painel administrativo.</p>
+<p><strong>Tabela 19 – Planejamento dos testes</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID / nome</th>
+<th style="text-align: left;">Tipo</th>
+<th style="text-align: left;">Nível</th>
+<th style="text-align: left;">Pré-condições</th>
+<th style="text-align: left;">Resultado previsto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>T1</strong> Cadastro de usuário com e-mail e senha</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário ainda não cadastrado; acesso à tela de cadastro; e-mail e senha válidos para o cadastro</td>
+<td style="text-align: left;">A conta e o perfil do usuário são criados. O usuário pode acessar a tela de login para se autenticar com o e-mail e a senha cadastrados</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T2</strong> Login com credencial válida</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário previamente cadastrado; e-mail e senha válidos</td>
+<td style="text-align: left;">O sistema autentica o usuário e exibe a tela principal correspondente ao perfil</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T3</strong> Login com dados inválidos</td>
+<td style="text-align: left;">Funcional / Segurança</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário cadastrado; senha ou e-mail incorreto</td>
+<td style="text-align: left;">O sistema nega o acesso e apresenta uma mensagem clara, sem revelar informação sensível</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T4</strong> Cadastro de treino personalizado</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; acesso ao formulário de treino; nome e tipo válidos</td>
+<td style="text-align: left;">O treino é validado, salvo no banco de dados e exibido na lista de treinos do usuário</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T5</strong> Validação de treino incompleto</td>
+<td style="text-align: left;">Funcional / Validação</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; acesso à tela de criação de treino</td>
+<td style="text-align: left;">O sistema impede o salvamento e informa quais campos precisam ser preenchidos. Nenhum registro incompleto é criado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T6</strong> Alteração de treino existente</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; existência de um treino salvo</td>
+<td style="text-align: left;">As alterações são salvas e aparecem corretamente na visualização do treino</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T7</strong> Exclusão de treino</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; existência de treino salvo</td>
+<td style="text-align: left;">O sistema solicita confirmação, exclui o treino após a confirmação e remove o item da listagem. Se o usuário cancelar, o treino permanece salvo</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T8</strong> Registro de exercício realizado</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; existência de treino cadastrado</td>
+<td style="text-align: left;">O exercício é marcado como realizado, o histórico é atualizado e as informações são persistidas pelo banco de dados</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T9</strong> Atualização de métricas de evolução</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; existência de exercícios realizados com datas e cargas registradas</td>
+<td style="text-align: left;">Os gráficos e indicadores apresentam os dados correspondentes aos exercícios realizados</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T10</strong> Pontuação e conquista por assiduidade</td>
+<td style="text-align: left;">Funcional / Gamificação</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; critérios de conquista definidos; registros de assiduidade preparados</td>
+<td style="text-align: left;">O sistema exibe a conquista no perfil somente quando os critérios de assiduidade são atingidos</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T11</strong> Restrição do painel de admin</td>
+<td style="text-align: left;">Não funcional / Segurança</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Existência de um usuário comum e um usuário administrador</td>
+<td style="text-align: left;">O usuário comum não consegue acessar o painel administrativo. O administrador consegue acessá-lo normalmente</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T12</strong> Login com Google</td>
+<td style="text-align: left;">Funcional / Autenticação</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Integração com o Google implementada e configurada; conta Google válida; serviço de autenticação disponível</td>
+<td style="text-align: left;">Após autorização e validação da autenticação com o Google, o usuário acessa o sistema com seu perfil. O login com e-mail e senha permanece disponível</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T13</strong> Falha ou cancelamento no login com Google</td>
+<td style="text-align: left;">Funcional / Segurança</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Integração com o Google implementada; falha de autenticação, indisponibilidade do serviço ou cancelamento pelo usuário; conta local válida para verificar o acesso com e-mail e senha</td>
+<td style="text-align: left;">O sistema não autentica o usuário pelo Google, informa a falha ou cancelamento e mantém disponível o acesso com e-mail e senha. Credenciais locais válidas permitem acessar o sistema</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T14</strong> Listagem de treinos</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; treinos próprios e de outro usuário cadastrados</td>
+<td style="text-align: left;">Exibir os treinos próprios e permitir adicionar um treino já montado; não expor treinos privados de outro usuário</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T15</strong> Cadastro de exercício no treino</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; treino próprio cadastrado; exercício predefinido disponível</td>
+<td style="text-align: left;">Exercício válido vinculado ao treino com a meta informada; dados obrigatórios ausentes impedem o cadastro</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T16</strong> Listagem de exercícios</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; treino com exercícios e treino sem exercícios</td>
+<td style="text-align: left;">Exibir os nomes e metas corretos de cada treino; apresentar estado vazio quando não houver exercícios</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T17</strong> Alteração de exercício</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; exercício vinculado a treino próprio</td>
+<td style="text-align: left;">Informações alteradas persistidas e exibidas; demais exercícios mantidos</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T18</strong> Exclusão de exercício</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; treino próprio com dois exercícios</td>
+<td style="text-align: left;">Exercício removido da lista do treino; outro exercício mantido</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T19</strong> Recorde pessoal</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; funcionalidade de PR implementada; exercício com meta de recorde pessoal</td>
+<td style="text-align: left;">Meta e acompanhamento de recorde pessoal persistidos e exibidos corretamente, sem alterar registros de outros exercícios</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T20</strong> Usabilidade do MVP</td>
+<td style="text-align: left;">Não funcional / Usabilidade</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">MVP disponível; conta de teste; navegador em telas móvel e desktop</td>
+<td style="text-align: left;">Fluxos concluídos sem bloqueios de navegação, campos ou botões inacessíveis, texto ilegível ou sobreposição; mensagens orientam a correção de entradas inválidas</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T21</strong> Token Google inválido ou expirado</td>
+<td style="text-align: left;">Funcional / Segurança</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">RF-24 implementado; resposta de autenticação simulável com token inválido e expirado</td>
+<td style="text-align: left;">Tokens rejeitados sem criação de sessão; acesso protegido negado; login local permanece disponível</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T22</strong> Rota protegida sem sessão</td>
+<td style="text-align: left;">Funcional / Segurança</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Aplicação disponível; nenhuma sessão autenticada</td>
+<td style="text-align: left;">Acesso negado sem exposição de dados; interface encaminha ao login e API retorna resposta de não autorização</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<p><strong>Tabela 20 – Registro de execução dos testes</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">ID</th>
+<th style="text-align: left;">Resultado obtido</th>
+<th style="text-align: left;">Evidência</th>
+<th style="text-align: left;">Reparos</th>
+<th style="text-align: center;">Ciclos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">T1</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T2</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T3</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T4</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T5</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T6</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T7</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T8</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T9</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T10</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T11</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T12</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T13</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T14</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T15</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T16</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T17</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T18</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T19</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T20</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T21</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T22</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h4 id="621-detalhamento-dos-casos-de-teste">6.2.1 Detalhamento dos casos de teste<a class="headerlink" href="#621-detalhamento-dos-casos-de-teste" title="Permanent link">&para;</a></h4>
+<h5 id="t1-cadastro-de-usuario-com-e-mail-e-senha">T1 – Cadastro de usuário com e-mail e senha<a class="headerlink" href="#t1-cadastro-de-usuario-com-e-mail-e-senha" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se um novo usuário consegue criar uma conta informando e-mail e senha (RF-01, CF-01).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário ainda não cadastrado; acesso à tela de cadastro; e-mail e senha válidos para o cadastro.</li>
+<li><strong>Procedimento:</strong> preencher e-mail e senha válidos, enviar o cadastro e verificar a conta criada; repetir com e-mail já cadastrado e dados obrigatórios ausentes.</li>
+<li><strong>Resultado esperado:</strong> a conta e o perfil do usuário são criados. O usuário pode acessar a tela de login para se autenticar com o e-mail e a senha cadastrados.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Após a execução, registrar se foi aprovado, reprovado ou bloqueado. Se houver falha, informar a correção realizada e o número da execução.</li>
+</ul>
+<h5 id="t2-login-com-credencial-valida">T2 – Login com credencial válida<a class="headerlink" href="#t2-login-com-credencial-valida" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se um usuário cadastrado consegue acessar o sistema com e-mail e senha válidos (RF-02, CF-02).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário previamente cadastrado; e-mail e senha válidos.</li>
+<li><strong>Procedimento:</strong> informar e-mail e senha corretos, confirmar o login e acessar a tela principal.</li>
+<li><strong>Resultado esperado:</strong> o sistema autentica o usuário e exibe a tela principal correspondente ao perfil.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado real e eventuais correções.</li>
+</ul>
+<h5 id="t3-login-com-dados-invalidos">T3 – Login com dados inválidos<a class="headerlink" href="#t3-login-com-dados-invalidos" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o sistema impede o acesso quando o usuário informa e-mail ou senha incorretos (RF-02, CF-02).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional / segurança</li>
+<li><strong>Pré-condições:</strong> usuário cadastrado; senha ou e-mail incorreto.</li>
+<li><strong>Procedimento:</strong> informar senha incorreta e depois e-mail não cadastrado; tentar acessar uma rota protegida após cada tentativa.</li>
+<li><strong>Resultado esperado:</strong> o sistema nega o acesso e apresenta uma mensagem clara, sem revelar informação sensível.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar se o bloqueio ocorreu corretamente. Corrigir mensagens ou regras de autenticação caso necessário.</li>
+</ul>
+<h5 id="t4-cadastro-de-treino-personalizado">T4 – Cadastro de treino personalizado<a class="headerlink" href="#t4-cadastro-de-treino-personalizado" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar o cadastro de treino com nome e tipo (RF-03, CF-03). A inclusão de exercícios e metas é validada em T15.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; acesso ao formulário de treino; nome e tipo válidos.</li>
+<li><strong>Procedimento:</strong> informar nome e tipo de treino, salvar e conferir os dados na lista do usuário.</li>
+<li><strong>Resultado esperado:</strong> o treino é validado, salvo no banco de dados e exibido na lista de treinos do usuário.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Caso o treino não seja salvo ou apresente dados incorretos, registrar o defeito e a correção aplicada.</li>
+</ul>
+<h5 id="t5-validacao-de-treino-incompleto">T5 – Validação de treino incompleto<a class="headerlink" href="#t5-validacao-de-treino-incompleto" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o sistema impede o cadastro de um treino sem informações obrigatórias.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / validação</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; acesso à tela de criação de treino.</li>
+<li><strong>Procedimento:</strong> deixar nome ou tipo obrigatório vazio, tentar salvar e verificar a mensagem e a ausência de persistência.</li>
+<li><strong>Resultado esperado:</strong> o sistema impede o salvamento e informa quais campos precisam ser preenchidos. Nenhum registro incompleto é criado.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado e corrigir validações ausentes, se necessário.</li>
+</ul>
+<h5 id="t6-alteracao-de-treino-existente">T6 – Alteração de treino existente<a class="headerlink" href="#t6-alteracao-de-treino-existente" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o usuário consegue alterar as informações de um treino já cadastrado.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; existência de um treino salvo.</li>
+<li><strong>Procedimento:</strong> editar nome e tipo do treino, salvar e recarregar a visualização.</li>
+<li><strong>Resultado esperado:</strong> as alterações são salvas e aparecem corretamente na visualização do treino.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado e eventuais correções na tela ou na API.</li>
+</ul>
+<h5 id="t7-exclusao-de-treino">T7 – Exclusão de treino<a class="headerlink" href="#t7-exclusao-de-treino" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o usuário consegue excluir um treino já cadastrado.</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; existência de treino salvo.</li>
+<li><strong>Procedimento:</strong> cancelar uma exclusão e verificar a permanência do treino; repetir confirmando a exclusão e consultar a lista.</li>
+<li><strong>Resultado esperado:</strong> o sistema solicita confirmação, exclui o treino após a confirmação e remove o item da listagem. Se o usuário cancelar, o treino permanece salvo.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar se a confirmação e a exclusão funcionaram corretamente.</li>
+</ul>
+<h5 id="t8-registro-de-exercicio-realizado">T8 – Registro de exercício realizado<a class="headerlink" href="#t8-registro-de-exercicio-realizado" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar o registro da execução de um exercício, com carga, repetições, séries e tempo (RF-11, CF-04).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; existência de treino cadastrado.</li>
+<li><strong>Procedimento:</strong> registrar a execução do exercício com os valores de carga, repetições, séries e tempo; recarregar o histórico e comparar os valores.</li>
+<li><strong>Resultado esperado:</strong> o exercício é marcado como realizado, o histórico é atualizado e as informações são persistidas pelo banco de dados.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado e corrigir problemas de persistência ou duplicidade, caso encontrados.</li>
+</ul>
+<h5 id="t9-atualizacao-de-metricas-de-evolucao">T9 – Atualização de métricas de evolução<a class="headerlink" href="#t9-atualizacao-de-metricas-de-evolucao" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o registro de exercícios atualiza corretamente a frequência, cargas e demais estatísticas.</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; existência de exercícios realizados com datas e cargas registradas.</li>
+<li><strong>Procedimento:</strong> inserir registros com datas e cargas conhecidas, consultar as métricas e comparar os indicadores com os registros de origem.</li>
+<li><strong>Resultado esperado:</strong> os gráficos e indicadores apresentam os dados correspondentes aos exercícios realizados.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Comparar os dados exibidos com os dados armazenados e registrar eventuais correções.</li>
+</ul>
+<h5 id="t10-pontuacao-e-conquista-por-assiduidade">T10 – Pontuação e conquista por assiduidade<a class="headerlink" href="#t10-pontuacao-e-conquista-por-assiduidade" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o sistema libera conquistas por assiduidade de acordo com os critérios definidos para RF-22.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / gamificação</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; critérios de conquista definidos; registros de assiduidade preparados.</li>
+<li><strong>Procedimento:</strong> preparar registros que atendam e que não atendam aos critérios de conquista definidos para RF-22; processar a assiduidade e conferir o perfil.</li>
+<li><strong>Resultado esperado:</strong> o sistema exibe a conquista no perfil somente quando os critérios de assiduidade são atingidos.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Conferir os cálculos e registrar correções em caso de pontuação incorreta.</li>
+</ul>
+<h5 id="t11-restricao-do-painel-de-admin">T11 – Restrição do painel de admin<a class="headerlink" href="#t11-restricao-do-painel-de-admin" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se somente os usuários autorizados conseguem acessar funcionalidades administrativas.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> não funcional / segurança / autorização</li>
+<li><strong>Pré-condições:</strong> existência de um usuário comum e um usuário administrador.</li>
+<li><strong>Procedimento:</strong> tentar acessar painel e rotas administrativas com usuário comum; repetir com administrador autorizado.</li>
+<li><strong>Resultado esperado:</strong> o usuário comum não consegue acessar o painel administrativo. O administrador consegue acessá-lo normalmente.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado e corrigir permissões ou validações de acesso, caso necessário.</li>
+</ul>
+<h5 id="t12-login-com-google">T12 – Login com Google<a class="headerlink" href="#t12-login-com-google" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar a autenticação opcional com o Google (RF-24, CF-09), após a implementação prevista nas Sprints finais.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / autenticação</li>
+<li><strong>Pré-condições:</strong> integração com o Google implementada e configurada; conta Google válida; serviço de autenticação disponível.</li>
+<li><strong>Procedimento:</strong> iniciar o login pelo Google, autorizar o consentimento e conferir o acesso; verificar que o login local continua disponível.</li>
+<li><strong>Resultado esperado:</strong> após autorização e validação da autenticação com o Google, o usuário acessa o sistema com seu perfil. O login com e-mail e senha permanece disponível.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Execução prevista nas Sprints finais, caso RF-24 seja implementado. Registrar resultado observado, correções e reexecuções.</li>
+</ul>
+<h5 id="t13-falha-ou-cancelamento-no-login-com-google">T13 – Falha ou cancelamento no login com Google<a class="headerlink" href="#t13-falha-ou-cancelamento-no-login-com-google" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar que falhas ou cancelamento na autenticação com o Google não liberam acesso e não impedem o uso do login com e-mail e senha (RF-24, CF-09).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / segurança</li>
+<li><strong>Pré-condições:</strong> integração com o Google implementada; falha de autenticação, indisponibilidade do serviço ou cancelamento pelo usuário; conta local válida para verificar o acesso com e-mail e senha.</li>
+<li><strong>Procedimento:</strong> iniciar o login pelo Google, cancelar o consentimento e conferir a ausência de sessão; simular indisponibilidade do provedor e verificar o login local.</li>
+<li><strong>Resultado esperado:</strong> o sistema não autentica o usuário pelo Google, informa a falha ou cancelamento e mantém disponível o acesso com e-mail e senha. Credenciais locais válidas permitem acessar o sistema.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Execução prevista nas Sprints finais, caso RF-24 seja implementado. Registrar resultado observado, correções e reexecuções.</li>
+</ul>
+<h5 id="t14-listagem-de-treinos">T14 – Listagem de treinos<a class="headerlink" href="#t14-listagem-de-treinos" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a listagem de treinos (RF-04, CF-03).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; treinos próprios e de outro usuário cadastrados.</li>
+<li><strong>Procedimento:</strong> abrir a lista de treinos; comparar com os registros do usuário; selecionar um treino já montado e adicioná-lo à lista.</li>
+<li><strong>Resultado esperado:</strong> exibir os treinos próprios e permitir adicionar um treino já montado; não expor treinos privados de outro usuário.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h5 id="t15-cadastro-de-exercicio-no-treino">T15 – Cadastro de exercício no treino<a class="headerlink" href="#t15-cadastro-de-exercicio-no-treino" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar o cadastro de exercício no treino (RF-07, CF-04).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; treino próprio cadastrado; exercício predefinido disponível.</li>
+<li><strong>Procedimento:</strong> selecionar o exercício, informar a meta e salvar; repetir sem exercício ou meta obrigatória.</li>
+<li><strong>Resultado esperado:</strong> exercício válido vinculado ao treino com a meta informada; dados obrigatórios ausentes impedem o cadastro.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h5 id="t16-listagem-de-exercicios">T16 – Listagem de exercícios<a class="headerlink" href="#t16-listagem-de-exercicios" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a listagem de exercícios (RF-08, CF-04).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; treino com exercícios e treino sem exercícios.</li>
+<li><strong>Procedimento:</strong> abrir os dois treinos e conferir os exercícios exibidos.</li>
+<li><strong>Resultado esperado:</strong> exibir os nomes e metas corretos de cada treino; apresentar estado vazio quando não houver exercícios.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h5 id="t17-alteracao-de-exercicio">T17 – Alteração de exercício<a class="headerlink" href="#t17-alteracao-de-exercicio" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a alteração de exercício (RF-09, CF-04).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; exercício vinculado a treino próprio.</li>
+<li><strong>Procedimento:</strong> alterar as metas, salvar e recarregar a tela.</li>
+<li><strong>Resultado esperado:</strong> informações alteradas persistidas e exibidas; demais exercícios mantidos.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h5 id="t18-exclusao-de-exercicio">T18 – Exclusão de exercício<a class="headerlink" href="#t18-exclusao-de-exercicio" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a exclusão de exercício (RF-10, CF-04).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; treino próprio com dois exercícios.</li>
+<li><strong>Procedimento:</strong> remover um exercício e recarregar a lista.</li>
+<li><strong>Resultado esperado:</strong> exercício removido da lista do treino; outro exercício mantido.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h5 id="t19-acompanhamento-de-recorde-pessoal">T19 – Acompanhamento de recorde pessoal<a class="headerlink" href="#t19-acompanhamento-de-recorde-pessoal" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar o acompanhamento de recorde pessoal (RF-20, CF-05).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; funcionalidade de PR implementada; exercício com meta de recorde pessoal.</li>
+<li><strong>Procedimento:</strong> cadastrar a meta de recorde pessoal no campo do exercício, salvar, consultar e atualizar o acompanhamento.</li>
+<li><strong>Resultado esperado:</strong> meta e acompanhamento de recorde pessoal persistidos e exibidos corretamente, sem alterar registros de outros exercícios.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h5 id="t20-usabilidade-do-mvp">T20 – Usabilidade do MVP<a class="headerlink" href="#t20-usabilidade-do-mvp" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a usabilidade do MVP (RF-01 a RF-11).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> não funcional / usabilidade</li>
+<li><strong>Pré-condições:</strong> MVP disponível; conta de teste; navegador em telas móvel e desktop.</li>
+<li><strong>Procedimento:</strong> executar cadastro, login, criação de treino, inclusão de exercício e registro de execução; verificar navegação por teclado, legibilidade, mensagens e adaptação da tela.</li>
+<li><strong>Resultado esperado:</strong> fluxos concluídos sem bloqueios de navegação, campos ou botões inacessíveis, texto ilegível ou sobreposição; mensagens orientam a correção de entradas inválidas.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h5 id="t21-token-google-invalido-ou-expirado">T21 – Token Google inválido ou expirado<a class="headerlink" href="#t21-token-google-invalido-ou-expirado" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar o tratamento de token Google inválido ou expirado (RF-24, CF-09).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / segurança</li>
+<li><strong>Pré-condições:</strong> RF-24 implementado; resposta de autenticação simulável com token inválido e expirado.</li>
+<li><strong>Procedimento:</strong> enviar cada token ao retorno da autenticação Google e tentar acessar rota protegida.</li>
+<li><strong>Resultado esperado:</strong> tokens rejeitados sem criação de sessão; acesso protegido negado; login local permanece disponível.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h5 id="t22-rota-protegida-sem-sessao">T22 – Rota protegida sem sessão<a class="headerlink" href="#t22-rota-protegida-sem-sessao" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar rota protegida sem sessão (RF-02, CF-02; RF-24, CF-09 quando implementado).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / segurança</li>
+<li><strong>Pré-condições:</strong> aplicação disponível; nenhuma sessão autenticada.</li>
+<li><strong>Procedimento:</strong> acessar diretamente uma rota protegida pela interface e pela API, sem sessão; repetir após encerramento da sessão.</li>
+<li><strong>Resultado esperado:</strong> acesso negado sem exposição de dados; interface encaminha ao login e API retorna resposta de não autorização.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<hr />
+<h2 id="referencias">Referências<a class="headerlink" href="#referencias" title="Permanent link">&para;</a></h2>
+<ol>
+<li>MOORE, Geoffrey A. <em>Crossing the chasm: marketing and selling high-tech products to mainstream customers.</em> New York: Harper Business, 1991.</li>
+<li>MARCZEWSKI, Andrzej. User Types. In: MARCZEWSKI, Andrzej. <em>Even ninja monkeys like to play: gamification, game thinking and motivational design.</em> 1. ed. [S.l.]: CreateSpace Independent Publishing Platform, 2015. p. 65–80.</li>
+<li>TONDELLO, Gustavo F. et al. The gamification user types Hexad scale. In: ANNUAL SYMPOSIUM ON COMPUTER-HUMAN INTERACTION IN PLAY, 2016, Austin. <em>Proceedings</em> [...]. New York: ACM (Association for Computing Machinery), 2016. p. 229–243. DOI (Digital Object Identifier, identificador digital de objeto): 10.1145/2967934.2968082.</li>
+<li>PRESSMAN, Roger S.; MAXIM, Bruce R. <em>Engenharia de software: uma abordagem profissional.</em> 8. ed. Porto Alegre: AMGH, 2016.</li>
+<li>SCHWABER, Ken; SUTHERLAND, Jeff. <em>O Guia do Scrum: o guia definitivo para o Scrum: as regras do jogo.</em> 2020.</li>
+<li>BASILI, Victor R.; CALDIERA, Gianluigi; ROMBACH, H. Dieter. The goal question metric approach. In: MARCINIAK, John J. (ed.). <em>Encyclopedia of software engineering.</em> New York: John Wiley &amp; Sons, 1994. v. 1, p. 528–532.</li>
+<li>KRUCHTEN, Philippe; NORD, Robert L.; OZKAYA, Ipek. <em>Managing technical debt: reducing friction in software development.</em> Boston: Addison-Wesley, 2019.</li>
+<li>BRASIL. Ministério do Planejamento, Orçamento e Gestão. <em>Guia de contagem de pontos de função do MP</em> (Ministério do Planejamento). Versão 1.0. Brasília, 2015. Disponível em: <a href="https://bibliotecadigital.gestao.gov.br/handle/777/235">https://bibliotecadigital.gestao.gov.br/handle/777/235</a>. Acesso em: 30 set. 2026.</li>
+<li>HEVY. <em>Gym progress.</em> Disponível em: <a href="https://www.hevyapp.com/features/gym-progress/">https://www.hevyapp.com/features/gym-progress/</a>. Acesso em: 30 set. 2026.</li>
+<li>STRONG. <em>Workout tracker and gym log.</em> Disponível em: <a href="https://www.strong.app/">https://www.strong.app/</a>. Acesso em: 30 set. 2026.</li>
+<li>JEFIT. <em>Workout logging app.</em> Disponível em: <a href="https://www.jefit.com/use-case/workout-logging-app">https://www.jefit.com/use-case/workout-logging-app</a>. Acesso em: 30 set. 2026.</li>
+<li>AMERICAN SOCIETY FOR QUALITY (ASQ). <em>Fishbone diagram.</em> [S.l.], [s.d.]. Disponível em: <a href="https://asq.org/quality-resources/fishbone">https://asq.org/quality-resources/fishbone</a>. Acesso em: 30 set. 2026.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Voltar para o topo
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../.." class="md-footer__link md-footer__link--prev" aria-label="Anterior: Início">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Início
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../arquitetura/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Documento de Arquitetura">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Documento de Arquitetura
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Grupo Perlman — T03 · Universidade de Brasília · MDS 2026
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

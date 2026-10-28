@@ -1,0 +1,204 @@
+% Transcrito de Documento_Visao_MotivaFit_Completo_e_Detalhado.pdf
+\clearpage
+\section{DECLARAÇÃO DE ESCOPO DO PROJETO}
+
+O escopo central do projeto abrange a criação de uma plataforma interativa onde o 'Atleta Amador' pode criar fichas de treino personalizadas, registrar a conclusão diária de exercícios (check-ins) e acompanhar seu progresso estatístico. Estão inclusas no escopo as lógicas de gamificação (Hexad) para recompensar a assiduidade do usuário, além de um painel administrativo para gestão global do sistema.
+
+\subsection{BACKLOG DO PRODUTO}
+
+A elicitação dos requisitos e a construção deste backlog foram realizadas majoritariamente por meio de brainstorming entre os membros da equipe e análise do problema, com base nas dificuldades reais de praticantes de exercícios físicos em manter a constância.
+
+\subsubsection{CLASSIFICAÇÃO DE PRIORIDADE (MOSCOW)}
+
+MoSCoW reúne as categorias Must have (obrigatório), Should have (importante), Could have (desejável) e Won't have (fora da entrega atual).
+
+A priorização dos itens foi definida da seguinte forma (visão da equipe a ser validada pelo Dono do Produto (P.O., Product Owner)):
+
+MUST (Obrigatório): Requisitos essenciais ao produto. O MVP da Sprint 4 reúne RF-01 a RF-11; RF-12 também é obrigatório para o produto, mas sua entrega está prevista para a Sprint 5, após o MVP.
+
+SHOULD (Importante): Requisitos de alto valor agregado (como funcionalidades de gamificação e gráficos). São fundamentais para a retenção e proposta de valor do aplicativo, mas não impedem o fluxo básico de uso se entregues em um segundo momento.
+
+COULD (Desejável): Funcionalidades que ampliam a experiência de uso, como a integração de login com o Google, mas que possuem menor prioridade e não são necessárias para a entrega do MVP. Sua implementação depende da capacidade disponível nas Sprints finais.
+
+\subsection{PERFIS}
+
+Teremos dois perfis de acesso, o usuário e o administrador. O usuário poderá acessar todas as funcionalidades referentes ao uso do aplicativo, ficando livre para testar as funcionalidades, enquanto o perfil administrador acompanhará as métricas e informações do aplicativo, como número de usuários, funcionalidades mais usadas e tempo médio de usuário no app, dentre outros.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.333\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.333\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.333\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\caption{Perfis de acesso}\\
+\hline
+\textbf{Perfil} & \textbf{Características} & \textbf{Permissões} \\ \hline
+\endfirsthead
+\textbf{Perfil} & \textbf{Características} & \textbf{Permissões} \\ \hline
+\endhead
+Administrador & Acompanham as métricas de uso do aplicativo: quantos usuários acessaram nos últimos 30 dias, qual a frequência média de treino, quem está no topo das atividades e quais atividades estão sendo mais utilizadas. & Painel Admin (métricas). \\ \hline
+Usuário & Atletas ou iniciantes em atividades físicas. Buscam registrar seus desempenhos individuais e comparar com seus amigos. & Uso do app e métricas individuais. \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\subsection{CENÁRIOS}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.150\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.670\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.180\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\caption{Cenários funcionais}\\
+\hline
+\textbf{ID} & \textbf{Cenário} & \textbf{Sprints} \\ \hline
+\endfirsthead
+\textbf{ID} & \textbf{Cenário} & \textbf{Sprints} \\ \hline
+\endhead
+CF-01 & Novo usuário cria sua conta com e-mail e senha & 3 \\ \hline
+CF-02 & Usuário cadastrado deseja autenticar-se com e-mail e senha & 3 \\ \hline
+CF-03 & Usuário deseja cadastrar, listar, alterar ou excluir seus treinos & 3 \\ \hline
+CF-04 & Usuário deseja cadastrar, listar, alterar e excluir exercícios de um treino e registrar sua execução & 4 \\ \hline
+CF-05 & Usuário já possui acesso ao sistema e deseja acompanhar sua evolução nos treinos & 5, 8 \\ \hline
+CF-06 & Usuário já possui acesso ao sistema, já possui registros de exercícios, busca novos desafios e deseja comparar sua evolução com a de seu grupo de amigos & 7, 8, 9 \\ \hline
+CF-07 & Administrador não possui acesso, mas pode receber um e-mail de convite para realizar seu cadastro & 5 \\ \hline
+CF-08 & Administrador já tem acesso ao sistema e deseja acessar o painel de acompanhamento de métricas & 5, 6, 7 \\ \hline
+CF-09 & Usuário deseja autenticar-se pelo Google como alternativa ao acesso com e-mail e senha, após a entrega do MVP & 9, 10 \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\subsection{TABELA DE BACKLOG DO PRODUTO}
+
+\noindent\textbf{Abreviações da tabela:} Est.: estimativa preliminar de planejamento do requisito, sem equivalência direta em horas ou contagem formal de PF; US: User Story (história de usuário); ID: identificador. O símbolo -- indica estimativa ainda não definida.
+
+O backlog identifica cada requisito funcional pelo código RF e o cenário de uso correspondente pelo código CF. Um cenário pode reunir vários requisitos: por exemplo, CF-03 corresponde ao gerenciamento de treinos e está associado a cadastro (RF-03), listagem (RF-04), alteração (RF-05) e exclusão (RF-06). Essa identificação permite relacionar cada funcionalidade ao planejamento e aos testes.
+
+Pontos de função (PF) são uma unidade de medida do tamanho funcional do software, considerando as funcionalidades oferecidas ao usuário, independentemente da linguagem ou tecnologia utilizada [8]. A contagem considera funções de dados e transações, como entradas, saídas e consultas, classificadas conforme sua complexidade. PF não representa diretamente horas de trabalho nem pontos de esforço da Sprint.
+
+O MVP será concluído ao final da Sprint 4 e compreenderá o cadastro e o login com e-mail e senha, o gerenciamento de treinos e o gerenciamento e registro de exercícios. O acesso inicial está dividido em cadastro de usuário com e-mail e senha (RF-01, cenário CF-01) e autenticação com e-mail e senha (RF-02, cenário CF-02), ambos obrigatórios (Must have). O backlog atribui o valor inicial de 1 a cada requisito, totalizando 2 unidades estimadas para cadastro e autenticação. Esses valores são estimativas preliminares de planejamento; a contagem formal em PF depende do detalhamento das funções, dos dados envolvidos e da aplicação das regras de contagem [8]. O desenvolvimento dessas funcionalidades está distribuído entre as Sprints 3 e 4, com a conclusão e validação do conjunto de login, treinos e exercícios na Sprint 4, conforme os casos de teste previstos.
+
+A integração de login com o Google corresponde ao requisito RF-24, associado ao cenário CF-09, com prioridade Could have. Está prevista para as Sprints finais: implementação na Sprint 9 e validação na Sprint 10, conforme a capacidade da equipe. O acesso com e-mail e senha permanece disponível independentemente dessa integração. A estimativa funcional de RF-24 será definida no refinamento do requisito.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.17\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.16\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.12\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.25\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.3\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\caption{Backlog detalhado}\\
+\hline
+\textbf{Requisito} & \textbf{Planejamento} & \textbf{Tipo} & \textbf{Descrição sucinta} & \textbf{User story associada} \\ \hline
+\endfirsthead
+\textbf{Requisito} & \textbf{Planejamento} & \textbf{Tipo} & \textbf{Descrição sucinta} & \textbf{User story associada} \\ \hline
+\endhead
+RF-01\newline Cadastro com e-mail e senha & CF-01\newline Sprint 3\newline Must\newline Est.: 1 & Funcional & Criar conta com e-mail e senha. & US-01: Como visitante, quero criar minha conta com e-mail e senha para acessar o aplicativo. \\ \hline
+RF-02\newline Login com e-mail e senha & CF-02\newline Sprint 3\newline Must\newline Est.: 1 & Funcional & Autenticar com e-mail e senha e rejeitar credenciais inválidas. & US-02: Como usuário cadastrado, quero entrar com e-mail e senha para acessar meus treinos. \\ \hline
+RF-03\newline Cadastro de Treino & CF-03\newline Sprint 3\newline Must\newline Est.: 1 & Funcional & Cadastrar treino com nome e tipo. & US-03: Como usuário, quero cadastrar meu treino para organizar minha rotina. \\ \hline
+RF-04\newline Listagem de Treinos & CF-03\newline Sprint 3\newline Must\newline Est.: 2 & Funcional & Listar os treinos do usuário e permitir adicionar treinos já montados. & US-04: Como usuário, quero visualizar meus treinos e adicionar treinos já montados para organizar minhas opções. \\ \hline
+RF-05\newline Alteração de Treino & CF-03\newline Sprint 3\newline Must\newline Est.: 1 & Funcional & Alterar nome e tipo de treino. & US-05: Como usuário, quero alterar meu treino para adaptar minha rotina. \\ \hline
+RF-06\newline Exclusão de Treino & CF-03\newline Sprint 3\newline Must\newline Est.: 1 & Funcional & Excluir treino do usuário. & US-06: Como usuário, quero excluir um treino para remover rotinas que não utilizo. \\ \hline
+RF-07\newline Cadastrar Exercício no treino & CF-04\newline Sprint 4\newline Must\newline Est.: 1 & Funcional & Adicionar exercício predefinido a um treino e definir metas. & US-07: Como usuário, quero adicionar exercícios e metas ao treino para planejar a sessão. \\ \hline
+RF-08\newline Listar Exercícios & CF-04\newline Sprint 4\newline Must\newline Est.: 2 & Funcional & Listar exercícios e metas de um treino. & US-08: Como usuário, quero consultar exercícios e metas para executar meu treino. \\ \hline
+RF-09\newline Alterar Exercício & CF-04\newline Sprint 4\newline Must\newline Est.: 1 & Funcional & Editar informações de exercício vinculado a treino. & US-09: Como usuário, quero ajustar as metas do exercício para adaptar meu treino. \\ \hline
+RF-10\newline Excluir Exercício & CF-04\newline Sprint 4\newline Must\newline Est.: 1 & Funcional & Excluir exercício de um treino. & US-10: Como usuário, quero remover um exercício para atualizar minha rotina. \\ \hline
+RF-11\newline Registrar Exercício Realizado & CF-04\newline Sprint 4\newline Must\newline Est.: 1 & Funcional & Registrar execução, carga, repetições, séries e tempo. & US-11: Como usuário, quero registrar a execução dos exercícios para manter meu histórico. \\ \hline
+RF-12\newline Métricas de evolução & CF-05\newline Sprint 5\newline Must\newline Est.: 2 & Funcional & Exibir indicadores de desempenho e evolução. & US-12: Como usuário, quero acompanhar minhas métricas para perceber minha evolução. \\ \hline
+RF-13\newline Convite admin por email & CF-07\newline Sprint 5\newline Could\newline Est.: 3 & Funcional & Enviar convite por e-mail para novo administrador. & US-13: Como superusuário, quero convidar administradores para delegar a gestão do sistema. \\ \hline
+RF-14\newline Usuários ativos (Admin) & CF-08\newline Sprint 5\newline Should\newline Est.: 3 & Funcional & Exibir quantidade de usuários ativos nos últimos 30 dias. & US-14: Como administrador, quero consultar usuários ativos para acompanhar a adesão. \\ \hline
+RF-15\newline Frequência média (Admin) & CF-08\newline Sprint 6\newline Should\newline Est.: 3 & Funcional & Exibir frequência média de treinos por semana e usuário. & US-15: Como administrador, quero consultar a frequência média para acompanhar a constância. \\ \hline
+RF-16\newline Ranking usuários (Admin) & CF-08\newline Sprint 6\newline Should\newline Est.: 3 & Funcional & Exibir os dez usuários com maior tempo de treino nos últimos 30 dias. & US-16: Como administrador, quero consultar o ranking para acompanhar a atividade dos usuários. \\ \hline
+RF-17\newline Exercícios + feitos (Admin) & CF-08\newline Sprint 7\newline Should\newline Est.: 3 & Funcional & Exibir os três exercícios mais realizados nos últimos 30 dias. & US-17: Como administrador, quero consultar exercícios mais realizados para conhecer o uso. \\ \hline
+RF-18\newline Submissão de desafios & CF-06\newline Sprint 7\newline Must\newline Est.: 3 & Funcional & Criar desafios entre amigos com exercícios, metas e prazo. & US-18: Como usuário, quero propor desafios para incentivar meu grupo de amigos. \\ \hline
+RF-19\newline Remoção de desafios & CF-06\newline Sprint 7\newline Must\newline Est.: 1 & Funcional & Remover desafio criado pelo usuário. & US-19: Como usuário, quero remover meus desafios para manter as propostas atualizadas. \\ \hline
+RF-20\newline PR - Recorde Pessoal & CF-05\newline Sprint 8\newline Must\newline Est.: 2 & Funcional & Acompanhar metas de recordes pessoais no exercício. & US-20: Como usuário, quero acompanhar meus recordes pessoais para perceber minha evolução. \\ \hline
+RF-21\newline Partilha de resultados & CF-06\newline Sprint 8\newline Should\newline Est.: 5 & Funcional & Compartilhar resultados em espaço comunitário público. & US-21: Como usuário, quero compartilhar meus resultados para motivar a comunidade. \\ \hline
+RF-22\newline Conquistas (Streak) & CF-06\newline Sprint 9\newline Must\newline Est.: 2 & Funcional & Exibir conquistas de assiduidade no perfil. & US-22: Como usuário, quero visualizar minhas conquistas para reconhecer minha constância. \\ \hline
+RF-23\newline Feed interativo & CF-06\newline Sprint 9\newline Should\newline Est.: 4 & Funcional & Permitir grupos por convite e interação com resultados diários. & US-23: Como usuário, quero curtir e comentar resultados do meu grupo para incentivar meus amigos. \\ \hline
+RF-24\newline Login com Google & CF-09\newline Sprint 9, 10\newline Could\newline Est.: -- & Funcional & Oferecer autenticação opcional com Google após o MVP. & US-24: Como usuário, quero entrar com Google como alternativa para facilitar meu acesso. \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\subsubsection{DESCRIÇÃO DOS REQUISITOS}
+
+Todos os requisitos abaixo são do tipo funcional. Os identificadores RF correspondem aos cenários CF apresentados na tabela de backlog.
+
+\begin{description}
+\item[RF-01] Permitir ao usuário não autenticado criar sua conta no sistema informando e-mail e senha. Requisito obrigatório para o MVP, associado ao cenário CF-01.
+
+\item[RF-02] Permitir ao usuário cadastrado acessar o sistema com e-mail e senha válidos e impedir o acesso com credenciais inválidas. Requisito obrigatório para o MVP, associado ao cenário CF-02.
+
+\item[RF-03] O usuário adiciona o seu novo treino, definindo o nome e tipo de treino (musculação ou aeróbico).
+
+\item[RF-04] O usuário irá visualizar o catálogo de treinos dele, permitindo também adicionar treinos já montados (basta o usuário adicionar na sua lista).
+
+\item[RF-05] Permite ao usuário fazer alteração no treino (nome e tipo de treino: musculação ou aeróbico).
+
+\item[RF-06] Permite ao usuário remover um treino da sua lista de treinos.
+
+\item[RF-07] Permite ao usuário cadastrar um novo exercício dentro de um treino, definindo a meta de tempo, repetições e/ou carga deste exercício, além do pace para corrida. Essas metas ficam em um campo de texto, onde o usuário digita a meta. Esse exercício já está predefinido na tabela de exercícios, de forma que o usuário não consegue criar o seu exercício.
+
+\item[RF-08] Listar os exercícios de um treino (exibir o nome do exercício e suas metas).
+
+\item[RF-09] Permite ao usuário a edição e atualização das informações de um exercício já cadastrado em um treino.
+
+\item[RF-10] Permite ao usuário remover um exercício da sua lista de exercícios de um treino.
+
+\item[RF-11] Permite ao usuário registrar a execução de um exercício em seu treino, registrando meta de carga, de repetições, de séries e tempo de execução.
+
+\item[RF-12] O usuário pode visualizar indicadores de desempenho e evolução física ao longo do tempo.
+
+\item[RF-13] Permite ao superusuário enviar um convite de novo administrador pelo e-mail do novo administrador.
+
+\item[RF-14] Exibe a quantidade de usuários ativos nos últimos 30 dias.
+
+\item[RF-15] Exibe a frequência média de treinos/semana/usuário.
+
+\item[RF-16] No painel do administrador, exibe o ranking dos usuários ativos nos últimos 30 dias, listados por maior tempo de treino (top 10).
+
+\item[RF-17] No painel do administrador, exibe os 3 exercícios mais realizados pelos usuários nos últimos 30 dias.
+
+\item[RF-18] No painel do usuário, criar uma lista de exercícios entre amigos para realizarem dentro de um prazo de tempo. Definindo, para cada exercício, metas de carga, repetições, séries ou tempo de exercício.
+
+\item[RF-19] Permite ao usuário remover um desafio criado.
+
+\item[RF-20] Opção para a criação de um acompanhamento sobre a evolução do usuário em suas metas de recordes pessoais (campo de texto no exercício).
+
+\item[RF-21] Local público para compartilhar os resultados dos usuários para fazer com que eles continuem se motivando.
+
+\item[RF-22] Conquistas visuais no perfil de cada usuário para que eles possam mostrar o seu empenho nos seus treinos.
+
+\item[RF-23] Criação de pequenos grupos de treino onde os membros podem curtir, comentar e celebrar os resultados diários uns dos outros, fortalecendo as relações (entrada por meio de convite).
+
+\item[RF-24] Integrar a autenticação com o Google como alternativa ao login com e-mail e senha. Requisito Could have, associado ao cenário CF-09, previsto para implementação e validação nas Sprints 9 e 10 conforme a capacidade da equipe, após a entrega do MVP. A integração não substitui o acesso com e-mail e senha.
+
+\end{description}
+
+\subsection{MATRIZ DE RASTREABILIDADE}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.22\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.16\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.17\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.3\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.15\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\caption{Matriz de rastreabilidade}\\
+\hline
+\textbf{Problema / cenário} & \textbf{Perfil} & \textbf{Requisitos} & \textbf{Testes planejados} & \textbf{Métrica} \\ \hline
+\endfirsthead
+\textbf{Problema / cenário} & \textbf{Perfil} & \textbf{Requisitos} & \textbf{Testes planejados} & \textbf{Métrica} \\ \hline
+\endhead
+Acesso (CF-01, CF-02) & Usuário & RF-01, RF-02 & T1, T2, T3, T22 & M2 \\ \hline
+Organização (CF-03) & Usuário & RF-03 a RF-06 & T4 a T7, T14 & Uso / Throughput \\ \hline
+Personalização (CF-04) & Free Spirit & RF-07 a RF-10 & T15 a T18 & M3 \\ \hline
+Registro (CF-04) & Usuário & RF-11 & T8 & Uso / M3 \\ \hline
+Evolução (CF-05) & Achiever & RF-12, RF-20 & T9, T19 & Uso / Throughput \\ \hline
+Convite (CF-07) & Superusuário & RF-13 & A detalhar antes da Sprint 5 & M2 \\ \hline
+Gestão (CF-08) & Administrador & RF-14 a RF-17 & T11 (acesso); testes funcionais a detalhar antes das Sprints 5 a 7 & Throughput \\ \hline
+Desafios (CF-06) & Disruptor & RF-18, RF-19 & A detalhar antes da Sprint 7 & Uso \\ \hline
+Compartilhamento (CF-06) & Philanthropist & RF-21 & A detalhar antes da Sprint 8 & Uso \\ \hline
+Conquistas (CF-06) & Player & RF-22 & T10 & Uso \\ \hline
+Interação (CF-06) & Socialiser & RF-23 & A detalhar antes da Sprint 9 & Uso \\ \hline
+Acesso alternativo (CF-09) & Usuário & RF-24 & T12, T13, T21, T22 & M2 \\ \hline
+Usabilidade do MVP & Usuário & RF-01 a RF-11 & T20 & Conclusão das tarefas \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup

@@ -1,0 +1,3235 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentação do projeto MotivaFit (Grupo Perlman — T03, Métodos de Desenvolvimento de Software, UnB)">
+      
+      
+        <meta name="author" content="Grupo Perlman — T03">
+      
+      
+      
+        <link rel="prev" href="../visao/">
+      
+      
+        <link rel="next" href="../../atas-reuniao/ata-reuniao-1/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Documento de Arquitetura - MotivaFit — Documentação</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#documento-de-arquitetura-motivafit" class="md-skip">
+          Pular para conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="../.." title="MotivaFit — Documentação" class="md-header__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MotivaFit — Documentação
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Documento de Arquitetura
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo escuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo escuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando busca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../visao/" class="md-tabs__link">
+          
+  
+  
+  Produto
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../atas-reuniao/ata-reuniao-1/" class="md-tabs__link">
+          
+  
+  
+  Atas de Reunião
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MotivaFit — Documentação" class="md-nav__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    MotivaFit — Documentação
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Produto
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Produto
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../visao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Visão
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#integrantes-da-equipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integrantes da equipe
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historico-de-revisoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Histórico de revisões
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-introducao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 Introdução
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1 Introdução">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-proposito" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Propósito
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-escopo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Escopo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-definicoes-acronimos-e-abreviacoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Definições, acrônimos e abreviações
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-documentos-de-referencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Documentos de referência
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-organizacao-do-documento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 Organização do documento
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-representacao-arquitetural" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 Representação arquitetural
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2 Representação arquitetural">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-definicoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Definições
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-justificativa-da-escolha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Justificativa da escolha
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Justificativa da escolha">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#221-tecnologias-e-decisoes-arquiteturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.1 Tecnologias e decisões arquiteturais
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-detalhamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Detalhamento
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Detalhamento">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#231-explicacao-do-diagrama-em-camadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1 Explicação do diagrama em camadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#232-contrato-da-api-rest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.2 Contrato da API REST
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#233-mecanismos-de-seguranca" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.3 Mecanismos de segurança
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-metas-e-restricoes-arquiteturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Metas e restrições arquiteturais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.4 Metas e restrições arquiteturais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#241-metas-arquiteturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1 Metas arquiteturais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.4.1 Metas arquiteturais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2411-garantir-modularidade-e-baixo-acoplamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.1 Garantir modularidade e baixo acoplamento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2412-garantir-qualidade-continua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.2 Garantir qualidade contínua
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2413-garantir-seguranca-e-controle-de-acesso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.3 Garantir segurança e controle de acesso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2414-garantir-usabilidade-e-fluidez" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.4 Garantir usabilidade e fluidez
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2415-garantir-evolucao-e-extensibilidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.5 Garantir evolução e extensibilidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#242-restricoes-arquiteturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2 Restrições arquiteturais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.4.2 Restrições arquiteturais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2421-restricao-tecnologica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.1 Restrição tecnológica
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2422-restricao-de-estilo-arquitetural" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.2 Restrição de estilo arquitetural
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2423-restricao-de-padronizacao-de-codigo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.3 Restrição de padronização de código
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2424-restricao-de-versionamento-e-integracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.4 Restrição de versionamento e integração
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2425-restricao-operacional-e-academica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.5 Restrição operacional e acadêmica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-visoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Visões
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.5 Visões">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#251-visao-de-uso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.1 Visão de uso
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.5.1 Visão de uso">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2511-diagrama-de-casos-de-uso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.1.1 Diagrama de casos de uso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2512-diagrama-de-atividades" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.1.2 Diagrama de atividades
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#252-visao-de-organizacao-logica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.2 Visão de organização lógica
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#253-visao-estrutural" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.3 Visão estrutural
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.5.3 Visão estrutural">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2531-modelo-de-dados-relacional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.3.1 Modelo de dados relacional
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2532-diagrama-de-componentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.3.2 Diagrama de componentes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-visao-de-implantacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Visão de implantação
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.6 Visão de implantação">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#261-estrategia-e-execucao-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6.1 Estratégia e execução de testes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#262-integracao-continua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6.2 Integração contínua
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-operacao-e-ciclo-de-vida-dos-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Operação e ciclo de vida dos dados
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-rastreabilidade-com-o-documento-de-visao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 Rastreabilidade com o Documento de Visão
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#29-riscos-arquiteturais-e-decisoes-pendentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.9 Riscos arquiteturais e decisões pendentes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-bibliografia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Bibliografia
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Atas de Reunião
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Atas de Reunião
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 6
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#integrantes-da-equipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integrantes da equipe
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historico-de-revisoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Histórico de revisões
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-introducao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 Introdução
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1 Introdução">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-proposito" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Propósito
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-escopo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Escopo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-definicoes-acronimos-e-abreviacoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Definições, acrônimos e abreviações
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-documentos-de-referencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Documentos de referência
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-organizacao-do-documento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 Organização do documento
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-representacao-arquitetural" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 Representação arquitetural
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2 Representação arquitetural">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-definicoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Definições
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-justificativa-da-escolha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Justificativa da escolha
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Justificativa da escolha">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#221-tecnologias-e-decisoes-arquiteturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.1 Tecnologias e decisões arquiteturais
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-detalhamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Detalhamento
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Detalhamento">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#231-explicacao-do-diagrama-em-camadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1 Explicação do diagrama em camadas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#232-contrato-da-api-rest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.2 Contrato da API REST
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#233-mecanismos-de-seguranca" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.3 Mecanismos de segurança
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-metas-e-restricoes-arquiteturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Metas e restrições arquiteturais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.4 Metas e restrições arquiteturais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#241-metas-arquiteturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1 Metas arquiteturais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.4.1 Metas arquiteturais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2411-garantir-modularidade-e-baixo-acoplamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.1 Garantir modularidade e baixo acoplamento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2412-garantir-qualidade-continua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.2 Garantir qualidade contínua
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2413-garantir-seguranca-e-controle-de-acesso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.3 Garantir segurança e controle de acesso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2414-garantir-usabilidade-e-fluidez" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.4 Garantir usabilidade e fluidez
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2415-garantir-evolucao-e-extensibilidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.1.5 Garantir evolução e extensibilidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#242-restricoes-arquiteturais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2 Restrições arquiteturais
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.4.2 Restrições arquiteturais">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2421-restricao-tecnologica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.1 Restrição tecnológica
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2422-restricao-de-estilo-arquitetural" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.2 Restrição de estilo arquitetural
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2423-restricao-de-padronizacao-de-codigo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.3 Restrição de padronização de código
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2424-restricao-de-versionamento-e-integracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.4 Restrição de versionamento e integração
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2425-restricao-operacional-e-academica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4.2.5 Restrição operacional e acadêmica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-visoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Visões
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.5 Visões">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#251-visao-de-uso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.1 Visão de uso
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.5.1 Visão de uso">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2511-diagrama-de-casos-de-uso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.1.1 Diagrama de casos de uso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2512-diagrama-de-atividades" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.1.2 Diagrama de atividades
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#252-visao-de-organizacao-logica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.2 Visão de organização lógica
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#253-visao-estrutural" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.3 Visão estrutural
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.5.3 Visão estrutural">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2531-modelo-de-dados-relacional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.3.1 Modelo de dados relacional
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2532-diagrama-de-componentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.3.2 Diagrama de componentes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-visao-de-implantacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Visão de implantação
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.6 Visão de implantação">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#261-estrategia-e-execucao-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6.1 Estratégia e execução de testes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#262-integracao-continua" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6.2 Integração contínua
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-operacao-e-ciclo-de-vida-dos-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Operação e ciclo de vida dos dados
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-rastreabilidade-com-o-documento-de-visao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 Rastreabilidade com o Documento de Visão
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#29-riscos-arquiteturais-e-decisoes-pendentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.9 Riscos arquiteturais e decisões pendentes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-bibliografia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Bibliografia
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="documento-de-arquitetura-motivafit">Documento de Arquitetura — MotivaFit<a class="headerlink" href="#documento-de-arquitetura-motivafit" title="Permanent link">&para;</a></h1>
+<p><strong>Universidade de Brasília · Grupo Perlman — T03</strong><br />
+<strong>Versão 1.7 — Revisada · Brasília, 2026</strong></p>
+<blockquote>
+<p>Documento de arquitetura do produto MotivaFit, elaborado pelo Grupo Perlman — T03, Universidade de Brasília, na disciplina de Métodos de Desenvolvimento de Software (MDS).</p>
+</blockquote>
+<h2 id="integrantes-da-equipe">Integrantes da equipe<a class="headerlink" href="#integrantes-da-equipe" title="Permanent link">&para;</a></h2>
+<p><strong>Tabela 1 – Integrantes do grupo</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Matrícula</th>
+<th style="text-align: left;">Nome</th>
+<th style="text-align: left;">Função</th>
+<th style="text-align: right;">Pontos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">232024966</td>
+<td style="text-align: left;">Bernardo Campos Caxito Silveira</td>
+<td style="text-align: left;">GQM</td>
+<td style="text-align: right;">14,28</td>
+</tr>
+<tr>
+<td style="text-align: left;">251039442</td>
+<td style="text-align: left;">Bruno Cruvinel Barros da Silva</td>
+<td style="text-align: left;">Documentação</td>
+<td style="text-align: right;">14,29</td>
+</tr>
+<tr>
+<td style="text-align: left;">252004290</td>
+<td style="text-align: left;">Lucas Venâncio Pereira</td>
+<td style="text-align: left;">Back-end</td>
+<td style="text-align: right;">14,28</td>
+</tr>
+<tr>
+<td style="text-align: left;">252023741</td>
+<td style="text-align: left;">Luís Felipe Pontes Vieira Andrade</td>
+<td style="text-align: left;">Back-end</td>
+<td style="text-align: right;">14,28</td>
+</tr>
+<tr>
+<td style="text-align: left;">251026248</td>
+<td style="text-align: left;">Mateus Fernandes Dantas</td>
+<td style="text-align: left;">Front-end</td>
+<td style="text-align: right;">14,29</td>
+</tr>
+<tr>
+<td style="text-align: left;">251013651</td>
+<td style="text-align: left;">Matheus Estevam Ferreira</td>
+<td style="text-align: left;">Back-end</td>
+<td style="text-align: right;">14,29</td>
+</tr>
+<tr>
+<td style="text-align: left;">211062428</td>
+<td style="text-align: left;">Rafael Souto Lopes Laube</td>
+<td style="text-align: left;">Front-end</td>
+<td style="text-align: right;">14,29</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><strong>Total</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;"><strong>100,00</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026). GQM: Goal-Question-Metric (objetivo–questão–métrica).</em></p>
+<h2 id="historico-de-revisoes">Histórico de revisões<a class="headerlink" href="#historico-de-revisoes" title="Permanent link">&para;</a></h2>
+<p><strong>Tabela 2 – Histórico de revisões</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Data</th>
+<th style="text-align: left;">Versão</th>
+<th style="text-align: left;">Descrição</th>
+<th style="text-align: left;">Autor(es)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">03/10/2026</td>
+<td style="text-align: left;">1.0</td>
+<td style="text-align: left;">Elaboração inicial do Documento de Arquitetura</td>
+<td style="text-align: left;">Equipe Perlman</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<hr />
+<h2 id="1-introducao">1 Introdução<a class="headerlink" href="#1-introducao" title="Permanent link">&para;</a></h2>
+<h3 id="11-proposito">1.1 Propósito<a class="headerlink" href="#11-proposito" title="Permanent link">&para;</a></h3>
+<p>Este documento descreve a arquitetura do sistema MotivaFit, desenvolvido pelo Grupo Perlman — T03 na disciplina de MDS — Métodos de Desenvolvimento de Software, edição do semestre de 2026. Seu propósito é fornecer uma visão abrangente e padronizada do sistema para desenvolvedores, testadores e demais interessados nos aspectos relacionados às tecnologias e às estruturas utilizadas no desenvolvimento do software, registrando as decisões arquiteturais e suas justificativas.</p>
+<h3 id="12-escopo">1.2 Escopo<a class="headerlink" href="#12-escopo" title="Permanent link">&para;</a></h3>
+<p>O escopo está alinhado à cópia revisada do Documento de Visão, versão 1.0.1, incluída nesta revisão. O MotivaFit é uma aplicação web para organização de treinos, registro de execução e acompanhamento de progresso, com recursos posteriores de conquistas, desafios, rede social e painel administrativo. Hexad é referência de projeto para discutir motivações; não há classificação de usuários, questionário, adaptação por tipo nem regras executáveis baseadas em Hexad.</p>
+<p>O MVP será concluído ao final da Sprint 4 e reúne exclusivamente os requisitos Must RF-01 a RF-11. RF-12, RF-18, RF-19, RF-20 e RF-22 passam de Must a Should, mantendo as Sprints 5, 7, 7, 8 e 9, respectivamente. Todos os requisitos fora do MVP são Should ou Could; RF-24 continua opcional nas Sprints 9 e 10. As Tabelas 7 e 13 e o backlog da cópia do Documento de Visão registram essa reclassificação. Não há antecipação de escopo obrigatório nem mudança das Sprints.</p>
+<p>Não fazem parte do escopo desta arquitetura: aplicativos móveis nativos (o produto é uma aplicação web que deve se adaptar a telas de celular e de computador) e a criação de exercícios pelo usuário, pois os exercícios são selecionados a partir de uma tabela de exercícios predefinidos (RF-07).</p>
+<h3 id="13-definicoes-acronimos-e-abreviacoes">1.3 Definições, acrônimos e abreviações<a class="headerlink" href="#13-definicoes-acronimos-e-abreviacoes" title="Permanent link">&para;</a></h3>
+<p><strong>Tabela 3 – Definições, acrônimos e abreviações</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Termo</th>
+<th style="text-align: left;">Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">API</td>
+<td style="text-align: left;">Application Programming Interface (interface de programação de aplicações).</td>
+</tr>
+<tr>
+<td style="text-align: left;">CI</td>
+<td style="text-align: left;">Continuous Integration (integração contínua).</td>
+</tr>
+<tr>
+<td style="text-align: left;">CF</td>
+<td style="text-align: left;">Cenário funcional do Documento de Visão (por exemplo, CF-03).</td>
+</tr>
+<tr>
+<td style="text-align: left;">CRUD</td>
+<td style="text-align: left;">Create, Read, Update, Delete (criar, consultar, atualizar e excluir).</td>
+</tr>
+<tr>
+<td style="text-align: left;">GQM</td>
+<td style="text-align: left;">Goal-Question-Metric (objetivo–questão–métrica), abordagem de medição adotada no projeto.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hexad</td>
+<td style="text-align: left;">Modelo de gamificação com seis tipos de usuário: Achiever, Philanthropist, Free Spirit, Player, Socialiser e Disruptor.</td>
+</tr>
+<tr>
+<td style="text-align: left;">JPA</td>
+<td style="text-align: left;">Jakarta Persistence API, especificação de mapeamento objeto-relacional em Java.</td>
+</tr>
+<tr>
+<td style="text-align: left;">JWT</td>
+<td style="text-align: left;">JSON Web Token, token assinado utilizado na autenticação sem estado (stateless).</td>
+</tr>
+<tr>
+<td style="text-align: left;">MoSCoW</td>
+<td style="text-align: left;">Técnica de priorização: Must, Should, Could e Won't have.</td>
+</tr>
+<tr>
+<td style="text-align: left;">MVC</td>
+<td style="text-align: left;">Model-View-Controller; não caracteriza o Backend REST adotado, que não possui View.</td>
+</tr>
+<tr>
+<td style="text-align: left;">MVP</td>
+<td style="text-align: left;">Minimum Viable Product (produto mínimo viável).</td>
+</tr>
+<tr>
+<td style="text-align: left;">ORM</td>
+<td style="text-align: left;">Object-Relational Mapping (mapeamento objeto-relacional).</td>
+</tr>
+<tr>
+<td style="text-align: left;">PR</td>
+<td style="text-align: left;">Neste documento, recorde pessoal (Personal Record) de um exercício. Pull Request é sempre escrito por extenso.</td>
+</tr>
+<tr>
+<td style="text-align: left;">REST</td>
+<td style="text-align: left;">Representational State Transfer, estilo de comunicação entre cliente e servidor sobre HTTP.</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF</td>
+<td style="text-align: left;">Requisito funcional do backlog do Documento de Visão (RF-01 a RF-24).</td>
+</tr>
+<tr>
+<td style="text-align: left;">SOLID</td>
+<td style="text-align: left;">Princípios de projeto orientado a objetos: responsabilidade única, aberto/fechado, substituição de Liskov, segregação de interfaces e inversão de dependência.</td>
+</tr>
+<tr>
+<td style="text-align: left;">SPA</td>
+<td style="text-align: left;">Single Page Application (aplicação de página única).</td>
+</tr>
+<tr>
+<td style="text-align: left;">T1 a T22</td>
+<td style="text-align: left;">Casos de teste planejados no Documento de Visão (seção 6.2).</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h3 id="14-documentos-de-referencia">1.4 Documentos de referência<a class="headerlink" href="#14-documentos-de-referencia" title="Permanent link">&para;</a></h3>
+<p>Esta versão toma como base o <a href="documento-de-visao.md">Documento de Visão</a> 1.0.0 e acompanha uma cópia revisada 1.0.1 com as mesmas prioridades, decisões sobre recordes, Hexad e cobertura. Os originais são preservados. As alterações constituem a proposta documental desta revisão e não evidenciam implementação ou homologação pelo Dono do Produto. Mudanças futuras de escopo e cronograma devem atualizar ambos os históricos e matrizes de rastreabilidade.</p>
+<h3 id="15-organizacao-do-documento">1.5 Organização do documento<a class="headerlink" href="#15-organizacao-do-documento" title="Permanent link">&para;</a></h3>
+<p>A seção 2 apresenta a representação arquitetural: estilo adotado e justificativa, tecnologias, detalhamento em camadas, metas e restrições, as visões de uso, de organização lógica, estrutural e de implantação, a operação e o ciclo de vida dos dados, a rastreabilidade com o Documento de Visão e os riscos arquiteturais. A seção 3 lista a bibliografia.</p>
+<hr />
+<h2 id="2-representacao-arquitetural">2 Representação arquitetural<a class="headerlink" href="#2-representacao-arquitetural" title="Permanent link">&para;</a></h2>
+<h3 id="21-definicoes">2.1 Definições<a class="headerlink" href="#21-definicoes" title="Permanent link">&para;</a></h3>
+<p>O sistema adotará o estilo arquitetural <strong>Cliente-Servidor (Client-Server)</strong> e operará em múltiplos níveis (<em>multi-tier</em>), conforme descrito por Bass, Clements e Kazman (2021) e por Fowler (2006). Haverá uma separação lógica e física bem definida entre a camada de apresentação consumida pelos usuários (Frontend), a camada responsável pelo processamento de negócio (Backend) e a estrutura de persistência (Banco de Dados). A comunicação entre cliente e servidor ocorrerá exclusivamente por meio de uma API RESTful, com troca de dados em formato JSON, o que padroniza a troca de informações e garante o baixo acoplamento entre as camadas.</p>
+<h3 id="22-justificativa-da-escolha">2.2 Justificativa da escolha<a class="headerlink" href="#22-justificativa-da-escolha" title="Permanent link">&para;</a></h3>
+<p>A escolha pelo estilo Cliente-Servidor com comunicação via API RESTful é justificada pelas necessidades operacionais e de organização do projeto MotivaFit, conforme evidenciado no Documento de Visão:</p>
+<ul>
+<li><strong>Separação de responsabilidades e desenvolvimento paralelo:</strong> a equipe possui papéis delineados entre desenvolvedores Backend e Frontend. A API REST permite que a interface (React) e os serviços (Java/Spring Boot) sejam construídos em paralelo, desde que o contrato da API seja definido previamente, mitigando riscos de integração.</li>
+<li><strong>Entregas curtas e incrementais:</strong> o projeto utiliza Sprints semanais e prevê integração contínua. A independência entre Frontend, Backend e Banco de Dados permite testar unidades e integrações isoladamente e implantar cada parte de forma independente.</li>
+<li><strong>Segurança e isolamento de dados:</strong> o MotivaFit armazena rotinas, cargas, repetições e recordes pessoais. Manter as regras de negócio e o acesso ao banco exclusivamente no servidor permite validar cada requisição, e a autenticação baseada em tokens JWT é compatível com o caráter <em>stateless</em> das APIs REST.</li>
+<li><strong>Evolução e extensibilidade:</strong> funcionalidades Should e Could (painel administrativo, desafios, feed, login com Google) entram como módulos adicionais sem alterar o que já está pronto.</li>
+</ul>
+<h4 id="221-tecnologias-e-decisoes-arquiteturais">2.2.1 Tecnologias e decisões arquiteturais<a class="headerlink" href="#221-tecnologias-e-decisoes-arquiteturais" title="Permanent link">&para;</a></h4>
+<p>A Tabela 4 consolida as tecnologias definidas no Documento de Visão, a camada em que atuam e o custo aceito em cada decisão. Como ferramentas de apoio ao desenvolvimento, o Documento de Visão também prevê Git, GitHub, Figma, VS Code, IntelliJ, Docker, Postman e Maven.</p>
+<p><strong>Tabela 4 – Tecnologias e decisões arquiteturais</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Tecnologia</th>
+<th style="text-align: left;">Camada</th>
+<th style="text-align: left;">Motivação</th>
+<th style="text-align: left;">Alternativa considerada</th>
+<th style="text-align: left;">Custo aceito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Java / Spring Boot</td>
+<td style="text-align: left;">Backend</td>
+<td style="text-align: left;">Robustez para as regras de negócio.</td>
+<td style="text-align: left;">Node.js / Express</td>
+<td style="text-align: left;">Maior verbosidade em troca de tipagem forte.</td>
+</tr>
+<tr>
+<td style="text-align: left;">React</td>
+<td style="text-align: left;">Frontend</td>
+<td style="text-align: left;">Criação de interface web interativa.</td>
+<td style="text-align: left;">Vue.js</td>
+<td style="text-align: left;">Curva de aprendizado da equipe em troca de ecossistema.</td>
+</tr>
+<tr>
+<td style="text-align: left;">PostgreSQL</td>
+<td style="text-align: left;">Persistência</td>
+<td style="text-align: left;">Estruturação relacional de treinos e usuários.</td>
+<td style="text-align: left;">MongoDB</td>
+<td style="text-align: left;">Rigidez do schema em troca de integridade ACID (atomicidade, consistência, isolamento e durabilidade).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Docker / GitHub Actions</td>
+<td style="text-align: left;">Infraestrutura e CI</td>
+<td style="text-align: left;">Padronização dos ambientes e automação de integração contínua.</td>
+<td style="text-align: left;">Implantação manual</td>
+<td style="text-align: left;">Tempo de configuração em troca de confiabilidade.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Git / GitHub</td>
+<td style="text-align: left;">Versionamento</td>
+<td style="text-align: left;">Versionamento colaborativo.</td>
+<td style="text-align: left;">GitLab</td>
+<td style="text-align: left;">Padrão de mercado adotado pela equipe.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026), com base no Documento de Visão (GRUPO PERLMAN, 2026).</em></p>
+<h3 id="23-detalhamento">2.3 Detalhamento<a class="headerlink" href="#23-detalhamento" title="Permanent link">&para;</a></h3>
+<p>O MotivaFit segue Cliente-Servidor em três níveis. React consome JSON por HTTPS; Spring Boot valida autenticação, autorização e regras de domínio. Repositórios e JPA/Hibernate executam no Backend e traduzem operações em SQL. PostgreSQL compõe exclusivamente a camada de armazenamento. A Figura 1 mostra essa localização do ORM.</p>
+<p><img alt="Figura 1 – Diagrama de arquitetura de software: React SPA, Backend Spring Boot (Controllers, Services, Repositories + JPA/Hibernate) e PostgreSQL" src="../assets/img/arq-fig1-arquitetura-de-software.png" /></p>
+<p><em>Figura 1 – Diagrama de arquitetura de software. Fonte: elaborado pelos autores (2026).</em></p>
+<h4 id="231-explicacao-do-diagrama-em-camadas">2.3.1 Explicação do diagrama em camadas<a class="headerlink" href="#231-explicacao-do-diagrama-em-camadas" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Camada de Apresentação (Frontend):</strong> desenvolvida com a biblioteca React, como aplicação de página única (SPA) com interface para o usuário e interface administrativa. É responsável por gerir as interações do usuário final (cadastro e login, gestão de treinos, registro de exercícios, dashboards de evolução, conquistas e interações sociais). Não contém regras de negócio críticas: todas as informações são obtidas por chamadas HTTP/REST e respostas em JSON.</li>
+<li><strong>Camada de Serviços e Negócio (Backend):</strong> Spring Boot, organizado por domínio, com Controllers, Services e Repositories. Inclui autenticação, regras de treinos, cálculo de métricas e recordes, conquistas e desafios. O adaptador JPA/Hibernate pertence ao Backend. Hexad não é um mecanismo de execução.</li>
+<li><strong>Camada de Persistência (Banco de Dados):</strong> PostgreSQL mantém tabelas, restrições, índices e transações ACID; é acessado apenas pelo Backend. O ORM não executa no servidor do banco.</li>
+</ul>
+<h4 id="232-contrato-da-api-rest">2.3.2 Contrato da API REST<a class="headerlink" href="#232-contrato-da-api-rest" title="Permanent link">&para;</a></h4>
+<p>A Tabela 5 apresenta a proposta inicial dos recursos expostos pela API, associados aos requisitos do backlog. Os caminhos são indicativos e serão refinados e versionados pela equipe de Backend e Frontend antes da Sprint em que cada requisito for implementado. As requisições e respostas utilizam JSON, os resultados são indicados pelos códigos de status HTTP e as rotas protegidas exigem o token JWT no cabeçalho <code>Authorization</code>.</p>
+<p><strong>Tabela 5 – Recursos REST previstos</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Recurso</th>
+<th style="text-align: left;">Métodos</th>
+<th style="text-align: left;">Requisitos</th>
+<th style="text-align: left;">Acesso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>/api/auth/cadastro</code></td>
+<td style="text-align: left;">POST</td>
+<td style="text-align: left;">RF-01</td>
+<td style="text-align: left;">Público</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/auth/login</code></td>
+<td style="text-align: left;">POST</td>
+<td style="text-align: left;">RF-02</td>
+<td style="text-align: left;">Público</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/auth/google</code></td>
+<td style="text-align: left;">POST</td>
+<td style="text-align: left;">RF-24</td>
+<td style="text-align: left;">Público (opcional, após o MVP)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/treinos</code></td>
+<td style="text-align: left;">GET, POST</td>
+<td style="text-align: left;">RF-03, RF-04</td>
+<td style="text-align: left;">Usuário autenticado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/treinos/{id}</code></td>
+<td style="text-align: left;">PUT, DELETE</td>
+<td style="text-align: left;">RF-05, RF-06</td>
+<td style="text-align: left;">Usuário autenticado (dono do treino)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/treinos/{id}/adicionar</code></td>
+<td style="text-align: left;">POST</td>
+<td style="text-align: left;">RF-04</td>
+<td style="text-align: left;">Usuário autenticado (treino público)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/treinos/{id}/exercicios</code></td>
+<td style="text-align: left;">GET, POST</td>
+<td style="text-align: left;">RF-07, RF-08</td>
+<td style="text-align: left;">Usuário autenticado (dono do treino)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/treinos/{id}/exercicios/{idEx}</code></td>
+<td style="text-align: left;">PUT, DELETE</td>
+<td style="text-align: left;">RF-09, RF-10</td>
+<td style="text-align: left;">Usuário autenticado (dono do treino)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/registros</code></td>
+<td style="text-align: left;">POST, GET</td>
+<td style="text-align: left;">RF-11</td>
+<td style="text-align: left;">Usuário autenticado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/metricas/evolucao</code></td>
+<td style="text-align: left;">GET</td>
+<td style="text-align: left;">RF-12</td>
+<td style="text-align: left;">Usuário autenticado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/catalogo-exercicios/{id}/recordes</code></td>
+<td style="text-align: left;">GET</td>
+<td style="text-align: left;">RF-20</td>
+<td style="text-align: left;">Autenticado; somente recordes próprios, calculados automaticamente</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/admin/convites</code></td>
+<td style="text-align: left;">POST</td>
+<td style="text-align: left;">RF-13</td>
+<td style="text-align: left;">Superusuário</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/admin/metricas/*</code></td>
+<td style="text-align: left;">GET</td>
+<td style="text-align: left;">RF-14 a RF-17</td>
+<td style="text-align: left;">Administrador</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/desafios</code></td>
+<td style="text-align: left;">GET, POST</td>
+<td style="text-align: left;">RF-18</td>
+<td style="text-align: left;">Usuário autenticado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/desafios/{id}</code></td>
+<td style="text-align: left;">DELETE</td>
+<td style="text-align: left;">RF-19</td>
+<td style="text-align: left;">Usuário autenticado (criador)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/publicacoes</code></td>
+<td style="text-align: left;">GET, POST</td>
+<td style="text-align: left;">RF-21</td>
+<td style="text-align: left;">Usuário autenticado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/conquistas</code></td>
+<td style="text-align: left;">GET</td>
+<td style="text-align: left;">RF-22</td>
+<td style="text-align: left;">Usuário autenticado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/grupos</code></td>
+<td style="text-align: left;">GET, POST</td>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: left;">Autenticado: criar grupo e listar grupos próprios</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/auth/refresh</code>; <code>/api/auth/logout</code></td>
+<td style="text-align: left;">POST</td>
+<td style="text-align: left;">RF-02 / transversal</td>
+<td style="text-align: left;">Cookie seguro + proteção CSRF; rotação/revogação</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/conta</code>; <code>/api/conta/exportacao</code></td>
+<td style="text-align: left;">DELETE; GET</td>
+<td style="text-align: left;">Privacidade / transversal</td>
+<td style="text-align: left;">Titular; DELETE com autenticação recente</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/catalogo-exercicios</code>; <code>/api/catalogo-exercicios/{id}</code></td>
+<td style="text-align: left;">GET</td>
+<td style="text-align: left;">RF-07</td>
+<td style="text-align: left;">Todos os perfis autenticados; somente ativos</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/admin/catalogo-exercicios</code>; <code>/api/admin/catalogo-exercicios/{id}</code></td>
+<td style="text-align: left;">POST; PUT, DELETE</td>
+<td style="text-align: left;">Suporte RF-07</td>
+<td style="text-align: left;">Administrador ou superusuário; DELETE desativa</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/admin/convites/aceite</code></td>
+<td style="text-align: left;">POST</td>
+<td style="text-align: left;">RF-13</td>
+<td style="text-align: left;">Token de convite válido + e-mail convidado verificado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/amizades</code>; <code>/api/amizades/{id}</code></td>
+<td style="text-align: left;">GET, POST; PATCH, DELETE</td>
+<td style="text-align: left;">Suporte RF-18</td>
+<td style="text-align: left;">Solicitante/destinatário; PATCH aceita ou bloqueia</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/desafios/{id}/participantes</code>; <code>/api/desafios/{id}/participantes/me</code></td>
+<td style="text-align: left;">GET, POST; PATCH, DELETE</td>
+<td style="text-align: left;">RF-18, RF-19</td>
+<td style="text-align: left;">Criador convida amigos; destinatário aceita/recusa ou sai</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/grupos/{id}</code></td>
+<td style="text-align: left;">GET, PUT, DELETE</td>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: left;">Membro consulta; proprietário altera/exclui</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/grupos/{id}/membros</code>; <code>/api/grupos/{id}/membros/{usuarioId}</code></td>
+<td style="text-align: left;">GET; DELETE</td>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: left;">Membro lista; próprio membro sai ou proprietário remove</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/grupos/{id}/convites</code>; <code>/api/grupos/convites/aceite</code></td>
+<td style="text-align: left;">POST; POST</td>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: left;">Proprietário convida; destinatário aceita token válido</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/grupos/{id}/feed</code></td>
+<td style="text-align: left;">GET</td>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: left;">Somente membro</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/publicacoes/{id}</code></td>
+<td style="text-align: left;">GET, DELETE</td>
+<td style="text-align: left;">RF-21, RF-23</td>
+<td style="text-align: left;">Leitura conforme visibilidade; exclusão pelo autor</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/publicacoes/{id}/curtidas/me</code></td>
+<td style="text-align: left;">PUT, DELETE</td>
+<td style="text-align: left;">RF-21, RF-23</td>
+<td style="text-align: left;">Autenticado com acesso à publicação; operação idempotente</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/publicacoes/{id}/comentarios</code>; <code>/api/comentarios/{id}</code></td>
+<td style="text-align: left;">GET, POST; PUT, DELETE</td>
+<td style="text-align: left;">RF-21, RF-23</td>
+<td style="text-align: left;">Acesso à publicação; alteração/exclusão pelo autor</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/registros/{id}</code></td>
+<td style="text-align: left;">GET, PUT, DELETE</td>
+<td style="text-align: left;">RF-11 / correção técnica</td>
+<td style="text-align: left;">Dono; correções recalculam métricas e projeções</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>/api/admin/conquistas</code>; <code>/api/admin/conquistas/{id}</code></td>
+<td style="text-align: left;">POST; PUT</td>
+<td style="text-align: left;">Suporte RF-22</td>
+<td style="text-align: left;">Administrador; critérios versionados</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026). Proposta inicial a ser refinada nas Sprints.</em></p>
+<h4 id="233-mecanismos-de-seguranca">2.3.3 Mecanismos de segurança<a class="headerlink" href="#233-mecanismos-de-seguranca" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Autenticação:</strong> login com e-mail e senha emite JWT de acesso com validade de 15 minutos, mantido em memória pelo cliente. Refresh token opaco com validade de 7 dias fica em cookie HttpOnly, Secure e SameSite=Lax, com hash persistido no Backend; é rotacionado a cada renovação. Reuso revoga a família de tokens. Logout e exclusão de conta revogam as renovações; o filtro valida também conta ativa e versão de credencial para impedir acesso com JWT remanescente. Esses prazos são decisões propostas, a validar nos testes.</li>
+<li><strong>Armazenamento de senhas:</strong> apenas o hash da senha é persistido, gerado por algoritmo adaptativo (por exemplo, BCrypt); a senha em texto puro nunca é registrada.</li>
+<li><strong>Autorização:</strong> controle por perfil (usuário, administrador e superusuário) e por posse do recurso. Um usuário só acessa os próprios registros e os treinos explicitamente públicos de outros usuários (T14); as rotas administrativas são negadas a usuários comuns (T11).</li>
+<li><strong>Validação e mensagens de erro:</strong> os dados de entrada são validados no Backend antes da persistência, e as mensagens de erro não revelam informações sensíveis (T3 e T5).</li>
+<li><strong>Transporte:</strong> toda comunicação entre navegador e servidores ocorre por HTTPS; os segredos (chave de assinatura do JWT, credenciais do banco) são fornecidos por variáveis de ambiente e não versionados no repositório.</li>
+<li><strong>CORS:</strong> permitir somente as origens exatas cadastradas para desenvolvimento e futura hospedagem; nunca usar origem curinga com credenciais. Métodos e cabeçalhos são explicitamente permitidos. Refresh e logout validam <code>Origin</code> e token anti-CSRF, pois usam cookie. CORS não substitui autenticação e autorização.</li>
+<li><strong>Inicialização administrativa:</strong> três perfis (<code>USUARIO</code>, <code>ADMINISTRADOR</code>, <code>SUPERUSUARIO</code>). O superusuário herda as permissões administrativas. O primeiro é criado por comando de <em>bootstrap</em> executado pelo operador, com credenciais fornecidas por segredo e senha temporária que deve ser trocada. O comando é idempotente, não é uma rota pública, não possui senha padrão e registra auditoria sem expor segredos. O cadastro público sempre cria <code>USUARIO</code>; apenas o superusuário concede <code>ADMINISTRADOR</code> por convite.</li>
+</ul>
+<h3 id="24-metas-e-restricoes-arquiteturais">2.4 Metas e restrições arquiteturais<a class="headerlink" href="#24-metas-e-restricoes-arquiteturais" title="Permanent link">&para;</a></h3>
+<p>As metas e restrições arquiteturais foram definidas considerando o contexto do sistema, os requisitos funcionais do Documento de Visão, as tecnologias adotadas pela equipe e o perfil dos usuários. Seu objetivo é garantir que a arquitetura seja segura, modular, testável e adequada à evolução incremental do produto ao longo das Sprints.</p>
+<h4 id="241-metas-arquiteturais">2.4.1 Metas arquiteturais<a class="headerlink" href="#241-metas-arquiteturais" title="Permanent link">&para;</a></h4>
+<h5 id="2411-garantir-modularidade-e-baixo-acoplamento">2.4.1.1 Garantir modularidade e baixo acoplamento<a class="headerlink" href="#2411-garantir-modularidade-e-baixo-acoplamento" title="Permanent link">&para;</a></h5>
+<p>A arquitetura deve manter separação clara entre interface, regras de negócio e persistência, e organizar o Backend em módulos por domínio, aplicando os princípios SOLID e Clean Code. Cada módulo pode ser desenvolvido, testado e evoluído de forma independente, o que facilita a prototipagem rápida e minimiza os impactos de mudanças no layout do aplicativo.</p>
+<h5 id="2412-garantir-qualidade-continua">2.4.1.2 Garantir qualidade contínua<a class="headerlink" href="#2412-garantir-qualidade-continua" title="Permanent link">&para;</a></h5>
+<p>Manter testes automatizados relevantes. A meta M3 permanece cobertura global ponderada de linhas ≥ 70%, medida também separadamente no Backend e Frontend. Sua viabilidade desde o primeiro Pull Request não está confirmada: esta revisão dispõe de documentação, sem resultados do pipeline. Até o piloto na Sprint 3 a cobertura é informativa; testes funcionais continuam bloqueantes. Antes do encerramento do MVP, a equipe deve executar um Pull Request representativo com builds, testes e relatórios, registrar cobertura, duração e esforço, e ativar o gate de 70% após demonstrar viabilidade. Sem evidência, a decisão fica pendente e deve ser revista nos dois documentos, sem alegar cumprimento. M2 e M4 medem defeitos e dívida técnica, não provam modularidade.</p>
+<h5 id="2413-garantir-seguranca-e-controle-de-acesso">2.4.1.3 Garantir segurança e controle de acesso<a class="headerlink" href="#2413-garantir-seguranca-e-controle-de-acesso" title="Permanent link">&para;</a></h5>
+<p>Como o MotivaFit armazena rotinas, evolução física (cargas, repetições) e recordes pessoais, é vital proteger a privacidade desses registros. A camada de serviços deve validar estritamente as requisições, garantindo que um atleta tenha acesso exclusivo às suas próprias métricas e apenas às interações permitidas nos grupos e espaços públicos do aplicativo.</p>
+<h5 id="2414-garantir-usabilidade-e-fluidez">2.4.1.4 Garantir usabilidade e fluidez<a class="headerlink" href="#2414-garantir-usabilidade-e-fluidez" title="Permanent link">&para;</a></h5>
+<p>O registro diário deve ser rápido e claro. Metas propostas de desempenho: p95 ≤ 500 ms para leitura e ≤ 800 ms para gravação de registros, erros de servidor &lt; 1%, em ensaio de 10 minutos com 20 usuários simultâneos, banco com 100 mil registros e servidor de referência com 2 vCPU e 4 GiB de RAM. Medir após aquecimento de 2 minutos, reportando infraestrutura, massa e latência; esses são critérios de aceitação, não resultados medidos.</p>
+<p>Usabilidade: realizar duas rodadas (MVP e após recursos sociais), com pelo menos cinco participantes representativos por rodada, em celular e computador; tarefas de cadastrar, montar treino, registrar e consultar histórico, com ≥ 90% de conclusão sem ajuda e mediana ≤ 60 segundos para registrar execução em conta preparada. T20 cobre a primeira rodada; repetir após mudanças de fluxo e documentar problemas e correções.</p>
+<h5 id="2415-garantir-evolucao-e-extensibilidade">2.4.1.5 Garantir evolução e extensibilidade<a class="headerlink" href="#2415-garantir-evolucao-e-extensibilidade" title="Permanent link">&para;</a></h5>
+<p>A arquitetura deve permitir que novas funcionalidades sejam acrescentadas sem alterar o que já está pronto. O planejamento do Documento de Visão depende disso: o MVP fecha na Sprint 4 e os recursos Should e Could chegam depois, conforme a capacidade da equipe. Cada recurso novo entra como módulo ou componente adicional (Sprints semanais conforme o Guia do Scrum, de Schwaber e Sutherland, 2020); o login com Google, por exemplo, soma-se ao acesso por e-mail e senha sem substituí-lo.</p>
+<p>A Tabela 6 distingue métricas arquiteturais propostas nesta revisão das métricas de processo M1 a M4 do Documento de Visão. Vazão mede entregas e dívida técnica mede problemas estáticos; nenhuma delas, isoladamente, verifica extensibilidade ou modularidade.</p>
+<p><strong>Tabela 6 – Metas arquiteturais e verificação</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Meta</th>
+<th style="text-align: left;">Como é verificada</th>
+<th style="text-align: left;">Referência (Visão)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">2.4.1.1 Modularidade</td>
+<td style="text-align: left;">Testes arquiteturais por Pull Request: zero ciclos entre domínios e zero acesso a repositórios internos de outro módulo; verificar dependências da Figura 4.</td>
+<td style="text-align: left;">MA1 (nova); M4 complementa</td>
+</tr>
+<tr>
+<td style="text-align: left;">2.4.1.2 Qualidade</td>
+<td style="text-align: left;">Builds/testes bloqueantes; M3 global ≥ 70% após piloto de viabilidade; registrar cobertura por camada. M2 ≤ 0,2 bugs/issue por Sprint.</td>
+<td style="text-align: left;">M2, M3; piloto Sprint 3</td>
+</tr>
+<tr>
+<td style="text-align: left;">2.4.1.3 Segurança</td>
+<td style="text-align: left;">Testar isolamento entre contas e grupos, os três perfis, bootstrap, rotação/reuso de refresh, CSRF e exclusão de conta.</td>
+<td style="text-align: left;">T3, T11, T14, T21, T22 + casos técnicos</td>
+</tr>
+<tr>
+<td style="text-align: left;">2.4.1.4 Usabilidade/desempenho</td>
+<td style="text-align: left;">Duas rodadas com ≥ 5 participantes; conclusão ≥ 90%; registro mediano ≤ 60 s. Carga de 20 usuários: p95 leitura ≤ 500 ms e gravação ≤ 800 ms; erros &lt; 1%.</td>
+<td style="text-align: left;">T20 ampliado; MA2/MA3 novas</td>
+</tr>
+<tr>
+<td style="text-align: left;">2.4.1.5 Extensibilidade</td>
+<td style="text-align: left;">Em cada novo recurso, registrar módulos alterados e mudanças de contrato; zero mudanças incompatíveis não versionadas. Exercício com nova regra de conquista deve mudar somente Gamificação e sua definição, preservando Core e contrato de Registro.</td>
+<td style="text-align: left;">MA4 (nova); M1 mede processo</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026), com base no Documento de Visão (GRUPO PERLMAN, 2026).</em></p>
+<h4 id="242-restricoes-arquiteturais">2.4.2 Restrições arquiteturais<a class="headerlink" href="#242-restricoes-arquiteturais" title="Permanent link">&para;</a></h4>
+<p>As restrições arquiteturais definem limitações, padrões e diretrizes técnicas que devem ser seguidos durante o desenvolvimento.</p>
+<h5 id="2421-restricao-tecnologica">2.4.2.1 Restrição tecnológica<a class="headerlink" href="#2421-restricao-tecnologica" title="Permanent link">&para;</a></h5>
+<p>O projeto deve utilizar as tecnologias estipuladas no Documento de Visão: Java com Spring Boot no Backend, React no Frontend e PostgreSQL na persistência, com Docker e GitHub Actions para containerização e integração contínua e Git/GitHub para versionamento.</p>
+<h5 id="2422-restricao-de-estilo-arquitetural">2.4.2.2 Restrição de estilo arquitetural<a class="headerlink" href="#2422-restricao-de-estilo-arquitetural" title="Permanent link">&para;</a></h5>
+<p>O sistema deve seguir o modelo Cliente-Servidor em múltiplas camadas. A comunicação entre Frontend e Backend ocorre por API RESTful e a autenticação utiliza tokens JWT para o controle de acesso às funcionalidades protegidas. O banco de dados é acessado exclusivamente pelo Backend.</p>
+<h5 id="2423-restricao-de-padronizacao-de-codigo">2.4.2.3 Restrição de padronização de código<a class="headerlink" href="#2423-restricao-de-padronizacao-de-codigo" title="Permanent link">&para;</a></h5>
+<ul>
+<li><strong>Backend:</strong> seguir os princípios SOLID e as diretrizes de Clean Code, com as convenções de nomenclatura da linguagem Java (classes em PascalCase; métodos e variáveis em camelCase) e organização em pacotes por domínio, evitando débito técnico a longo prazo.</li>
+<li><strong>Frontend:</strong> componentes React com responsabilidade única, arquivos organizados de forma modular e reutilizável e comunicação com a API concentrada em serviços de requisição.</li>
+<li>A conformidade será verificada por revisões de código (Code Review e Pair Programming) e por análise estática automatizada.</li>
+</ul>
+<h5 id="2424-restricao-de-versionamento-e-integracao">2.4.2.4 Restrição de versionamento e integração<a class="headerlink" href="#2424-restricao-de-versionamento-e-integracao" title="Permanent link">&para;</a></h5>
+<p>Cada funcionalidade é desenvolvida em branch própria e integrada por Pull Request. Builds, testes e análise estática crítica são bloqueantes. A política de cobertura e o piloto de viabilidade seguem a seção 2.4.1.2, sem impor um bloqueio sem baseline comprovada. A análise estática roda a cada Pull Request e em execução diária independente.</p>
+<h5 id="2425-restricao-operacional-e-academica">2.4.2.5 Restrição operacional e acadêmica<a class="headerlink" href="#2425-restricao-operacional-e-academica" title="Permanent link">&para;</a></h5>
+<ul>
+<li>O desenvolvimento ocorre em Sprints semanais, sem Daily Scrum, pois a disponibilidade dos integrantes impossibilita encontros diários; o acompanhamento é feito por reuniões semanais e pelos canais de comunicação do grupo.</li>
+<li>As funcionalidades são implementadas conforme a priorização MoSCoW do backlog.</li>
+<li>O mesmo ambiente base (Linux e containers Docker) deve ser usado por todos os integrantes, garantindo reprodutibilidade.</li>
+</ul>
+<h3 id="25-visoes">2.5 Visões<a class="headerlink" href="#25-visoes" title="Permanent link">&para;</a></h3>
+<p>Esta seção apresenta as visões de uso, de organização lógica e estrutural do sistema. Por meio dos diagramas e das descrições é possível compreender como os usuários interagem com o sistema e como os requisitos do projeto influenciaram as decisões arquiteturais. O contexto do MotivaFit abrange praticantes de exercícios, iniciantes e atletas, e os principais grupos de casos de uso que influenciaram a arquitetura são:</p>
+<ul>
+<li><strong>Gestão de treinos:</strong> criar, alterar, listar e excluir treinos e seus exercícios (RF-03 a RF-10).</li>
+<li><strong>Registro diário:</strong> registrar os exercícios realizados com carga, repetições, séries e tempo (RF-11).</li>
+<li><strong>Análise:</strong> consultar indicadores de evolução e recordes pessoais (RF-12 e RF-20).</li>
+<li><strong>Gamificação e interação social:</strong> conquistas por assiduidade, desafios, compartilhamento, grupos e feed (RF-18 a RF-23).</li>
+<li><strong>Administrativo:</strong> convite de administradores e métricas da plataforma sobre retenção e rotinas mais usadas (RF-13 a RF-17).</li>
+</ul>
+<h4 id="251-visao-de-uso">2.5.1 Visão de uso<a class="headerlink" href="#251-visao-de-uso" title="Permanent link">&para;</a></h4>
+<p>O MotivaFit possui três perfis: <code>USUARIO</code> utiliza treinos e métricas pessoais; <code>ADMINISTRADOR</code> consulta métricas agregadas e mantém o catálogo; <code>SUPERUSUARIO</code> herda essas atribuições e convida administradores. Todos autenticam pelo mesmo módulo. O <em>bootstrap</em> do primeiro superusuário está definido na seção 2.3.3.</p>
+<h5 id="2511-diagrama-de-casos-de-uso">2.5.1.1 Diagrama de casos de uso<a class="headerlink" href="#2511-diagrama-de-casos-de-uso" title="Permanent link">&para;</a></h5>
+<p>A Figura 2 associa os três perfis à autenticação e delimita permissões. O superusuário herda as permissões do administrador; somente ele cria convites administrativos. Indicadores administrativos são agregados e não liberam automaticamente acesso ao histórico individual dos usuários.</p>
+<p><img alt="Figura 2 – Diagrama de casos de uso do sistema MotivaFit: superusuário, administrador e usuário" src="../assets/img/arq-fig2-casos-de-uso.png" /></p>
+<p><em>Figura 2 – Diagrama de casos de uso do sistema MotivaFit. Fonte: elaborado pelos autores (2026).</em></p>
+<p><strong>Tabela 7 – Casos de uso, atores e requisitos</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Caso de uso</th>
+<th style="text-align: left;">Ator</th>
+<th style="text-align: left;">Requisitos</th>
+<th style="text-align: center;">Sprint</th>
+<th style="text-align: center;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Cadastrar conta</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-01</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">Autenticar com e-mail e senha</td>
+<td style="text-align: left;">Usuário, Administrador, Superusuário</td>
+<td style="text-align: left;">RF-02</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gerenciar treinos</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-03 a RF-06</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gerenciar exercícios do treino</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-07 a RF-10</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">Registrar exercício realizado</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-11</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">Acompanhar métricas e recordes pessoais</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-12, RF-20</td>
+<td style="text-align: center;">5 e 8</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">Convidar administrador por e-mail</td>
+<td style="text-align: left;">Superusuário</td>
+<td style="text-align: left;">RF-13</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">Could</td>
+</tr>
+<tr>
+<td style="text-align: left;">Consultar painel administrativo</td>
+<td style="text-align: left;">Administrador</td>
+<td style="text-align: left;">RF-14 a RF-17</td>
+<td style="text-align: center;">5 a 7</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">Criar e remover desafios</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-18, RF-19</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">Compartilhar resultados</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-21</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">Visualizar conquistas</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-22</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">Participar de grupos e feed</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">Autenticar com Google (opcional)</td>
+<td style="text-align: left;">Usuário</td>
+<td style="text-align: left;">RF-24</td>
+<td style="text-align: center;">9 e 10</td>
+<td style="text-align: center;">Could</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026), com base no Documento de Visão (GRUPO PERLMAN, 2026).</em></p>
+<h5 id="2512-diagrama-de-atividades">2.5.1.2 Diagrama de atividades<a class="headerlink" href="#2512-diagrama-de-atividades" title="Permanent link">&para;</a></h5>
+<p>A Figura 3 mostra a orquestração do registro: autenticar e validar posse e campos, persistir a execução e atualizar projeções que já tenham sido entregues. Na Sprint 4 somente o registro faz parte do MVP; recordes e conquistas entram nas Sprints 8 e 9. O orquestrador de aplicação chama as interfaces de Registro e Gamificação; o domínio Registro não depende do domínio Gamificação.</p>
+<p><img alt="Figura 3 – Diagrama de atividades do registro de exercício e gamificação" src="../assets/img/arq-fig3-diagrama-de-atividades.png" /></p>
+<p><em>Figura 3 – Diagrama de atividades do registro de exercício e gamificação. Fonte: elaborado pelos autores (2026).</em></p>
+<p>Na mesma transação local, o orquestrador persiste o registro e, quando disponíveis, chama atualização de recordes e avaliação de conquistas. Gamificação consulta a interface de leitura de Registro e Métricas para apurar assiduidade; Registro não chama Gamificação. A API responde com os dados dos recursos já entregues. Falhas provocam <em>rollback</em>; restrições únicas e chave de idempotência impedem duplicação na repetição de requisições. As Figuras 3, 4 e 7 e a Tabela 14 usam o mesmo sentido de dependência (consumidor → provedor).</p>
+<h4 id="252-visao-de-organizacao-logica">2.5.2 Visão de organização lógica<a class="headerlink" href="#252-visao-de-organizacao-logica" title="Permanent link">&para;</a></h4>
+<p>A organização lógica do MotivaFit divide o sistema em módulos que agrupam funcionalidades relacionadas ao domínio, seguindo o princípio de alta coesão e baixo acoplamento. Essa divisão reduz o acoplamento, facilita a manutenção, permite o desenvolvimento paralelo entre os integrantes e favorece a evolução incremental ao longo das Sprints. O Frontend concentra os módulos de interface, navegação e comunicação com a API; o Backend concentra as regras de negócio, a autenticação e a persistência. O acesso ao banco ocorre exclusivamente pelo Backend, por meio do ORM, evitando o acesso direto da interface aos dados.</p>
+<p><img alt="Figura 4 – Visão de organização lógica em módulos (dependência: consumidor → provedor)" src="../assets/img/arq-fig4-organizacao-logica.png" /></p>
+<p><em>Figura 4 – Visão de organização lógica em módulos. Fonte: elaborado pelos autores (2026).</em></p>
+<p><strong>Tabela 8 – Módulos lógicos do Backend e requisitos atendidos</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Módulo</th>
+<th style="text-align: left;">Responsabilidades</th>
+<th style="text-align: left;">Requisitos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1. Autenticação e Segurança</td>
+<td style="text-align: left;">Cadastro de contas, autenticação por e-mail e senha, emissão e validação de tokens JWT, perfis de acesso, convite de administradores e, futuramente, login opcional via Google (OAuth).</td>
+<td style="text-align: left;">RF-01, RF-02, RF-13, RF-24</td>
+</tr>
+<tr>
+<td style="text-align: left;">2. Core de Treinos</td>
+<td style="text-align: left;">Treinos do usuário, sua composição por exercícios (selecionados no catálogo predefinido), metas por exercício e adição de treinos já montados.</td>
+<td style="text-align: left;">RF-03 a RF-10</td>
+</tr>
+<tr>
+<td style="text-align: left;">3. Registro e Métricas</td>
+<td style="text-align: left;">Registro diário de execução (carga, repetições, séries e tempo), indicadores de desempenho e evolução e recordes pessoais.</td>
+<td style="text-align: left;">RF-11, RF-12, RF-20</td>
+</tr>
+<tr>
+<td style="text-align: left;">4. Gamificação</td>
+<td style="text-align: left;">Conquistas por assiduidade e desafios; consulta a interface de leitura de Registro. Hexad é referência de projeto.</td>
+<td style="text-align: left;">RF-18, RF-19, RF-22</td>
+</tr>
+<tr>
+<td style="text-align: left;">5. Analítico e Admin</td>
+<td style="text-align: left;">Compilações de dados para o painel: usuários ativos, frequência média, ranking por tempo de treino e exercícios mais realizados.</td>
+<td style="text-align: left;">RF-14 a RF-17</td>
+</tr>
+<tr>
+<td style="text-align: left;">6. Infraestrutura compartilhada</td>
+<td style="text-align: left;">Configurações, validações, tratamento de erros, filtros de segurança e padrão de resposta da API, reutilizados pelos demais módulos.</td>
+<td style="text-align: left;">Transversal</td>
+</tr>
+<tr>
+<td style="text-align: left;">7. Social</td>
+<td style="text-align: left;">Amizades, publicações, curtidas, comentários, grupos, membros e convites.</td>
+<td style="text-align: left;">RF-21, RF-23</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026), com base no Documento de Visão (GRUPO PERLMAN, 2026).</em></p>
+<p>Hexad foi usado somente como referência de projeto, distribuída entre vários módulos. Os seis tipos são discutidos abaixo; não se promete atender integralmente todos eles. Marczewski (2015) e Tondello et al. (2016) relacionam Philanthropist a propósito e altruísmo e Disruptor a mudança do sistema; mecânicas sociais ou desafios não demonstram essas motivações por si só.</p>
+<ul>
+<li><strong>Achiever:</strong> maestria e progressão, apoiadas por métricas e recordes (Registro e Métricas, RF-12 e RF-20).</li>
+<li><strong>Free Spirit:</strong> autonomia para compor rotinas e metas (Core de Treinos, RF-03, RF-05, RF-07 e RF-09).</li>
+<li><strong>Player:</strong> recompensas visuais de assiduidade (Gamificação, RF-22).</li>
+<li><strong>Philanthropist:</strong> o compartilhamento de RF-21 pode apoiar outros usuários se for usado com intenção de ajuda, uma hipótese de projeto inspirada em propósito e altruísmo na literatura. Compartilhar resultados sozinho não comprova esse tipo; não existe mecânica específica de mentoria ou doação no escopo.</li>
+<li><strong>Socialiser:</strong> relações e interação em grupos e feed (Social, RF-21 e RF-23).</li>
+<li><strong>Disruptor:</strong> a literatura associa esse tipo a mudança e influência sobre o sistema. Criar desafios (RF-18) não permite alterar regras da plataforma, portanto o mapeamento anterior é removido. O escopo não atende especificamente esse tipo; desafios são mecânicas de progressão e interação social. Não se adiciona questionário ou requisito para preencher artificialmente essa lacuna.</li>
+</ul>
+<h4 id="253-visao-estrutural">2.5.3 Visão estrutural<a class="headerlink" href="#253-visao-estrutural" title="Permanent link">&para;</a></h4>
+<p>O Backend usa arquitetura em camadas organizada por domínio (Controllers → Services → Repositories), e não MVC completo: a API não possui View. JSON é um contrato de transporte, enquanto a apresentação é responsabilidade do React. Cada pacote de domínio contém seus controladores, serviços, portas e adaptadores de persistência; chamadas entre domínios usam interfaces públicas, nunca repositórios ou entidades internas de outro módulo.</p>
+<ul>
+<li><strong>Controllers:</strong> recebem as requisições HTTP e expõem os endpoints no formato JSON.</li>
+<li><strong>Services:</strong> concentram toda a lógica de negócio, inclusive as regras de gamificação.</li>
+<li><strong>Repositories:</strong> realizam as consultas e as abstrações de acesso ao banco PostgreSQL.</li>
+<li><strong>Entidades/Modelos:</strong> representam os dados do domínio (Usuário, Treino, Exercício, Registro Diário, Conquista e demais) mapeados pelo ORM.</li>
+</ul>
+<p>Essa separação favorece a testabilidade: as regras presentes nos Services podem ser testadas de forma isolada, e a integração entre Controllers, Services, Repositories e banco de dados pode ser validada por testes de integração. O Frontend é estruturado com componentização funcional em React, orientada a fluxos: páginas, componentes de interface e serviços de requisição.</p>
+<h5 id="2531-modelo-de-dados-relacional">2.5.3.1 Modelo de dados relacional<a class="headerlink" href="#2531-modelo-de-dados-relacional" title="Permanent link">&para;</a></h5>
+<p>As Figuras 5 e 6 são modelos de dados relacionais, não diagramas de classes UML. A Figura 5 distingue catálogo, exercício planejado, execução histórica, recorde numérico e concessão de conquista. A Figura 6 define desafios e participantes, amizade, grupos, membros, convites e conteúdo social. PK identifica chave primária, FK chave estrangeira e UQ unicidade; o texto a seguir complementa cardinalidades, unidades e regras de integridade. As entidades posteriores ao MVP são identificadas pela Sprint na Tabela 9.</p>
+<p><img alt="Figura 5 – Modelo de dados: MVP, recordes (Sprint 8) e conquistas (Sprint 9)" src="../assets/img/arq-fig5-modelo-de-dados-mvp.png" /></p>
+<p><em>Figura 5 – Modelo de dados: MVP, recordes (Sprint 8) e conquistas (Sprint 9). Fonte: elaborado pelos autores (2026).</em></p>
+<p><img alt="Figura 6 – Modelo de dados relacional: entidades previstas para as Sprints 5 a 9" src="../assets/img/arq-fig6-modelo-de-dados-social.png" /></p>
+<p><em>Figura 6 – Modelo de dados relacional: entidades previstas para as Sprints 5 a 9. Fonte: elaborado pelos autores (2026).</em></p>
+<p><strong>Tabela 9 – Entidades do domínio</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Entidade</th>
+<th style="text-align: left;">Descrição</th>
+<th style="text-align: left;">Requisitos</th>
+<th style="text-align: center;">Sprint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>USUARIO</code></td>
+<td style="text-align: left;">Conta de acesso. Possui e-mail único, hash da senha e perfil (usuário, administrador ou superusuário).</td>
+<td style="text-align: left;">RF-01, RF-02</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>TREINO</code></td>
+<td style="text-align: left;">Rotina do usuário, com nome, tipo (musculação ou aeróbico) e visibilidade (privado ou público), esta última para permitir a adição de treinos já montados sem expor treinos privados.</td>
+<td style="text-align: left;">RF-03 a RF-06</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>CATALOGO_EXERCICIO</code></td>
+<td style="text-align: left;">Tabela de exercícios predefinidos, com nome e grupo muscular. Não é editável pelo usuário.</td>
+<td style="text-align: left;">RF-07</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EXERCICIO</code></td>
+<td style="text-align: left;">Vínculo catálogo/treino; metas numéricas de carga, repetições, séries, tempo e distância; <code>excluido_em</code>. Não guarda recorde.</td>
+<td style="text-align: left;">RF-07 a RF-10</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>REGISTRO_DIARIO</code></td>
+<td style="text-align: left;">Execução do usuário ligada ao catálogo, com <code>carga_kg</code>, repetições, séries, <code>tempo_s</code>, <code>distancia_m</code>, data e snapshots; FKs opcionais de rotina não apagam histórico.</td>
+<td style="text-align: left;">RF-11, RF-12</td>
+<td style="text-align: center;">4 e 5</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>CONQUISTA_DEFINICAO</code> e <code>USUARIO_CONQUISTA</code></td>
+<td style="text-align: left;"><code>CONQUISTA_DEFINICAO</code> descreve critério; <code>USUARIO_CONQUISTA</code> registra concessão única por usuário/definição.</td>
+<td style="text-align: left;">RF-22</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>DESAFIO</code></td>
+<td style="text-align: left;">Desafio com criador, prazo, itens numéricos e participantes convidados/aceitos; amizade aceita valida convite.</td>
+<td style="text-align: left;">RF-18, RF-19</td>
+<td style="text-align: center;">7</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>PUBLICACAO</code>, <code>CURTIDA</code> e <code>COMENTARIO</code></td>
+<td style="text-align: left;"><code>PUBLICACAO</code>, <code>CURTIDA</code> e <code>COMENTARIO</code> separados; visibilidade pública ou restrita a membros de grupo.</td>
+<td style="text-align: left;">RF-21, RF-23</td>
+<td style="text-align: center;">8 e 9</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>GRUPO_TREINO</code></td>
+<td style="text-align: left;">Grupo com <code>GRUPO_MEMBRO</code> e <code>CONVITE_GRUPO</code> (destinatário, hash do token, validade e estado).</td>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>CONVITE_ADMIN</code></td>
+<td style="text-align: left;">Convite de cadastro administrativo com destinatário, hash de token, expiração, estado e convidador superusuário.</td>
+<td style="text-align: left;">RF-13</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>RECORDE_PESSOAL</code></td>
+<td style="text-align: left;">Projeção numérica automática por usuário, catálogo, métrica e distância de referência quando aplicável.</td>
+<td style="text-align: left;">RF-20</td>
+<td style="text-align: center;">8</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>AMIZADE</code> e <code>DESAFIO_PARTICIPANTE</code></td>
+<td style="text-align: left;">Relações de amizade e adesão explícita aos desafios; chaves únicas impedem duplicação.</td>
+<td style="text-align: left;">RF-18</td>
+<td style="text-align: center;">7</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>REFRESH_TOKEN</code></td>
+<td style="text-align: left;">Hash, família, usuário, validade e revogação para renovação rotativa.</td>
+<td style="text-align: left;">Transversal (RF-02)</td>
+<td style="text-align: center;">3</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026), com base no Documento de Visão (GRUPO PERLMAN, 2026).</em></p>
+<p><strong>Integridade histórica.</strong> Excluir treino ou exercício planejado arquiva o item com <code>excluido_em</code> e remove-o das listagens ativas. <code>REGISTRO_DIARIO</code> não sofre exclusão em cascata: mantém <code>usuario_id</code> e <code>catalogo_id</code> obrigatórios, <code>treino_id</code> e <code>exercicio_id</code> opcionais, além do nome do treino e do exercício no momento da execução. Se houver expurgo físico da rotina, essas duas FKs usam <code>ON DELETE SET NULL</code>. O catálogo é desativado, nunca excluído enquanto referenciado. Copiar treino público cria nova rotina sem copiar registros ou recordes. A exclusão de conta é um fluxo separado de eliminação de dados pessoais, descrito na seção 2.7.</p>
+<p><strong>Campos e recordes.</strong> Metas e registros usam <code>carga_kg NUMERIC(8,2)</code>, <code>repeticoes</code> e <code>series INTEGER</code>, <code>tempo_s INTEGER</code> e <code>distancia_m NUMERIC(10,2)</code>, com validação por modalidade; valores não aplicáveis ficam nulos. Tempo, distância, séries e repetições são positivos; carga pode ser zero. Pace em segundos/km é derivado de <code>tempo_s × 1000 / distancia_m</code>, somente com distância &gt; 0. Metas de pace usam <code>meta_tempo_s</code> e <code>meta_distancia_m</code>; não armazenam texto livre. <code>RECORDE_PESSOAL</code> tem <code>usuario_id</code>, <code>catalogo_id</code>, <code>tipo_metrica</code>, <code>valor NUMERIC(12,3)</code>, <code>unidade</code>, <code>atingido_em</code> e <code>registro_origem_id</code>, com <code>UQ(usuario_id, catalogo_id, tipo_metrica, distancia_referencia_m)</code> e tratamento de nulos como iguais (<code>UNIQUE NULLS NOT DISTINCT</code>), evitando múltiplos recordes sem referência de distância. Máximos de carga, repetições, distância e duração são independentes; menor pace é melhor. Comparações de pace e duração exigem distância de referência igual (incluída na chave de comparação), evitando comparar corridas diferentes. Não se estima 1RM. Recordes são calculados automaticamente sobre execuções válidas e recalculados ao corrigir ou eliminar um registro; <code>PUT</code> manual de recorde é removido. A mesma execução do catálogo em dois treinos atualiza o mesmo recorde, sem duplicação.</p>
+<p><strong>Conquistas.</strong> <code>CONQUISTA_DEFINICAO</code> contém código único, título, <code>tipo_criterio</code>, limiar e versão; <code>USUARIO_CONQUISTA</code> contém <code>usuario_id</code>, <code>conquista_id</code>, <code>concedida_em</code> e <code>registro_origem_id</code> opcional, com <code>UQ(usuario_id, conquista_id)</code>. Assiduidade usa dias distintos de execução no fuso America/Sao_Paulo; múltiplos registros no mesmo dia contam uma vez. Correções que invalidem o critério revogam a concessão derivada, mantendo auditoria. Catálogo e definições são mantidos por administradores em rotas auditadas, com carga inicial versionada; usuários apenas consultam e selecionam.</p>
+<p><strong>Interação social.</strong> <code>AMIZADE</code> usa par canônico de usuários distintos e estado pendente/aceita/bloqueada, com unicidade do par. <code>DESAFIO</code> tem criador, prazo e estado; <code>DESAFIO_ITEM</code> liga catálogo e metas numéricas; <code>DESAFIO_PARTICIPANTE</code> tem chave (<code>desafio_id</code>, <code>usuario_id</code>), estado convidado/aceito/recusado e data de aceite. Só amigos aceitos recebem convite; apenas aceitos contribuem para o progresso. Remover desafio o cancela sem remover execuções históricas. <code>GRUPO_MEMBRO</code> usa chave (<code>grupo_id</code>, <code>usuario_id</code>) e papel; <code>CONVITE_GRUPO</code> contém grupo, convidador, destinatário, hash de token, expiração e estado. Aceite valida destinatário e validade e cria associação em transação idempotente. <code>CONVITE_ADMIN</code> segue o mesmo padrão, restrito ao e-mail convidado e sem conceder superusuário. <code>PUBLICACAO</code> tem autor, grupo opcional e visibilidade; <code>CURTIDA</code> é única por publicação/usuário e <code>COMENTARIO</code> tem autor, texto e datas. Grupos privados e seus conteúdos são acessíveis apenas a membros.</p>
+<h5 id="2532-diagrama-de-componentes">2.5.3.2 Diagrama de componentes<a class="headerlink" href="#2532-diagrama-de-componentes" title="Permanent link">&para;</a></h5>
+<p>A Figura 7 mostra explicitamente as interfaces REST de autenticação, treinos/catálogo, registros/métricas, gamificação, social e administração. O serviço HTTP do React consome essas interfaces. Cada domínio do Backend contém Controller, Service, porta pública e Repository JPA. A seta de dependência aponta do consumidor ao provedor; Analítico e Admin consulta portas de leitura de Registro e Autenticação, e não recebe chamadas desses domínios. ORM é adaptador do Backend.</p>
+<p><img alt="Figura 7 – Diagrama de componentes: React, domínios do Backend, adaptadores JPA/Hibernate e PostgreSQL" src="../assets/img/arq-fig7-componentes.png" /></p>
+<p><em>Figura 7 – Diagrama de componentes. Fonte: elaborado pelos autores (2026).</em></p>
+<ul>
+<li><strong>Frontend (React):</strong> interface do usuário, interface administrativa e serviços de requisição; comunica-se com o Backend exclusivamente por API REST em JSON.</li>
+<li><strong>Backend (Spring Boot):</strong> domínios Autenticação, Core de Treinos, Registro e Métricas, Gamificação, Social e Analítico e Admin, cada um com seus controladores, serviços, interfaces e repositórios. Orquestração de registro coordena operações entre domínios sem criar dependência inversa.</li>
+<li><strong>Banco de Dados (PostgreSQL):</strong> armazenamento persistente de todos os dados, acessado apenas pelo Backend.</li>
+</ul>
+<h3 id="26-visao-de-implantacao">2.6 Visão de implantação<a class="headerlink" href="#26-visao-de-implantacao" title="Permanent link">&para;</a></h3>
+<p>Docker padroniza dependências e torna ambientes de desenvolvimento e testes reproduzíveis em Linux. Isso reduz divergências de configuração; Pair Programming depende da organização das duplas e das ferramentas de colaboração, não do contêiner. Esta arquitetura define integração contínua e geração de artefatos; não promete entrega contínua ou <em>deploy</em> automatizado.</p>
+<p><strong>Tabela 10 – Elementos de implantação</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Elemento</th>
+<th style="text-align: left;">Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Dispositivo do usuário (navegador web)</td>
+<td style="text-align: left;">Ponto de acesso ao sistema, sem instalação de software. A interface deve se adaptar a telas de celular e de computador.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hospedagem do Frontend</td>
+<td style="text-align: left;">Serve os artefatos estáticos da aplicação React, gerados pelo build automatizado na esteira de CI.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Backend (contêiner Docker)</td>
+<td style="text-align: left;">Empacota o projeto Spring Boot e o ambiente Java necessário; expõe a API REST por HTTPS.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Banco de Dados (contêiner Docker)</td>
+<td style="text-align: left;">Contêiner com PostgreSQL instanciado com as variáveis de ambiente necessárias, acessível apenas pelo Backend em rede privada.</td>
+</tr>
+<tr>
+<td style="text-align: left;">GitHub e GitHub Actions</td>
+<td style="text-align: left;">Repositório de código e esteira de CI: compilação, testes, cobertura, análise estática e geração das imagens Docker.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<p>O provedor de hospedagem ainda não foi escolhido. A Figura 8 descreve uma topologia de referência, não uma implantação existente. Ambientes previstos: desenvolvimento local, CI efêmero com dados fictícios e futura homologação separada de produção. Antes da primeira publicação, a equipe deve escolher provedor e responsável operacional, configurar TLS e segredos, definir <em>deploy</em> e <em>rollback</em> e registrar o procedimento. Não há etapa de <em>deploy</em> automatizado nesta revisão.</p>
+<p><img alt="Figura 8 – Diagrama de implantação: topologia de referência, provedor pendente, sem deploy automatizado" src="../assets/img/arq-fig8-implantacao.png" /></p>
+<p><em>Figura 8 – Diagrama de implantação. Fonte: elaborado pelos autores (2026).</em></p>
+<p>Na topologia proposta, o navegador carrega React por HTTPS e acessa a API Spring Boot. PostgreSQL fica em rede privada, com volume persistente; contêiner não substitui persistência ou backup. A CI compila e testa, produzindo artefatos rastreáveis pelo commit; sua aprovação não publica automaticamente a aplicação.</p>
+<h4 id="261-estrategia-e-execucao-de-testes">2.6.1 Estratégia e execução de testes<a class="headerlink" href="#261-estrategia-e-execucao-de-testes" title="Permanent link">&para;</a></h4>
+<p>A estratégia de testes do MotivaFit é integrada à arquitetura em camadas, permitindo a validação independente dos componentes e, depois, da integração entre eles. Os níveis (unitário, integração e sistema, conforme Pressman e Maxim, 2016) são os mesmos do Documento de Visão (seção 6.1) e são distribuídos conforme a Tabela 11.</p>
+<p><strong>Tabela 11 – Níveis de teste por camada</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Nível</th>
+<th style="text-align: left;">Foco arquitetural</th>
+<th style="text-align: left;">Exemplos do roteiro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Unitário</td>
+<td style="text-align: left;">Camada de Services do Backend (regras de treinos, registros, métricas e gamificação), com dependências isoladas ou simuladas; componentes e comportamentos relevantes da interface no Frontend.</td>
+<td style="text-align: left;">Definidos junto ao código; não constam de T1 a T22</td>
+</tr>
+<tr>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Controllers, Services e Repositories com o banco PostgreSQL, em ambiente controlado e reproduzível provisionado por contêineres Docker; integração das telas com os endpoints.</td>
+<td style="text-align: left;">T1, T4, T5, T6, T8, T10, T11, T12, T13, T15, T17, T21, T22</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Fluxo completo do usuário, da interface (incluindo telas de celular) à resposta do servidor e à persistência; fluxos críticos podem ser validados por testes ponta a ponta.</td>
+<td style="text-align: left;">T2, T3, T7, T9, T14, T16, T18, T19, T20</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026), com base no Documento de Visão (GRUPO PERLMAN, 2026).</em></p>
+<p>No Backend, os testes unitários focam a camada de Services, e a integração entre Controllers, Services e Repositories é validada por testes de integração contra o PostgreSQL. As ferramentas de teste serão definidas pela equipe de desenvolvimento (por exemplo, JUnit e Mockito no Backend e Jest ou Vitest com React Testing Library no Frontend). Os casos T1 a T22 estão planejados no Documento de Visão e seguem a regra <strong>Previsto = Realizado</strong>: qualquer divergência é tratada como defeito, corrigida e testada novamente até a aprovação.</p>
+<h4 id="262-integracao-continua">2.6.2 Integração contínua<a class="headerlink" href="#262-integracao-continua" title="Permanent link">&para;</a></h4>
+<p>GitHub Actions executa builds e testes a cada abertura ou atualização de Pull Request. A Tabela 12 explicita os gatilhos: análise estática por Pull Request e varredura diária são execuções separadas. Após integração na branch principal, um job gera artefatos identificados pelo commit. A CI não constitui entrega contínua; <em>deploy</em> está fora da esteira descrita.</p>
+<p><strong>Tabela 12 – Etapas da pipeline de integração contínua</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Etapa</th>
+<th style="text-align: left;">Descrição</th>
+<th style="text-align: left;">Bloqueante</th>
+<th style="text-align: left;">Gatilho</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Compilação do Backend (Maven) e build do Frontend.</td>
+<td style="text-align: left;">Sim</td>
+<td style="text-align: left;">Pull Request</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Testes unitários do Backend e do Frontend.</td>
+<td style="text-align: left;">Sim</td>
+<td style="text-align: left;">Pull Request</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Testes de integração com PostgreSQL provisionado em contêiner Docker.</td>
+<td style="text-align: left;">Sim</td>
+<td style="text-align: left;">Pull Request</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">Cobertura global ponderada M3 e por camada; meta ≥ 70%, gate após piloto documentado.</td>
+<td style="text-align: left;">Após piloto</td>
+<td style="text-align: left;">Pull Request</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">Análise estática por Pull Request; execução diária independente por agendamento.</td>
+<td style="text-align: left;">Defeitos críticos ou Blocker</td>
+<td style="text-align: left;">Pull Request + cron diário</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">Gerar imagens e build estático identificados pelo commit; armazenar artefatos. Não realiza <em>deploy</em>.</td>
+<td style="text-align: left;">Falha impede artefato</td>
+<td style="text-align: left;">Push na principal</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: revisão proposta com base em M2, M3 e M4; a política de cobertura foi atualizada também na cópia do Documento de Visão 1.0.1.</em></p>
+<h3 id="27-operacao-e-ciclo-de-vida-dos-dados">2.7 Operação e ciclo de vida dos dados<a class="headerlink" href="#27-operacao-e-ciclo-de-vida-dos-dados" title="Permanent link">&para;</a></h3>
+<p><strong>Operação.</strong> Esta seção concentra somente decisões operacionais e de ciclo de vida; tecnologias, acesso e padronização estão nas seções 2.3.3 e 2.4.2. Até a definição de hospedagem não há compromisso formal de disponibilidade. Requisitos de desempenho e usabilidade estão na seção 2.4.1.4.</p>
+<p><strong>Migrações.</strong> Adotar scripts SQL versionados via Flyway no Backend. Testar migração de banco vazio e atualização da versão anterior na CI; aplicar migrações uma única vez antes de liberar uma nova versão, após backup. Não usar criação automática de schema pelo Hibernate em homologação ou produção. Preferir alterações compatíveis em etapas; <em>rollback</em> da aplicação exige schema compatível, e restauração do banco requer plano e validação próprios.</p>
+<p><strong>Backup e recuperação (plano para a primeira hospedagem).</strong> Backup diário criptografado do PostgreSQL, fora do servidor principal, retenção de 30 dias e acesso restrito ao operador. Meta proposta RPO ≤ 24 h e RTO ≤ 4 h. Testar restauração antes da primeira publicação e mensalmente; registrar data, checksum e duração. Provedor e responsável devem ser identificados antes de operar. Não há evidência de backup implantado nesta revisão.</p>
+<ul>
+<li><strong>Privacidade e LGPD:</strong> apresentar aviso de privacidade com finalidade, categorias de dados, bases legais, retenção e contato do controlador a serem definidos antes de dados reais. Coletar apenas o necessário; publicar resultados somente por ação explícita do titular. Dados de treino podem revelar saúde e exigem avaliação do tratamento de dados sensíveis (art. 11). Usar dados fictícios em testes, reduzir e proteger logs e limitar métricas administrativas a agregados. O direito de acesso, correção e eliminação é considerado nos termos dos arts. 16 e 18 da Lei 13.709/2018; a revisão não presume consentimento como base para todo tratamento.</li>
+<li><strong>Exclusão de conta:</strong> <code>DELETE /api/conta</code> exige autenticação recente e confirmação explícita; bloqueia a conta e revoga tokens imediatamente. Um job elimina identificadores, rotinas, execuções, recordes, concessões e conteúdo pessoal em até 30 dias, ou documenta fundamento e prazo de retenção legal excepcional. Associações sociais são removidas e conteúdo de terceiros é preservado sem identificadores do titular. Logs de auditoria são minimizados e sujeitos a prazo definido. Backups expiram em até 30 dias; se restaurados antes disso, reaplicar solicitações de eliminação antes de reabrir acesso. <code>GET /api/conta/exportacao</code> permite obter os próprios dados. Esses fluxos transversais devem ser detalhados e testados no backlog técnico do MVP.</li>
+<li><strong>Ciclo de vida:</strong> arquivamento de treino preserva histórico; exclusão de conta elimina dados pessoais conforme a política acima. Essa distinção deve ser visível na confirmação apresentada ao usuário e testada com treino contendo registros.</li>
+</ul>
+<p><strong>Decisões operacionais pendentes:</strong> escolha do provedor e operador, dimensionamento real, política de retenção por categoria e evidências de carga, restauração e cobertura. Os números apresentados são metas propostas, sem homologação ou ensaios realizados.</p>
+<h3 id="28-rastreabilidade-com-o-documento-de-visao">2.8 Rastreabilidade com o Documento de Visão<a class="headerlink" href="#28-rastreabilidade-com-o-documento-de-visao" title="Permanent link">&para;</a></h3>
+<p>A Tabela 13 relaciona cada requisito do backlog ao módulo do Backend, às entidades envolvidas, à Sprint e à prioridade, garantindo que a arquitetura cubra todos os requisitos (RF-01 a RF-24).</p>
+<p><strong>Tabela 13 – Rastreabilidade entre requisitos, módulos e entidades</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Requisito</th>
+<th style="text-align: left;">Módulo</th>
+<th style="text-align: left;">Entidades</th>
+<th style="text-align: center;">Sprint</th>
+<th style="text-align: center;">Prioridade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RF-01</td>
+<td style="text-align: left;">Autenticação e Segurança</td>
+<td style="text-align: left;"><code>USUARIO</code></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-02</td>
+<td style="text-align: left;">Autenticação e Segurança</td>
+<td style="text-align: left;"><code>USUARIO</code></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-03</td>
+<td style="text-align: left;">Core de Treinos</td>
+<td style="text-align: left;"><code>TREINO</code></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-04</td>
+<td style="text-align: left;">Core de Treinos</td>
+<td style="text-align: left;"><code>TREINO</code></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-05</td>
+<td style="text-align: left;">Core de Treinos</td>
+<td style="text-align: left;"><code>TREINO</code></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-06</td>
+<td style="text-align: left;">Core de Treinos</td>
+<td style="text-align: left;"><code>TREINO</code></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-07</td>
+<td style="text-align: left;">Core de Treinos</td>
+<td style="text-align: left;"><code>EXERCICIO</code>, <code>CATALOGO_EXERCICIO</code></td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-08</td>
+<td style="text-align: left;">Core de Treinos</td>
+<td style="text-align: left;"><code>EXERCICIO</code></td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-09</td>
+<td style="text-align: left;">Core de Treinos</td>
+<td style="text-align: left;"><code>EXERCICIO</code></td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-10</td>
+<td style="text-align: left;">Core de Treinos</td>
+<td style="text-align: left;"><code>EXERCICIO</code></td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-11</td>
+<td style="text-align: left;">Registro e Métricas</td>
+<td style="text-align: left;"><code>REGISTRO_DIARIO</code></td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Must</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-12</td>
+<td style="text-align: left;">Registro e Métricas</td>
+<td style="text-align: left;"><code>REGISTRO_DIARIO</code></td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-13</td>
+<td style="text-align: left;">Autenticação e Segurança</td>
+<td style="text-align: left;"><code>CONVITE_ADMIN</code>, <code>USUARIO</code></td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">Could</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-14</td>
+<td style="text-align: left;">Analítico e Admin</td>
+<td style="text-align: left;"><code>USUARIO</code>, <code>REGISTRO_DIARIO</code></td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-15</td>
+<td style="text-align: left;">Analítico e Admin</td>
+<td style="text-align: left;"><code>USUARIO</code>, <code>REGISTRO_DIARIO</code></td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-16</td>
+<td style="text-align: left;">Analítico e Admin</td>
+<td style="text-align: left;"><code>USUARIO</code>, <code>REGISTRO_DIARIO</code></td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-17</td>
+<td style="text-align: left;">Analítico e Admin</td>
+<td style="text-align: left;"><code>EXERCICIO</code>, <code>REGISTRO_DIARIO</code></td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-18</td>
+<td style="text-align: left;">Gamificação</td>
+<td style="text-align: left;"><code>DESAFIO</code>, <code>DESAFIO_ITEM</code>, <code>DESAFIO_PARTICIPANTE</code>, <code>AMIZADE</code></td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-19</td>
+<td style="text-align: left;">Gamificação</td>
+<td style="text-align: left;"><code>DESAFIO</code></td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-20</td>
+<td style="text-align: left;">Registro e Métricas</td>
+<td style="text-align: left;"><code>RECORDE_PESSOAL</code>, <code>REGISTRO_DIARIO</code>, <code>CATALOGO_EXERCICIO</code></td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-21</td>
+<td style="text-align: left;">Social</td>
+<td style="text-align: left;"><code>PUBLICACAO</code></td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-22</td>
+<td style="text-align: left;">Gamificação</td>
+<td style="text-align: left;"><code>CONQUISTA_DEFINICAO</code>, <code>USUARIO_CONQUISTA</code>, <code>REGISTRO_DIARIO</code></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-23</td>
+<td style="text-align: left;">Social</td>
+<td style="text-align: left;"><code>GRUPO_TREINO</code>, <code>GRUPO_MEMBRO</code>, <code>CONVITE_GRUPO</code>, <code>PUBLICACAO</code>, <code>CURTIDA</code>, <code>COMENTARIO</code></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">Should</td>
+</tr>
+<tr>
+<td style="text-align: left;">RF-24</td>
+<td style="text-align: left;">Autenticação e Segurança</td>
+<td style="text-align: left;"><code>USUARIO</code></td>
+<td style="text-align: center;">9 e 10</td>
+<td style="text-align: center;">Could</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026), com base no Documento de Visão (GRUPO PERLMAN, 2026).</em></p>
+<h3 id="29-riscos-arquiteturais-e-decisoes-pendentes">2.9 Riscos arquiteturais e decisões pendentes<a class="headerlink" href="#29-riscos-arquiteturais-e-decisoes-pendentes" title="Permanent link">&para;</a></h3>
+<p>A Tabela 14 complementa o gerenciamento de riscos do Documento de Visão com os riscos de natureza arquitetural identificados nesta revisão.</p>
+<p><strong>Tabela 14 – Riscos arquiteturais e decisões pendentes</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Risco / pendência</th>
+<th style="text-align: left;">Mitigação arquitetural</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Falha na integração com a autenticação Google (RF-24, Could have).</td>
+<td style="text-align: left;">Isolar a autenticação externa no módulo de Autenticação e Segurança, mantendo o login por e-mail e senha sempre disponível (T13). Testar a requisição isoladamente via Postman antes de integrar ao Frontend e ao Backend.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Consultas do painel administrativo (RF-14 a RF-17) ficarem lentas com o crescimento do histórico.</td>
+<td style="text-align: left;">Executar as agregações no banco, com índices por usuário e data nos registros diários, e avaliar paginação e cache caso a métrica de desempenho seja ultrapassada.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Acoplamento entre a gamificação e o registro de exercícios.</td>
+<td style="text-align: left;">Orquestrador chama interfaces de Registro e Gamificação; Gamificação consulta Registro, sem dependência inversa. Testes arquiteturais verificam ciclos.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Vazamento ou uso indevido de tokens JWT.</td>
+<td style="text-align: left;">Tokens com expiração curta, chave de assinatura em variável de ambiente, comunicação exclusivamente por HTTPS e rejeição de tokens inválidos (T21 e T22).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Provedor de hospedagem ainda não definido.</td>
+<td style="text-align: left;">Decidir antes da primeira implantação. A conteinerização com Docker mantém o sistema portável entre provedores.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Implementação do modelo social ainda não validada.</td>
+<td style="text-align: left;">Implementar entidades e integridade da Figura 6; testar convite, adesão e privacidade antes da entrega.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Entregas semanais curtas podem atrasar requisitos Must.</td>
+<td style="text-align: left;">Must limitado a RF-01 a RF-11; reavaliar Should e Could a cada Sprint. Mudanças de escopo devem atualizar Visão e Arquitetura.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cobertura de 70% desde o primeiro Pull Request sem evidência.</td>
+<td style="text-align: left;">Executar piloto na Sprint 3; registrar esforço e relatórios. Gate informativo até comprovação, com meta antes do fim do MVP.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Metas operacionais e legais ainda não homologadas.</td>
+<td style="text-align: left;">Escolher operador/provedor; validar carga, restauração, retenção e aviso de privacidade antes de tratar dados reais.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026), com base no Documento de Visão (GRUPO PERLMAN, 2026).</em></p>
+<hr />
+<h2 id="3-bibliografia">3 Bibliografia<a class="headerlink" href="#3-bibliografia" title="Permanent link">&para;</a></h2>
+<ul>
+<li>BASILI, Victor R.; CALDIERA, Gianluigi; ROMBACH, H. Dieter. The goal question metric approach. In: MARCINIAK, John J. (ed.). <em>Encyclopedia of software engineering.</em> New York: John Wiley &amp; Sons, 1994. v. 1, p. 528–532.</li>
+<li>BASS, Len; CLEMENTS, Paul; KAZMAN, Rick. <em>Software architecture in practice.</em> 4. ed. Boston: Addison-Wesley, 2021.</li>
+<li>FOWLER, Martin. <em>Padrões de arquitetura de aplicações corporativas.</em> Tradução de Francisco Araújo. Porto Alegre: Bookman, 2006.</li>
+<li>GRUPO PERLMAN. <em>Documento de Visão do Produto e do Projeto – MotivaFit.</em> Versões 1.0.0 (original) e 1.0.1 (cópia revisada). Brasília: Universidade de Brasília, 2026.</li>
+<li>KRUCHTEN, Philippe; NORD, Robert L.; OZKAYA, Ipek. <em>Managing technical debt: reducing friction in software development.</em> Boston: Addison-Wesley, 2019.</li>
+<li>MARCZEWSKI, Andrzej. User Types. In: MARCZEWSKI, Andrzej. <em>Even ninja monkeys like to play: gamification, game thinking and motivational design.</em> 1. ed. [S.l.]: CreateSpace Independent Publishing Platform, 2015. p. 65–80.</li>
+<li>PRESSMAN, Roger S.; MAXIM, Bruce R. <em>Engenharia de software: uma abordagem profissional.</em> 8. ed. Porto Alegre: AMGH, 2016.</li>
+<li>SCHWABER, Ken; SUTHERLAND, Jeff. <em>O Guia do Scrum: o guia definitivo para o Scrum: as regras do jogo.</em> 2020.</li>
+<li>TONDELLO, Gustavo F. et al. The gamification user types Hexad scale. In: ANNUAL SYMPOSIUM ON COMPUTER-HUMAN INTERACTION IN PLAY, 2016, Austin. <em>Proceedings</em> [...]. New York: ACM, 2016. p. 229–243. DOI: 10.1145/2967934.2968082.</li>
+<li>BRASIL. Lei nº 13.709, de 14 de agosto de 2018 (LGPD), arts. 11, 16 e 18. Texto compilado. Disponível em: <a href="https://planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm">https://planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm</a>. Acesso em: 7 out. 2026.</li>
+<li>MARCZEWSKI, Andrzej. Correcting the misconceptions around the Philanthropist user type and purpose. 2017. Disponível em: <a href="https://www.gamified.uk/2017/01/23/rediscovering-purposephilanthropist-user-type/">https://www.gamified.uk/2017/01/23/rediscovering-purposephilanthropist-user-type/</a>. Acesso em: 7 out. 2026.</li>
+<li>TONDELLO, Gustavo F. et al. The gamification user types Hexad scale. 2016. Texto do artigo: <a href="https://www.gamefulbits.com/wp-content/uploads/2016/09/2016-The-GamificationUser-Types-Hexad-Scale.pdf">https://www.gamefulbits.com/wp-content/uploads/2016/09/2016-The-GamificationUser-Types-Hexad-Scale.pdf</a>. As associações no MotivaFit são hipóteses de projeto, não validação empírica.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Voltar para o topo
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../visao/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Documento de Visão">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Documento de Visão
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../atas-reuniao/ata-reuniao-1/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Ata 1">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Ata 1
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Grupo Perlman — T03 · Universidade de Brasília · MDS 2026
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>
