@@ -1,4 +1,48 @@
 services:
+  app:
+    image: maven:3.9-eclipse-temurin-25
+    container_name: springboot-dev
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ~/.m2:/root/.m2
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    command: mvn spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=${DB_URL_CONTEINER}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES}
+      - JWT_REFRESH_EXPIRATION_DAYS=${JWT_REFRESH_EXPIRATION_DAYS}
+    depends_on:
+      - db
+
+  test:
+    image: maven:3.9-eclipse-temurin-25
+    container_name: springboot-test
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ~/.m2:/root/.m2
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES}
+      JWT_REFRESH_EXPIRATION_DAYS: ${JWT_REFRESH_EXPIRATION_DAYS}
+      TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
+      TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: /var/run/docker.sock
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: mvn test
+    profiles:
+      - testing
+
   db:
     image: postgres:16-alpine
     container_name: motivafit
