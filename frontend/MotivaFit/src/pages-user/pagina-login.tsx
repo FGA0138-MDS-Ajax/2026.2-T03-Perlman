@@ -10,23 +10,42 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Link, useNavigate } from "react-router-dom";
-import { Dumbbell, ArrowLeft } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Dumbbell, ArrowLeft, ShieldCheck } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth, isEmailAdmin } from "@/lib/auth-context";
 
 export default function PaginaLogin() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
+    const { login, admins } = useAuth();
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        // TODO: integrar com backend de autenticação
-        console.log("Login:", { email, senha });
-        navigate("/principal");
+        if (!email.trim()) return;
+
+        login(email, senha);
+
+        const eAdmin = isEmailAdmin(email, admins);
+        const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
+
+        if (from && (from !== "/admin" || eAdmin)) {
+            navigate(from, { replace: true });
+        } else if (eAdmin) {
+            navigate("/admin", { replace: true });
+        } else {
+            navigate("/principal", { replace: true });
+        }
     }
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4 py-8">
+        <div className="relative flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4 py-8">
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+                <ThemeToggle variant="outline" className="h-9 w-9" />
+            </div>
+
             <Link
                 to="/"
                 className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -75,6 +94,16 @@ export default function PaginaLogin() {
                                 onChange={(e) => setSenha(e.target.value)}
                                 required
                             />
+                        </div>
+
+                        <div className="rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground border border-border/40 space-y-1">
+                            <div className="flex items-center gap-1.5 font-medium text-foreground">
+                                <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                                <span>Controle de Acesso:</span>
+                            </div>
+                            <p>
+                                Administradores cadastrados (<code className="font-mono text-primary">admin@motivafit.com</code>) têm acesso ao Painel Admin. Demais e-mails acessam o Painel do Aluno.
+                            </p>
                         </div>
                     </CardContent>
 
