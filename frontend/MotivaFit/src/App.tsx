@@ -5,7 +5,10 @@ import PaginaInterfaceInicial from "@/pages-user/pagina-interface-inicial";
 import PaginaLogin from "@/pages-user/pagina-login";
 import PaginaCadastro from "@/pages-user/pagina-cadastro";
 import PaginaPrincipal from "@/pages-user/pagina-principal";
-import PaginaPainelAdmin from "@/pages-admin/pagina-painel-admin";
+import PaginaDashboardAdmin from "@/pages-admin/pagina-dashboard-admin";
+import PaginaTreinosAdmin from "@/pages-admin/pagina-treinos-admin";
+import PaginaRelatoriosAdmin from "@/pages-admin/pagina-relatorios-admin";
+import PaginaSuperUsuario from "@/pages-admin/pagina-superusuario";
 
 function App() {
     return (
@@ -44,12 +47,36 @@ function App() {
                             }
                         />
 
-                        {/* Painel Administrativo: Exige usuário logado E e-mail no banco de administradores */}
+                        {/* Páginas administrativas exigem sessão autenticada e e-mail autorizado como admin */}
                         <Route
                             path="/admin"
                             element={
                                 <RotaAdmin>
-                                    <PaginaPainelAdmin />
+                                    <PaginaDashboardAdmin />
+                                </RotaAdmin>
+                            }
+                        />
+                        <Route
+                            path="/admin/treinos"
+                            element={
+                                <RotaAdmin>
+                                    <PaginaTreinosAdmin />
+                                </RotaAdmin>
+                            }
+                        />
+                        <Route
+                            path="/admin/relatorios"
+                            element={
+                                <RotaAdmin>
+                                    <PaginaRelatoriosAdmin />
+                                </RotaAdmin>
+                            }
+                        />
+                        <Route
+                            path="/admin/superusuario"
+                            element={
+                                <RotaAdmin>
+                                    <PaginaSuperUsuario />
                                 </RotaAdmin>
                             }
                         />

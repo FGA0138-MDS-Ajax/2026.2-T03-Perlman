@@ -96,15 +96,7 @@ export default function PaginaLogin() {
                             />
                         </div>
 
-                        <div className="rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground border border-border/40 space-y-1">
-                            <div className="flex items-center gap-1.5 font-medium text-foreground">
-                                <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                                <span>Controle de Acesso:</span>
-                            </div>
-                            <p>
-                                Administradores cadastrados (<code className="font-mono text-primary">admin@motivafit.com</code>) têm acesso ao Painel Admin. Demais e-mails acessam o Painel do Aluno.
-                            </p>
-                        </div>
+                       
                     </CardContent>
 
                     <CardFooter className="flex flex-col gap-3 pt-2">

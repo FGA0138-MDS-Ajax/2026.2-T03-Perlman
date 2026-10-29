@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -7,51 +7,127 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate, Link } from "react-router-dom";
 import {
     Home,
     Dumbbell,
-    LineChart,
-    Settings,
     LogOut,
-    CheckCircle2,
     Flame,
     Calendar,
-    Zap,
     Shield
 } from "lucide-react";
 import { ThemeToggle, ThemeSelector } from "@/components/theme-toggle";
 import { useAuth } from "@/lib/auth-context";
+import {
+    getWorkoutHistory,
+    registerWorkoutCompletion,
+    WORKOUT_HISTORY_UPDATED_EVENT,
+    type WorkoutCompletion,
+} from "@/lib/workout-history";
+import {
+    enrollInWorkoutPlan,
+    getUserWorkoutPlanIds,
+    leaveWorkoutPlan,
+    WORKOUT_ENROLLMENTS_UPDATED_EVENT,
+} from "@/lib/workout-enrollments";
+import { WORKOUT_PLANS } from "@/lib/workout-plans";
 
-interface Exercicio {
-    id: number;
-    nome: string;
-    series: string;
-    carga: string;
+function obterChaveData(data: Date): string {
+    return `${data.getFullYear()}-${data.getMonth()}-${data.getDate()}`;
 }
 
 export default function PaginaPrincipal() {
     const navigate = useNavigate();
     const { user, logout, isAdmin } = useAuth();
-    const [treinosConcluidos, setTreinosConcluidos] = useState<number[]>([1]);
-
-    function alternarTreino(id: number) {
-        if (treinosConcluidos.includes(id)) {
-            setTreinosConcluidos(treinosConcluidos.filter((i) => i !== id));
-        } else {
-            setTreinosConcluidos([...treinosConcluidos, id]);
-        }
+    const [historicoTreinos, setHistoricoTreinos] = useState<WorkoutCompletion[]>(getWorkoutHistory);
+    const [referenciaAtual, setReferenciaAtual] = useState(Date.now);
+    const [fichasInscritas, setFichasInscritas] = useState<string[]>(() =>
+        user ? getUserWorkoutPlanIds(user.email) : []
+    );
+    const historicoDoUsuario = historicoTreinos
+        .filter((treino) =>
+            user &&
+            treino.userEmail?.trim().toLowerCase() === user.email.trim().toLowerCase()
+        )
+        .filter((treino) => Number.isFinite(new Date(treino.completedAt).getTime()))
+        .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+    const fichasDoUsuario = WORKOUT_PLANS.filter((ficha) => fichasInscritas.includes(ficha.id));
+    const agora = new Date(referenciaAtual);
+    const inicioDaSemana = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+    const diaDaSemana = inicioDaSemana.getDay();
+    inicioDaSemana.setDate(inicioDaSemana.getDate() - (diaDaSemana === 0 ? 6 : diaDaSemana - 1));
+    const treinosNaSemana = historicoDoUsuario.filter(
+        (treino) => new Date(treino.completedAt).getTime() >= inicioDaSemana.getTime()
+    ).length;
+    const diasComTreino = new Set(
+        historicoDoUsuario.map((treino) => obterChaveData(new Date(treino.completedAt)))
+    );
+    const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+    const inicioSequencia = new Date(hoje);
+    if (!diasComTreino.has(obterChaveData(inicioSequencia))) {
+        inicioSequencia.setDate(inicioSequencia.getDate() - 1);
     }
+    let sequenciaAtiva = 0;
+    while (diasComTreino.has(obterChaveData(inicioSequencia))) {
+        sequenciaAtiva += 1;
+        inicioSequencia.setDate(inicioSequencia.getDate() - 1);
+    }
+
+    useEffect(() => {
+        function atualizarHistorico() {
+            setHistoricoTreinos(getWorkoutHistory());
+            setReferenciaAtual(Date.now());
+        }
+
+        function atualizarFichasInscritas() {
+            if (user) {
+                setFichasInscritas(getUserWorkoutPlanIds(user.email));
+            }
+        }
+
+        window.addEventListener(WORKOUT_HISTORY_UPDATED_EVENT, atualizarHistorico);
+        window.addEventListener("storage", atualizarHistorico);
+        window.addEventListener(WORKOUT_ENROLLMENTS_UPDATED_EVENT, atualizarFichasInscritas);
+        window.addEventListener("storage", atualizarFichasInscritas);
+
+        return () => {
+            window.removeEventListener(WORKOUT_HISTORY_UPDATED_EVENT, atualizarHistorico);
+            window.removeEventListener("storage", atualizarHistorico);
+            window.removeEventListener(WORKOUT_ENROLLMENTS_UPDATED_EVENT, atualizarFichasInscritas);
+            window.removeEventListener("storage", atualizarFichasInscritas);
+        };
+    }, [user]);
 
     function handleLogout() {
         logout();
         navigate("/login");
     }
 
-    const exerciciosHoje: Exercicio[] = [];
+    function handleConcluirTreino(workoutPlanId: string) {
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+
+        registerWorkoutCompletion(user.id, user.email, workoutPlanId);
+    }
+
+    function alternarInscricao(workoutPlanId: string) {
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+
+        if (fichasInscritas.includes(workoutPlanId)) {
+            leaveWorkoutPlan(user.email, workoutPlanId);
+        } else {
+            enrollInWorkoutPlan(user.email, workoutPlanId);
+        }
+        setFichasInscritas(getUserWorkoutPlanIds(user.email));
+    }
 
     return (
         <div className="flex min-h-screen bg-background">
@@ -69,19 +145,16 @@ export default function PaginaPrincipal() {
                         <Home className="h-4 w-4" />
                         Início
                     </Button>
-                    <Button variant="ghost" className="justify-start gap-2.5">
+                    <Button
+                        variant="ghost"
+                        className="justify-start gap-2.5"
+                        onClick={() =>
+                            document.getElementById("fichas-disponiveis")?.scrollIntoView({ behavior: "smooth" })
+                        }
+                    >
                         <Dumbbell className="h-4 w-4" />
                         Meus Treinos
                     </Button>
-                    <Button variant="ghost" className="justify-start gap-2.5">
-                        <LineChart className="h-4 w-4" />
-                        Progresso
-                    </Button>
-                    <Button variant="ghost" className="justify-start gap-2.5">
-                        <Settings className="h-4 w-4" />
-                        Configurações
-                    </Button>
-
                     <Separator className="my-3" />
 
                     <div className="space-y-1.5 px-0.5">
@@ -121,7 +194,9 @@ export default function PaginaPrincipal() {
                 <header className="flex items-center justify-between border-b px-6 py-4 bg-background/60 backdrop-blur">
                     <div>
                         <h1 className="text-xl font-heading font-bold">Painel do Aluno</h1>
-                        <p className="text-xs text-muted-foreground">Foco de hoje: Treino personalizado</p>
+                        <p className="text-xs text-muted-foreground">
+                            Olá, {user?.nome || "aluno"} — acompanhe sua atividade e suas fichas.
+                        </p>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -131,7 +206,6 @@ export default function PaginaPrincipal() {
                             <span className="block text-xs text-muted-foreground">{user?.email || "aluno@motivafit.com"}</span>
                         </div>
                         <Avatar className="h-9 w-9 border border-primary/20">
-                            <AvatarImage src="" alt="Avatar do usuário" />
                             <AvatarFallback className="bg-primary/10 text-primary font-bold">
                                 {user?.nome ? user.nome.slice(0, 2).toUpperCase() : "AL"}
                             </AvatarFallback>
@@ -142,15 +216,15 @@ export default function PaginaPrincipal() {
                 {/* Dashboard Content */}
                 <main className="flex-1 space-y-6 p-6">
                     {/* Summary Cards */}
-                    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         <Card className="shadow-sm">
                             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                                 <CardDescription>Treinos na Semana</CardDescription>
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-heading font-bold text-foreground">3 / 5</div>
-                                <p className="text-xs text-muted-foreground mt-1">Faltam 2 para sua meta</p>
+                                <div className="text-3xl font-heading font-bold text-foreground">{treinosNaSemana}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Treinos registrados desde segunda-feira</p>
                             </CardContent>
                         </Card>
 
@@ -160,82 +234,52 @@ export default function PaginaPrincipal() {
                                 <Flame className="h-4 w-4 text-primary" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-heading font-bold text-primary">7 Dias</div>
-                                <p className="text-xs text-muted-foreground mt-1">Seu recorde é de 14 dias</p>
+                                <div className="text-3xl font-heading font-bold text-primary">
+                                    {sequenciaAtiva} {sequenciaAtiva === 1 ? "dia" : "dias"}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">Dias consecutivos com treino registrado</p>
                             </CardContent>
                         </Card>
 
                         <Card className="shadow-sm">
                             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                                <CardDescription>Calorias Queimadas</CardDescription>
-                                <Zap className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-heading font-bold text-foreground">1.480</div>
-                                <p className="text-xs text-muted-foreground mt-1">Kcal estimadas na semana</p>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="shadow-sm">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                                <CardDescription>Próximo Treino</CardDescription>
+                                <CardDescription>Fichas inscritas</CardDescription>
                                 <Dumbbell className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-heading font-bold text-foreground">Hoje</div>
-                                <Badge variant="secondary" className="mt-1 text-xs">Treino A - Superior</Badge>
+                                <div className="text-3xl font-heading font-bold text-foreground">{fichasDoUsuario.length}</div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    {fichasDoUsuario.length === 1 ? "Ficha vinculada ao seu perfil" : "Fichas vinculadas ao seu perfil"}
+                                </p>
                             </CardContent>
                         </Card>
                     </section>
 
                     {/* Activity Section */}
                     <section className="grid gap-6 lg:grid-cols-2">
-                        {/* Ficha de hoje interativa */}
                         <Card className="shadow-sm">
                             <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <CardTitle className="text-lg font-heading">Treino de Hoje (Treino A)</CardTitle>
-                                        <CardDescription>
-                                            Marque os exercícios conforme você completa cada série
-                                        </CardDescription>
-                                    </div>
-                                    <Badge variant="outline" className="text-xs font-mono">
-                                        {treinosConcluidos.length}/{exerciciosHoje.length} Concluídos
-                                    </Badge>
-                                </div>
+                                <CardTitle className="text-lg font-heading">Minhas fichas</CardTitle>
+                                <CardDescription>
+                                    Conclua uma sessão para registrar sua atividade no perfil.
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                {exerciciosHoje.map((ex) => {
-                                    const feito = treinosConcluidos.includes(ex.id);
-                                    return (
-                                        <div
-                                            key={ex.id}
-                                            onClick={() => alternarTreino(ex.id)}
-                                            className={`flex cursor-pointer items-center justify-between rounded-lg border p-3.5 transition-all ${
-                                                feito
-                                                    ? "bg-primary/5 border-primary/30 text-muted-foreground line-through"
-                                                    : "bg-card hover:border-primary/40"
-                                            }`}
-                                        >
-                                            <div className="space-y-0.5">
-                                                <div className="font-medium text-foreground">{ex.nome}</div>
-                                                <div className="text-xs text-muted-foreground">{ex.series} • {ex.carga}</div>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <CheckCircle2
-                                                    className={`h-5 w-5 ${
-                                                        feito ? "text-primary" : "text-muted-foreground/30"
-                                                    }`}
-                                                />
-                                            </div>
+                                {fichasDoUsuario.length === 0 ? (
+                                    <p className="py-4 text-sm text-muted-foreground">
+                                        Você ainda não está inscrito em nenhuma ficha. Escolha uma nas fichas disponíveis abaixo.
+                                    </p>
+                                ) : fichasDoUsuario.map((ficha) => (
+                                    <div key={ficha.id} className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+                                        <div>
+                                            <p className="font-medium">{ficha.title}</p>
+                                            <p className="text-sm text-muted-foreground">{ficha.frequency}</p>
                                         </div>
-                                    );
-                                })}
-
-                                <Button className="w-full mt-4 h-11 font-medium shadow-sm">
-                                    Concluir Treino de Hoje
-                                </Button>
+                                        <Button onClick={() => handleConcluirTreino(ficha.id)}>
+                                            Registrar treino concluído
+                                        </Button>
+                                    </div>
+                                ))}
                             </CardContent>
                         </Card>
 
@@ -243,34 +287,66 @@ export default function PaginaPrincipal() {
                         <Card className="shadow-sm">
                             <CardHeader>
                                 <CardTitle className="text-lg font-heading">Histórico Recente</CardTitle>
-                                <CardDescription>Suas últimas sessões registradas</CardDescription>
+                                <CardDescription>Conclusões registradas para seu perfil</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="space-y-0.5">
-                                        <span className="font-medium text-sm">Treino C - Costas & Bíceps</span>
-                                        <span className="block text-xs text-muted-foreground">5 exercícios • 48 minutos</span>
-                                    </div>
-                                    <Badge variant="outline" className="text-xs">Ontem</Badge>
-                                </div>
-                                <Separator />
-                                <div className="flex items-center justify-between">
-                                    <div className="space-y-0.5">
-                                        <span className="font-medium text-sm">Treino B - Pernas & Core</span>
-                                        <span className="block text-xs text-muted-foreground">6 exercícios • 55 minutos</span>
-                                    </div>
-                                    <Badge variant="outline" className="text-xs">2 dias atrás</Badge>
-                                </div>
-                                <Separator />
-                                <div className="flex items-center justify-between">
-                                    <div className="space-y-0.5">
-                                        <span className="font-medium text-sm">Treino A - Peito & Tríceps</span>
-                                        <span className="block text-xs text-muted-foreground">4 exercícios • 42 minutos</span>
-                                    </div>
-                                    <Badge variant="outline" className="text-xs">4 dias atrás</Badge>
-                                </div>
+                                    {historicoDoUsuario.length === 0 ? (
+                                        <p className="py-4 text-sm text-muted-foreground">
+                                            Nenhum treino concluído registrado para este perfil.
+                                        </p>
+                                    ) : historicoDoUsuario.slice(0, 5).map((treino, index) => {
+                                        const ficha = WORKOUT_PLANS.find((item) => item.id === treino.workoutPlanId);
+                                        return (
+                                            <div key={`${treino.completedAt}-${index}`}>
+                                                {index > 0 && <Separator className="mb-4" />}
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <div className="space-y-0.5">
+                                                        <span className="text-sm font-medium">
+                                                            {ficha?.title ?? "Treino concluído"}
+                                                        </span>
+                                                        <span className="block text-xs text-muted-foreground">
+                                                            {new Date(treino.completedAt).toLocaleString("pt-BR")}
+                                                        </span>
+                                                    </div>
+                                                    <Badge variant="outline" className="text-xs">Concluído</Badge>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                             </CardContent>
                         </Card>
+                    </section>
+
+                    <section id="fichas-disponiveis" className="space-y-4">
+                        <div>
+                            <h2 className="text-xl font-heading font-bold">Fichas de Treino</h2>
+                            <p className="text-sm text-muted-foreground">Inscreva-se ou cancele suas fichas.</p>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {WORKOUT_PLANS.map((ficha) => {
+                                const inscrito = fichasInscritas.includes(ficha.id);
+                                return (
+                                    <Card key={ficha.id}>
+                                        <CardHeader>
+                                            <CardTitle>{ficha.title}</CardTitle>
+                                            <CardDescription>{ficha.description}</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-3">
+                                            <p className="text-sm text-muted-foreground">
+                                                Frequência: {ficha.frequency}
+                                            </p>
+                                            <Button
+                                                className="w-full"
+                                                variant={inscrito ? "outline" : "default"}
+                                                onClick={() => alternarInscricao(ficha.id)}
+                                            >
+                                                {inscrito ? "Cancelar inscrição" : "Inscrever-se"}
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
+                        </div>
                     </section>
                 </main>
             </div>
