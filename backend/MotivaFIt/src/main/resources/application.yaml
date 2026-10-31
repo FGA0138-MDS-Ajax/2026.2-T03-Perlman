@@ -35,3 +35,8 @@ springdoc:
     path: /swagger-ui.html
     operations-sorter: method
     display-request-duration: true
+
+admin:
+  bootstrap:
+    email: ${SUPERUSUARIO_EMAIL}
+    senha-temporaria: ${SUPERUSUARIO_SENHA}
