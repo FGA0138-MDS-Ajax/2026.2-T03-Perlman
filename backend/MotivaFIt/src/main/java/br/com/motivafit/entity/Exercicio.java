@@ -2,7 +2,9 @@ package br.com.motivafit.entity;
 
 import jakarta.persistence.*;
 import java.util.Objects;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "exercicio")
 public class Exercicio {
@@ -10,6 +12,9 @@ public class Exercicio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "treino_id", insertable = false, updatable = false)
+    private Long treinoId;
 
     @Column(nullable = false)
     private String meta;
