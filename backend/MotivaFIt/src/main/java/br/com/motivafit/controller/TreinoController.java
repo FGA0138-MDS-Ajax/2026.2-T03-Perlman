@@ -50,7 +50,7 @@ public class TreinoController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar treinos", description = "Lista os treinos ativos do usuário autenticado. Treinos excluídos não aparecem.")
+    @Operation(summary = "Listar treinos", description = "Lista os treinos ativos do usuário autenticado e os treinos públicos de outros usuários, que podem ser adicionados à lista. Treinos excluídos não aparecem.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista de treinos (vazia se não houver nenhum)", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TreinoResponseDTO.class)))),
             @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
@@ -62,7 +62,7 @@ public class TreinoController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar treino por id", description = "Retorna um treino do usuário autenticado. Treino inexistente, excluído ou de outro usuário retorna 404.")
+    @Operation(summary = "Buscar treino por id", description = "Retorna um treino do usuário autenticado ou um treino público de outro usuário. Treino inexistente, excluído ou privado de outro usuário retorna 404.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Treino encontrado", content = @Content(schema = @Schema(implementation = TreinoResponseDTO.class))),
             @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
@@ -76,7 +76,7 @@ public class TreinoController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Alterar treino", description = "Altera nome, tipo e, se informada, a visibilidade de um treino do usuário autenticado.")
+    @Operation(summary = "Alterar treino", description = "Altera nome, tipo e, se informada, a visibilidade de um treino do usuário autenticado. Treino de outro usuário (mesmo público) retorna 404.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Treino alterado", content = @Content(schema = @Schema(implementation = TreinoResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
@@ -104,5 +104,21 @@ public class TreinoController {
             @Parameter(description = "Identificador do treino", example = "12") @PathVariable Long id) {
         service.delete(usuario.getId(), id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/adicionar")
+    @Operation(summary = "Adicionar treino público à minha lista", description = "Copia um treino público de outro usuário, com os seus exercícios, para a lista do usuário autenticado. A cópia é um novo treino PRIVADO; registros e metas de recorde não são copiados, e exercícios cujo item do catálogo foi desativado ficam de fora.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Treino adicionado (cópia criada)", content = @Content(schema = @Schema(implementation = TreinoResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Treino não encontrado (inexistente, excluído ou privado de outro usuário)", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "409", description = "O treino já é do usuário", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<TreinoResponseDTO> adicionar(
+            @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario,
+            @Parameter(description = "Identificador do treino público a ser copiado", example = "12") @PathVariable Long id) {
+        var dto = service.adicionar(usuario.getId(), id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 }
