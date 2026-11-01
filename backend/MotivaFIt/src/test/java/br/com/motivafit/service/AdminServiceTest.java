@@ -101,6 +101,7 @@ class AdminServiceTest {
 
         assertEquals(Perfil.ADMINISTRADOR, usuario.getPerfil());
         assertEquals(Estado.ACEITO, convite.getEstado());
+        verify(usuarioRepository).save(usuario);
     }
 
     @Test

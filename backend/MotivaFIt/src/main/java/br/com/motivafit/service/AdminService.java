@@ -83,8 +83,8 @@ public class AdminService {
         } catch (ConflitoException e) {
             throw conviteInvalido();
         }
-
         usuario.promoverParaAdministrador();
+        usuarioRepository.save(usuario);
     }
 
     private String gerarToken() {
