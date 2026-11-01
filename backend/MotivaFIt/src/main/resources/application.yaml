@@ -38,5 +38,5 @@ springdoc:
 
 admin:
   bootstrap:
-    email: ${SUPERUSUARIO_EMAIL}
-    senha-temporaria: ${SUPERUSUARIO_SENHA}
+    email: ${SUPERUSUARIO_EMAIL:}
+    senha-temporaria: ${SUPERUSUARIO_SENHA:}
