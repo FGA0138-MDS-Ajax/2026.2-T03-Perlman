@@ -69,6 +69,10 @@ public class Usuario implements UserDetails {
         this.perfil = perfil;
     }
 
+    public void promoverParaAdministrador(){
+        setPerfil(Perfil.ADMINISTRADOR);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
