@@ -19,6 +19,8 @@ services:
       - JWT_ISSUER=${JWT_ISSUER}
       - JWT_EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES}
       - JWT_REFRESH_EXPIRATION_DAYS=${JWT_REFRESH_EXPIRATION_DAYS}
+      - SUPERUSUARIO_EMAIL=${SUPERUSUARIO_EMAIL:-superusuario-test@motivafit.com}
+      - SUPERUSUARIO_SENHA=${SUPERUSUARIO_SENHA:-SenhaBootstrapTeste123!}
     depends_on:
       - db
 

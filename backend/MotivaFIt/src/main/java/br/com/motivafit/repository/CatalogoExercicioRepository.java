@@ -14,5 +14,7 @@ public interface CatalogoExercicioRepository extends JpaRepository<CatalogoExerc
 
     boolean existsByNomeIgnoreCase(String nome);
 
+    Optional<CatalogoExercicio> findByNomeIgnoreCase(String nome);
+
     boolean existsByNomeIgnoreCaseAndIdNot(String nome, Long id);
 }
