@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record UsuarioRequestDTO(
-        @NotBlank(message = "Email é obrigatório")
+        @NotBlank(message = "email é obrigatório")
         @Email(message = "Insira um email válido")
         @Schema(description = "E-mail único da conta", example = "usuario@motivafit.com")
         String email,

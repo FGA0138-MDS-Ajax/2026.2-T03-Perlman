@@ -12,7 +12,11 @@ import java.util.Optional;
 
 public interface TreinoRepository extends JpaRepository<Treino, Long> {
 
+    Optional<Treino> findByUsuarioIdAndNome(Long usuarioId, String nome);
+
     List<Treino> findAllByUsuarioIdAndExcluidoEmIsNullOrVisibilidadeAndExcluidoEmIsNull(Long usuarioId, Visibilidade visibilidade);
+
+    Optional<Treino> findByIdAndUsuarioIdAndExcluidoEmIsNull(Long id, Long usuarioId);
 
     @Query("SELECT t FROM Treino t WHERE t.id = :id AND (t.usuarioId = :usuarioId OR t.visibilidade = :visibilidade) AND t.excluidoEm IS NULL")
     Optional<Treino> findByIdEUsuarioOuPublico(

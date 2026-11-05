@@ -2,7 +2,6 @@ package br.com.motivafit.entity;
 
 import jakarta.persistence.*;
 import java.util.Objects;
-
 @Entity
 @Table(name = "exercicio")
 public class Exercicio {
@@ -10,6 +9,9 @@ public class Exercicio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "treino_id", insertable = false, updatable = false)
+    private Long treinoId;
 
     @Column(nullable = false)
     private String meta;
@@ -28,6 +30,10 @@ public class Exercicio {
     public Exercicio() {}
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getTreinoId() { return treinoId; }
+    public void setTreinoId(Long treinoId) { this.treinoId = treinoId; }
 
     public String getMeta() { return meta; }
     public void setMeta(String meta) { this.meta = meta; }

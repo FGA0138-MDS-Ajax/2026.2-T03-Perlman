@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record LoginRequestDTO(
-        @NotBlank(message = "Email é obrigatório")
+        @NotBlank(message = "email é obrigatório")
         @Email(message = "Insira um email válido")
         @Schema(description = "E-mail usado para acessar a conta", example = "usuario@motivafit.com")
         String email,
