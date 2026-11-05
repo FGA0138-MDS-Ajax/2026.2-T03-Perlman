@@ -9,19 +9,27 @@ import br.com.motivafit.dto.mapper.ExercicioMapper;
 import br.com.motivafit.repository.CatalogoExercicioRepository;
 import br.com.motivafit.repository.ExercicioRepository;
 import br.com.motivafit.repository.TreinoRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class ExercicioService {
 
     private final ExercicioRepository exercicioRepository;
     private final TreinoRepository treinoRepository;
     private final CatalogoExercicioRepository catalogoExercicioRepository;
     private final ExercicioMapper exercicioMapper;
+
+    public ExercicioService(ExercicioRepository exercicioRepository,
+                            TreinoRepository treinoRepository,
+                            CatalogoExercicioRepository catalogoExercicioRepository,
+                            ExercicioMapper exercicioMapper) {
+        this.exercicioRepository = exercicioRepository;
+        this.treinoRepository = treinoRepository;
+        this.catalogoExercicioRepository = catalogoExercicioRepository;
+        this.exercicioMapper = exercicioMapper;
+    }
 
     public List<ExercicioResponseDTO> listarPorTreinoId(Long treinoId) {
         List<Exercicio> exercicios = exercicioRepository.findByTreinoId(treinoId);
