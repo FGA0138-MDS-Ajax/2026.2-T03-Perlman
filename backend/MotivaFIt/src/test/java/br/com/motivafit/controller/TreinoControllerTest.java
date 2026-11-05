@@ -87,6 +87,18 @@ class TreinoControllerTest {
         verify(service).delete(USUARIO_ID, TREINO_ID);
     }
 
+    @Test
+    void adicaoRetorna201ComACopiaDoTreino() {
+        TreinoResponseDTO dto = resposta(50L, "Treino público");
+        when(service.adicionar(USUARIO_ID, TREINO_ID)).thenReturn(dto);
+
+        var response = controller.adicionar(usuario, TREINO_ID);
+
+        assertEquals(201, response.getStatusCode().value());
+        assertSame(dto, response.getBody());
+        verify(service).adicionar(USUARIO_ID, TREINO_ID);
+    }
+
     private TreinoResponseDTO resposta(Long id, String nome) {
         return new TreinoResponseDTO(id, nome, TipoTreino.MUSCULACAO, Visibilidade.PRIVADO,
                 OffsetDateTime.now(), OffsetDateTime.now());
