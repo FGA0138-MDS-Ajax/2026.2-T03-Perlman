@@ -10,4 +10,5 @@ import java.util.List;
 public interface ExercicioRepository extends JpaRepository<Exercicio, Long> {
     List<Exercicio> findAllByTreinoId(Long treinoId);
     List<Exercicio> findByTreinoId(Long treinoId);
+    boolean existsByTreinoIdAndCatalogoExercicioId(Long treinoId, Long catalogoExercicioId);
 }
