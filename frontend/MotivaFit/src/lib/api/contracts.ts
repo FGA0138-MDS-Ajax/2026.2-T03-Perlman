@@ -48,6 +48,8 @@ export interface TreinoResponseDTO {
     visibilidade: VisibilidadeBackend;
     createdAt: string;
     updatedAt: string;
+    meuTreino: boolean;
+    podeEditar: boolean;
 }
 
 export interface ExercicioRequestDTO {
@@ -76,6 +78,25 @@ export interface CatalogoExercicioResponseDTO {
     nome: string;
     modalidade: ModalidadeBackend;
     grupoMuscular: string;
+}
+
+export interface RegistroDiarioRequestDTO {
+    catalogoId: number;
+    treinoId?: number;
+    exercicioId?: number;
+    cargaKg?: number;
+    repeticoes?: number;
+    series?: number;
+    tempoS: number;
+    distanciaM?: number;
+    chaveIdempotencia?: string;
+}
+
+export interface RegistroDiarioResponseDTO {
+    id: number;
+    catalogoId: number;
+    exercicioNome: string;
+    tempoS: number;
 }
 
 export interface ApiErroResponse {

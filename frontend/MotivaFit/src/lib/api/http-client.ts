@@ -20,6 +20,20 @@ export class ApiError extends Error {
     }
 }
 
+export function exigirValor<T>(valor: unknown, valido: (item: unknown) => item is T): T {
+    if (!valido(valor)) {
+        throw clientError("RESPOSTA_API_INVALIDA", "O servidor retornou uma resposta inválida.");
+    }
+    return valor;
+}
+
+export function exigirLista<T>(valor: unknown, itemValido: (item: unknown) => item is T): T[] {
+    if (!Array.isArray(valor)) {
+        throw clientError("RESPOSTA_API_INVALIDA", "O servidor retornou uma resposta inválida.");
+    }
+    return valor.map((item) => exigirValor(item, itemValido));
+}
+
 function clientError(code: string, message: string, status = 0, cause?: unknown): ApiError {
     return new ApiError(status, {
         codigo: code, mensagem: message, dataHora: new Date().toISOString(),

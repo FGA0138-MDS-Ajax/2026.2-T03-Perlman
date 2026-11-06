@@ -101,6 +101,6 @@ class TreinoControllerTest {
 
     private TreinoResponseDTO resposta(Long id, String nome) {
         return new TreinoResponseDTO(id, nome, TipoTreino.MUSCULACAO, Visibilidade.PRIVADO,
-                OffsetDateTime.now(), OffsetDateTime.now());
+                OffsetDateTime.now(), OffsetDateTime.now(), true, true);
     }
 }

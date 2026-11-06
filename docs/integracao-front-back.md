@@ -19,7 +19,7 @@ O frontend React/TypeScript está em `frontend/MotivaFit`; o backend Spring Boot
 | --- | --- | --- |
 | 1 | Base HTTP, cookies, erros e configuração | Nenhuma |
 | 2 | Cadastro, login, restauração de sessão e perfis — implementado | 1 |
-| 3 | Consulta de catálogo e CRUD de treinos | 2; identificação de propriedade do treino |
+| 3 | Consulta de catálogo e CRUD de treinos — implementado | 2; identificação de propriedade do treino |
 | 4 | Exercícios da ficha e cópia de treinos públicos | 3; correções de autorização e persistência |
 | 5 | Registros de execução, histórico e indicadores pessoais | 4; decisão sobre sessão concluída |
 | 6 | Convites e manutenção administrativa do catálogo | 2 e 3; correções de identidade nos convites |
@@ -98,10 +98,10 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 
 **Contratos existentes:** `GET /api/catalogo-exercicios` e `GET /api/catalogo-exercicios/{id}`, autenticados. Resposta: `id`, `nome`, `modalidade`, `grupoMuscular`.
 
-- [ ] Trocar `CATALOGO_MOTIVAFIT` por consulta real e manter filtros de nome/grupo/modalidade.
-- [ ] Mapear `MUSCULACAO`/`AEROBICO` para rótulos da interface; manter IDs numéricos nos contratos e conversão explícita onde a UI usa strings.
-- [ ] Não inferir do catálogo `metaPadrao`, `metaRecordePadrao` ou `origem`: esses campos locais não existem no DTO. Metas devem ser informadas na ficha ou receber padrões de apresentação claramente definidos.
-- [ ] Resolver “Meus exercícios”: criação pessoal não é suportada pelo catálogo global atual. Proposta inicial: restringir o usuário comum à seleção do catálogo; se criação pessoal for requisito, implementar propriedade, visibilidade e rotas próprias antes de habilitá-la.
+- [x] Trocar `CATALOGO_MOTIVAFIT` por consulta real e manter filtros de nome/grupo/modalidade.
+- [x] Mapear `MUSCULACAO`/`AEROBICO` para rótulos da interface; manter IDs numéricos nos contratos e conversão explícita onde a UI usa strings.
+- [x] Não inferir do catálogo `metaPadrao`, `metaRecordePadrao` ou `origem`: esses campos locais não existem no DTO. Metas devem ser informadas na ficha ou receber padrões de apresentação claramente definidos.
+- [x] Resolver “Meus exercícios”: criação pessoal não é suportada pelo catálogo global atual. Proposta inicial: restringir o usuário comum à seleção do catálogo; se criação pessoal for requisito, implementar propriedade, visibilidade e rotas próprias antes de habilitá-la.
 
 **Aceite:** itens vêm do servidor, filtros funcionam e indisponibilidade oferece nova tentativa; usuário comum não ganha permissão de escrita no catálogo global.
 
@@ -111,14 +111,16 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 
 **Contratos existentes:** `GET/POST /api/treinos`; `GET/PUT/DELETE /api/treinos/{id}`. Escrita recebe `{ nome, tipo, visibilidade? }`; resposta inclui `id`, `nome`, `tipo`, `visibilidade`, `createdAt`, `updatedAt`. Exclusão é lógica.
 
-- [ ] Registrar uma rota protegida para o editor, por exemplo `/treinos`, e conectar os links da página principal.
-- [ ] Substituir `TREINOS_INICIAIS` e `@motivafit:treinos` pelas operações do cliente existente.
-- [ ] Separar visualmente treinos próprios e públicos de terceiros: a listagem atual retorna ambos, mas o DTO não informa propriedade. Acrescentar indicador como `meuTreino`/`podeEditar` ou separar consultas no backend antes de exibir ações de edição.
-- [ ] Enviar enums e visibilidade reais; usar datas ISO retornadas pelo servidor e formatá-las apenas na apresentação.
+- [x] Registrar uma rota protegida para o editor, por exemplo `/treinos`, e conectar os links da página principal.
+- [x] Substituir `TREINOS_INICIAIS` e `@motivafit:treinos` pelas operações do cliente existente.
+- [x] Separar visualmente treinos próprios e públicos de terceiros: a listagem atual retorna ambos, mas o DTO não informa propriedade. Acrescentar indicador como `meuTreino`/`podeEditar` ou separar consultas no backend antes de exibir ações de edição.
+- [x] Enviar enums e visibilidade reais; usar datas ISO retornadas pelo servidor e formatá-las apenas na apresentação.
 - [ ] Integrar a composição de exercícios conforme a seção seguinte. `TreinoResponseDTO` não contém a lista de exercícios.
-- [ ] Confirmar exclusão e atualizar a listagem apenas após sucesso. A edição/exclusão de treino de terceiros deve continuar bloqueada no backend, inclusive quando público.
+- [x] Confirmar exclusão e atualizar a listagem apenas após sucesso. A edição/exclusão de treino de terceiros deve continuar bloqueada no backend, inclusive quando público.
 
-**Aceite:** CRUD persiste após recarga e nova sessão; treino público de terceiros é consultável, mas não editável; treino arquivado sai da listagem e seus registros históricos permanecem.
+**Implementação da tarefa 3:** a resposta de treino informa `meuTreino` e `podeEditar`, hoje equivalentes à propriedade. A tela `/treinos` consulta o catálogo ativo e faz o CRUD do cabeçalho pela API, com carregamento, vazio, erro recuperável e envio único. Datas ISO são formatadas em `America/Sao_Paulo`. As chaves locais `@motivafit:treinos` e `@motivafit:meus-exercicios` são descartadas. A página principal aponta para o editor. Na mesma tela, depois de gravar o cabeçalho, o frontend associa cada exercício escolhido em `POST /api/treinos/{id}/exercicios`. A meta é informada na ficha. Não há remoção nem alteração de exercício já gravado, porque o contrato só oferece inclusão. A escrita do exercício ainda não confere o dono do treino no servidor.
+
+**Aceite:** CRUD persiste após recarga e nova sessão; treino público de terceiros é consultável, mas não editável; treino arquivado sai da listagem e seus registros históricos permanecem. O ciclo no navegador com os dois serviços continua pendente.
 
 ## 9. Exercícios associados ao treino e metas
 

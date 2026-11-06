@@ -60,6 +60,8 @@ class TreinoServiceTest {
         assertEquals(Visibilidade.PRIVADO, salvo.getVisibilidade());
         assertEquals("Treino A", response.nome());
         assertEquals(Visibilidade.PRIVADO, response.visibilidade());
+        assertTrue(response.meuTreino());
+        assertTrue(response.podeEditar());
     }
 
     @Test
@@ -87,6 +89,23 @@ class TreinoServiceTest {
         assertEquals("Treino A", response.get(0).nome());
         assertEquals(2L, response.get(1).id());
         assertEquals(Visibilidade.PUBLICO, response.get(1).visibilidade());
+        assertTrue(response.get(0).meuTreino());
+        assertTrue(response.get(0).podeEditar());
+    }
+
+    @Test
+    void listaIndicaTreinoPublicoDeOutroUsuarioComoSomenteConsulta() {
+        Treino meu = treino(1L, "Meu", TipoTreino.MUSCULACAO, Visibilidade.PRIVADO);
+        Treino publico = treinoPublicoDeOutroUsuario(2L);
+        when(repository.findAllByUsuarioIdAndExcluidoEmIsNullOrVisibilidadeAndExcluidoEmIsNull(USUARIO_ID, Visibilidade.PUBLICO))
+                .thenReturn(List.of(meu, publico));
+
+        List<TreinoResponseDTO> response = service.findAll(USUARIO_ID);
+
+        assertTrue(response.get(0).meuTreino());
+        assertTrue(response.get(0).podeEditar());
+        assertFalse(response.get(1).meuTreino());
+        assertFalse(response.get(1).podeEditar());
     }
 
     @Test
@@ -197,6 +216,8 @@ class TreinoServiceTest {
         TreinoResponseDTO response = service.findById(USUARIO_ID, TREINO_ID);
 
         assertEquals("Treino público", response.nome());
+        assertFalse(response.meuTreino());
+        assertFalse(response.podeEditar());
     }
 
     @Test
@@ -247,6 +268,8 @@ class TreinoServiceTest {
         assertNull(copia.getExcluidoEm());
         assertEquals(COPIA_ID, response.id());
         assertEquals(Visibilidade.PRIVADO, response.visibilidade());
+        assertTrue(response.meuTreino());
+        assertTrue(response.podeEditar());
 
         List<Exercicio> copiados = capturarExerciciosSalvos();
         assertEquals(2, copiados.size());

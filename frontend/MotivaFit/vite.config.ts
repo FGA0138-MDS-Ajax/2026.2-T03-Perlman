@@ -11,6 +11,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       strictPort: true,
+      watch: {
+        usePolling: true,
+        interval: 300,
+      },
       proxy: {
         '/api': {
           target: env.API_PROXY_TARGET || 'http://localhost:8080',

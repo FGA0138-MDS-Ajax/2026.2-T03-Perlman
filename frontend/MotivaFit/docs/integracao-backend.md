@@ -1,6 +1,6 @@
 # Integração com o backend
 
-A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login, restauração de sessão, logout e guardas por perfil já estão conectados. Os demais clientes serão conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
+A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login, restauração de sessão, logout, guardas por perfil, consulta do catálogo e CRUD de treinos já estão conectados. Os demais clientes serão conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
 
 ## Desenvolvimento local
 
@@ -42,9 +42,16 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 - A sessão é renovada antes da expiração, além da renovação por 401. Alterações de perfil refletidas pelo refresh atualizam as guardas. Falha encerra a sessão local; falha de logout informa quando a revogação remota não pôde ser confirmada.
 - A promoção local de administradores foi removida. A tela de superusuário sinaliza que convites estarão disponíveis em entrega posterior. Recuperação de senha não possui implementação nesta entrega.
 
+## Catálogo e treinos
+
+- `GET /api/catalogo-exercicios` alimenta a consulta, com filtro local por nome, grupo muscular e modalidade. Os rótulos de `MUSCULACAO` e `AEROBICO` ficam só na apresentação. Não há meta padrão nem exercício pessoal: o catálogo global não possui esses campos, e esta tela não chama as rotas administrativas.
+- `GET/POST /api/treinos` e `PUT/DELETE /api/treinos/{id}` substituem a lista local. A resposta inclui `meuTreino` e `podeEditar`. Ações de edição aparecem apenas quando `podeEditar` é verdadeiro. A exclusão pede confirmação e só altera a lista depois do sucesso.
+- Datas do servidor são formatadas em `America/Sao_Paulo`. `@motivafit:treinos` e `@motivafit:meus-exercicios` são removidas ao abrir a tela.
+- Na mesma tela, após criar ou atualizar o treino, cada exercício novo é enviado a `POST /api/treinos/{id}/exercicios` com a meta informada. Exercício já gravado não é alterado nem removido por esta tela. Cópia de treino público, execução e histórico continuam fora desta entrega.
+
 ## Funcionalidades existentes e próximas integrações
 
-Os clientes existentes cobrem autenticação, CRUD de treinos e catálogo. O backend também possui exercícios de ficha, registros diários, cópia de treino público e convites; seus clientes/telas e correções de autorização estão detalhados no plano. Perfil editável, inscrições, sessões concluídas e relatórios agregados ainda exigem contratos novos.
+Os clientes existentes cobrem autenticação, CRUD de treinos e catálogo. A tela de treinos já usa catálogo e cabeçalho do treino. O backend também possui exercícios de ficha, registros diários, cópia de treino público e convites; seus clientes/telas e correções de autorização estão detalhados no plano. Perfil editável, inscrições, sessões concluídas e relatórios agregados ainda exigem contratos novos.
 
 `readJwtUsuarioClaims` apenas decodifica o JWT para apresentação. A autorização efetiva é responsabilidade do backend.
 

@@ -50,7 +50,7 @@ public class TreinoController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar treinos", description = "Lista os treinos ativos do usuário autenticado e os treinos públicos de outros usuários, que podem ser adicionados à lista. Treinos excluídos não aparecem.")
+    @Operation(summary = "Listar treinos", description = "Lista os treinos ativos do usuário autenticado e os treinos públicos de outros usuários. Cada item informa meuTreino e podeEditar: treino público de outra pessoa é consultável, mas não alterável. Treinos excluídos não aparecem.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista de treinos (vazia se não houver nenhum)", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TreinoResponseDTO.class)))),
             @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),

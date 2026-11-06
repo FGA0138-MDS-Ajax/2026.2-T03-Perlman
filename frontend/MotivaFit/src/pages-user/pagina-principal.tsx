@@ -17,6 +17,7 @@ import {
     LogOut,
     Flame,
     Calendar,
+    Play,
     Shield
 } from "lucide-react";
 import { ThemeToggle, ThemeSelector } from "@/components/theme-toggle";
@@ -151,6 +152,14 @@ export default function PaginaPrincipal() {
                     >
                         <Dumbbell className="h-4 w-4" />
                         Meus Treinos
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        className="justify-start gap-2.5"
+                        onClick={() => navigate("/treinos")}
+                    >
+                        <Play className="h-4 w-4" />
+                        Realizar treino
                     </Button>
                     <Separator className="my-3" />
 
@@ -316,9 +325,14 @@ export default function PaginaPrincipal() {
                     </section>
 
                     <section id="fichas-disponiveis" className="space-y-4">
-                        <div>
-                            <h2 className="text-xl font-heading font-bold">Fichas de Treino</h2>
-                            <p className="text-sm text-muted-foreground">Inscreva-se ou cancele suas fichas.</p>
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h2 className="text-xl font-heading font-bold">Fichas de Treino</h2>
+                                <p className="text-sm text-muted-foreground">Inscreva-se ou cancele suas fichas.</p>
+                            </div>
+                            <Button variant="outline" asChild>
+                                <Link to="/treinos">Abrir meus treinos</Link>
+                            </Button>
                         </div>
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {WORKOUT_PLANS.map((ficha) => {

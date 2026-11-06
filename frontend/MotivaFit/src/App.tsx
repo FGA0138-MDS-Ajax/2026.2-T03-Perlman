@@ -10,6 +10,7 @@ import PaginaTreinosAdmin from "@/pages-admin/pagina-treinos-admin";
 import PaginaRelatoriosAdmin from "@/pages-admin/pagina-relatorios-admin";
 import PaginaSuperUsuario from "@/pages-admin/pagina-superusuario";
 import PaginaTreinos from "./pages-user/pagina-treinos";
+import PaginaRealizarTreino from "./pages-user/pagina-realizar-treino";
 
 function App() {
     return (
@@ -54,6 +55,14 @@ function App() {
                             element={
                                 <RotaProtegida>
                                     <PaginaTreinos />
+                                </RotaProtegida>
+                            }
+                        />
+                        <Route
+                            path="/treinos/:treinoId/realizar"
+                            element={
+                                <RotaProtegida>
+                                    <PaginaRealizarTreino />
                                 </RotaProtegida>
                             }
                         />
