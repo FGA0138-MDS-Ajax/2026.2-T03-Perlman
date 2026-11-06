@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider, RotaProtegida, RotaAdmin, RotaPublica } from "@/lib/auth-context";
+import { AuthProvider, RotaProtegida, RotaAdmin, RotaSuperusuario, RotaPublica } from "@/lib/auth-context";
 import PaginaInterfaceInicial from "@/pages-user/pagina-interface-inicial";
 import PaginaLogin from "@/pages-user/pagina-login";
 import PaginaCadastro from "@/pages-user/pagina-cadastro";
@@ -9,6 +9,7 @@ import PaginaDashboardAdmin from "@/pages-admin/pagina-dashboard-admin";
 import PaginaTreinosAdmin from "@/pages-admin/pagina-treinos-admin";
 import PaginaRelatoriosAdmin from "@/pages-admin/pagina-relatorios-admin";
 import PaginaSuperUsuario from "@/pages-admin/pagina-superusuario";
+import PaginaTreinos from "./pages-user/pagina-treinos";
 
 function App() {
     return (
@@ -47,7 +48,17 @@ function App() {
                             }
                         />
 
-                        {/* Páginas administrativas exigem sessão autenticada e e-mail autorizado como admin */}
+                        {/* Painel do Aluno: Exige usuário logado */}
+                        <Route
+                            path="/treinos"
+                            element={
+                                <RotaProtegida>
+                                    <PaginaTreinos />
+                                </RotaProtegida>
+                            }
+                        />
+
+                        {/* Páginas administrativas exigem sessão autenticada e perfil administrativo */}
                         <Route
                             path="/admin"
                             element={
@@ -75,9 +86,9 @@ function App() {
                         <Route
                             path="/admin/superusuario"
                             element={
-                                <RotaAdmin>
+                                <RotaSuperusuario>
                                     <PaginaSuperUsuario />
-                                </RotaAdmin>
+                                </RotaSuperusuario>
                             }
                         />
 

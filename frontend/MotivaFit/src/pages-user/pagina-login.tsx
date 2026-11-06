@@ -10,34 +10,25 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Dumbbell, ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { useAuth, isEmailAdmin } from "@/lib/auth-context";
+import { useAuth, mensagemAutenticacao } from "@/lib/auth-context";
 
 export default function PaginaLogin() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
-    const navigate = useNavigate();
     const location = useLocation();
-    const { login, admins } = useAuth();
+    const { login, enviando, limparAviso } = useAuth();
+    const [erro, setErro] = useState("");
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (!email.trim()) return;
-
-        login(email, senha);
-
-        const eAdmin = isEmailAdmin(email, admins);
-        const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
-
-        if (from && (from !== "/admin" || eAdmin)) {
-            navigate(from, { replace: true });
-        } else if (eAdmin) {
-            navigate("/admin", { replace: true });
-        } else {
-            navigate("/principal", { replace: true });
-        }
+        if (enviando) return;
+        setErro("");
+        limparAviso();
+        try { await login(email, senha); }
+        catch (error) { setErro(mensagemAutenticacao(error)); }
     }
 
     return (
@@ -65,12 +56,16 @@ export default function PaginaLogin() {
                     </CardDescription>
                 </CardHeader>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} aria-busy={enviando}>
+                    <fieldset disabled={enviando}>
                     <CardContent className="space-y-4">
+                        {location.state?.cadastroConcluido && <p role="status" className="text-sm">Conta criada. Entre com seu e-mail e senha.</p>}
+                        {erro && <p role="alert" className="text-sm text-destructive">{erro}</p>}
                         <div className="space-y-2">
                             <Label htmlFor="email">E-mail</Label>
                             <Input
                                 id="email"
+                                autoComplete="username"
                                 type="email"
                                 placeholder="seu@email.com"
                                 value={email}
@@ -82,12 +77,11 @@ export default function PaginaLogin() {
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="senha">Senha</Label>
-                                <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-                                    Esqueceu a senha?
-                                </a>
+                                <span className="text-xs text-muted-foreground">Recuperação de senha em breve</span>
                             </div>
                             <Input
                                 id="senha"
+                                autoComplete="current-password"
                                 type="password"
                                 placeholder="••••••••"
                                 value={senha}
@@ -101,7 +95,7 @@ export default function PaginaLogin() {
 
                     <CardFooter className="flex flex-col gap-3 pt-2">
                         <Button type="submit" className="w-full h-11 font-medium shadow-sm">
-                            Entrar na conta
+                            {enviando ? "Entrando…" : "Entrar na conta"}
                         </Button>
                         <p className="text-center text-sm text-muted-foreground">
                             Ainda não tem conta?{" "}
@@ -110,6 +104,7 @@ export default function PaginaLogin() {
                             </Link>
                         </p>
                     </CardFooter>
+                    </fieldset>
                 </form>
             </Card>
         </div>

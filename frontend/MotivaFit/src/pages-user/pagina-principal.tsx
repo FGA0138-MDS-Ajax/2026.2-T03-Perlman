@@ -41,7 +41,7 @@ function obterChaveData(data: Date): string {
 
 export default function PaginaPrincipal() {
     const navigate = useNavigate();
-    const { user, logout, isAdmin } = useAuth();
+    const { user, logout, isAdmin, enviando } = useAuth();
     const [historicoTreinos, setHistoricoTreinos] = useState<WorkoutCompletion[]>(getWorkoutHistory);
     const [referenciaAtual, setReferenciaAtual] = useState(Date.now);
     const [fichasInscritas, setFichasInscritas] = useState<string[]>(() =>
@@ -102,8 +102,7 @@ export default function PaginaPrincipal() {
     }, [user]);
 
     function handleLogout() {
-        logout();
-        navigate("/login");
+        void logout();
     }
 
     function handleConcluirTreino(workoutPlanId: string) {
@@ -148,9 +147,7 @@ export default function PaginaPrincipal() {
                     <Button
                         variant="ghost"
                         className="justify-start gap-2.5"
-                        onClick={() =>
-                            document.getElementById("fichas-disponiveis")?.scrollIntoView({ behavior: "smooth" })
-                        }
+                        onClick={() => navigate("/treinos")}
                     >
                         <Dumbbell className="h-4 w-4" />
                         Meus Treinos
@@ -182,6 +179,7 @@ export default function PaginaPrincipal() {
                     variant="ghost"
                     className="justify-start gap-2 text-destructive hover:bg-destructive/10"
                     onClick={handleLogout}
+                    disabled={enviando}
                 >
                     <LogOut className="h-4 w-4" />
                     Sair

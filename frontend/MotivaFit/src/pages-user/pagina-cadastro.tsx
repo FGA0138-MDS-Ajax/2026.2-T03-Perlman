@@ -13,38 +13,37 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { Dumbbell, ArrowLeft, AlertCircle } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { useAuth, isEmailAdmin } from "@/lib/auth-context";
+import { useAuth, mensagemAutenticacao } from "@/lib/auth-context";
 
 export default function PaginaCadastro() {
-    const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
     const [confirmarSenha, setConfirmarSenha] = useState("");
     const [erro, setErro] = useState("");
     const navigate = useNavigate();
-    const { cadastro, admins } = useAuth();
+    const { cadastro, enviando, limparAviso } = useAuth();
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        if (enviando) return;
         setErro("");
+        limparAviso();
 
         if (senha !== confirmarSenha) {
             setErro("As senhas não coincidem.");
             return;
         }
 
-        if (senha.length < 6) {
-            setErro("A senha deve ter pelo menos 6 caracteres.");
+        if (!/^(?=.*\p{Lu})(?=.*\p{Ll})(?=.*\d)(?=.*[^\p{L}\d\s]).{12,}$/u.test(senha)) {
+            setErro("A senha deve ter pelo menos 12 caracteres, incluindo maiúscula, minúscula, número e símbolo.");
             return;
         }
 
-        cadastro(nome, email, senha);
+        try {
+            await cadastro(email, senha);
+            navigate("/login", { replace: true, state: { cadastroConcluido: true } });
+        } catch (error) { setErro(mensagemAutenticacao(error)); }
 
-        if (isEmailAdmin(email, admins)) {
-            navigate("/admin", { replace: true });
-        } else {
-            navigate("/principal", { replace: true });
-        }
     }
 
     return (
@@ -72,31 +71,21 @@ export default function PaginaCadastro() {
                     </CardDescription>
                 </CardHeader>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} aria-busy={enviando}>
+                    <fieldset disabled={enviando}>
                     <CardContent className="space-y-4">
                         {erro && (
-                            <div className="flex items-center gap-2 rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
+                            <div role="alert" className="flex items-center gap-2 rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
                                 <AlertCircle className="h-4 w-4 shrink-0" />
                                 <span>{erro}</span>
                             </div>
                         )}
 
                         <div className="space-y-2">
-                            <Label htmlFor="nome">Nome completo</Label>
-                            <Input
-                                id="nome"
-                                type="text"
-                                placeholder="Seu nome completo"
-                                value={nome}
-                                onChange={(e) => setNome(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="space-y-2">
                             <Label htmlFor="email">E-mail</Label>
                             <Input
                                 id="email"
+                                autoComplete="email"
                                 type="email"
                                 placeholder="seu@email.com"
                                 value={email}
@@ -107,10 +96,14 @@ export default function PaginaCadastro() {
 
                         <div className="space-y-2">
                             <Label htmlFor="senha">Senha</Label>
+                            <p id="regras-senha" className="text-xs text-muted-foreground">Use 12 ou mais caracteres, com maiúscula, minúscula, número e símbolo.</p>
                             <Input
                                 id="senha"
                                 type="password"
-                                placeholder="Mínimo de 6 caracteres"
+                                placeholder="Mínimo de 12 caracteres"
+                                aria-describedby="regras-senha"
+                                minLength={12}
+                                autoComplete="new-password"
                                 value={senha}
                                 onChange={(e) => setSenha(e.target.value)}
                                 required
@@ -121,6 +114,7 @@ export default function PaginaCadastro() {
                             <Label htmlFor="confirmar-senha">Confirmar senha</Label>
                             <Input
                                 id="confirmar-senha"
+                                autoComplete="new-password"
                                 type="password"
                                 placeholder="Repita sua senha"
                                 value={confirmarSenha}
@@ -134,7 +128,7 @@ export default function PaginaCadastro() {
 
                     <CardFooter className="flex flex-col gap-3 pt-2">
                         <Button type="submit" className="w-full h-11 font-medium shadow-sm">
-                            Criar minha conta
+                            {enviando ? "Criando conta…" : "Criar minha conta"}
                         </Button>
                         <p className="text-center text-sm text-muted-foreground">
                             Já tem uma conta?{" "}
@@ -143,6 +137,7 @@ export default function PaginaCadastro() {
                             </Link>
                         </p>
                     </CardFooter>
+                    </fieldset>
                 </form>
             </Card>
         </div>

@@ -1,3 +1,4 @@
+import { useAuth } from "@/lib/auth-context";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin-layout";
@@ -28,6 +29,7 @@ interface UsuarioAdmin {
 }
 
 export default function PaginaDashboardAdmin() {
+    const { isSuperusuario } = useAuth();
     const [usuarios, setUsuarios] = useState<UsuarioAdmin[]>([]);
     const [busca, setBusca] = useState("");
     const [filtroStatus, setFiltroStatus] = useState<"Todos" | "Ativo" | "Inativo">("Todos");
@@ -91,7 +93,7 @@ export default function PaginaDashboardAdmin() {
         },
         {
             title: "SuperUsuário",
-            description: "Gerencie os e-mails autorizados como admins",
+            description: "Gerencie os convites para administradores",
             to: "/admin/superusuario",
             icon: Settings,
         },
@@ -127,7 +129,7 @@ export default function PaginaDashboardAdmin() {
             </section>
 
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {atalhos.map(({ title, description, to, icon: Icon }) => (
+                {atalhos.filter((item) => item.to !== "/admin/superusuario" || isSuperusuario).map(({ title, description, to, icon: Icon }) => (
                     <Link key={to} to={to} className="block">
                         <Card className="h-full transition-shadow hover:shadow-md">
                             <CardHeader>

@@ -113,6 +113,7 @@ export function refreshSession(): Promise<LoginResponseDTO> {
             }
             // A renovação mantém a mesma identidade; não invalida consultas concorrentes.
             accessToken = data.token;
+            if (typeof window !== "undefined") window.dispatchEvent(new Event(SESSION_CHANGED_EVENT));
             return data;
         } catch (error) {
             if (version === sessionVersion) setAccessToken(null);

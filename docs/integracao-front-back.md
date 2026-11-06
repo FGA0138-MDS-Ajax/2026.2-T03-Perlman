@@ -1,6 +1,6 @@
 # Plano de integração entre frontend e backend
 
-Data da análise: 05/11/2026. Escopo: planejar a integração do MotivaFit por funcionalidade, com base no código atual. Este documento não representa funcionalidades já integradas.
+Data da análise: 05/11/2026. Escopo: planejar a integração do MotivaFit por funcionalidade, com base no código atual. O diagnóstico inicial descreve a situação em 05/11/2026; as notas de implementação e os checkboxes registram o progresso posterior.
 
 ## 1. Diagnóstico e premissas
 
@@ -18,7 +18,7 @@ O frontend React/TypeScript está em `frontend/MotivaFit`; o backend Spring Boot
 | Ordem | Entrega | Dependências |
 | --- | --- | --- |
 | 1 | Base HTTP, cookies, erros e configuração | Nenhuma |
-| 2 | Cadastro, login, restauração de sessão e perfis | 1 |
+| 2 | Cadastro, login, restauração de sessão e perfis — implementado | 1 |
 | 3 | Consulta de catálogo e CRUD de treinos | 2; identificação de propriedade do treino |
 | 4 | Exercícios da ficha e cópia de treinos públicos | 3; correções de autorização e persistência |
 | 5 | Registros de execução, histórico e indicadores pessoais | 4; decisão sobre sessão concluída |
@@ -41,7 +41,7 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 - [x] Implementar renovação compartilhada de sessão: uma requisição de refresh por vez, no máximo uma repetição da chamada protegida após 401, sem recursão em login/refresh/logout. Não repetir mutações automaticamente após falhas de rede ambíguas.
 - [ ] Usar estados de carregamento, vazio, erro recuperável e envio em andamento; limpar dados da conta anterior no logout/troca de usuário e descartar respostas atrasadas.
 
-**Implementação em 05/11/2026:** base HTTP/configuração concluída, com testes automatizados de concorrência, falhas, isolamento de sessão e cookies. O último item permanece pendente na camada visual e será aplicado ao conectar contexto/telas nas tarefas seguintes; a infraestrutura já emite mudança de sessão e descarta respostas antigas. O aceite completo no navegador e a instalação de HTTPS dependem do ambiente de destino. Consulte [configuração e limites](../frontend/MotivaFit/docs/integracao-backend.md).
+**Implementação em 05/11/2026:** base HTTP/configuração concluída, com testes automatizados de concorrência, falhas, isolamento de sessão e cookies. Os estados visuais e a limpeza por mudança de identidade foram conectados à autenticação na tarefa 2; as demais funcionalidades devem aplicar o mesmo cuidado ao serem integradas. O aceite completo no navegador e a instalação de HTTPS dependem do ambiente de destino. Consulte [configuração e limites](../frontend/MotivaFit/docs/integracao-backend.md).
 
 **Aceite:** login, refresh e logout funcionam no navegador na topologia escolhida; múltiplos 401 simultâneos não provocam várias rotações do refresh; erros são exibidos sem dados fictícios.
 
@@ -51,11 +51,13 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 
 **Contrato existente:** `POST /api/auth/cadastro`, corpo `{ email, senha }`, resposta `UsuarioResponseDTO` com `id`, `email`, `perfil`, `ativo`.
 
-- [ ] Tornar o cadastro assíncrono e chamar `registerAccount`; não criar identidade usando `Date.now()`.
-- [ ] Alinhar validação de senha: a tela exige seis caracteres, enquanto o backend exige pelo menos 12, com maiúscula, minúscula, número e símbolo. Manter confirmação de senha apenas na interface.
-- [ ] Resolver o campo nome: a tela o exige, mas a API não o recebe nem retorna. Proposta inicial: retirar a obrigatoriedade e exibir e-mail; se nome persistido for requisito, adicionar campo, migration e DTOs antes de anunciá-lo como salvo.
-- [ ] Após cadastro, encaminhar para login. Caso seja adotado login automático, executar uma chamada real de login; a resposta do cadastro não contém token.
-- [ ] Tratar validação e e-mail duplicado sem perder o formulário ou navegar em caso de falha.
+- [x] Tornar o cadastro assíncrono e chamar `registerAccount`; não criar identidade usando `Date.now()`.
+- [x] Alinhar validação de senha: a tela exige seis caracteres, enquanto o backend exige pelo menos 12, com maiúscula, minúscula, número e símbolo. Manter confirmação de senha apenas na interface.
+- [x] Resolver o campo nome: a tela o exige, mas a API não o recebe nem retorna. Decisão aplicada nesta entrega: remover o campo de nome e exibir e-mail; se nome persistido for requisito, adicionar campo, migration e DTOs antes de anunciá-lo como salvo.
+- [x] Após cadastro, encaminhar para login. Caso seja adotado login automático, executar uma chamada real de login; a resposta do cadastro não contém token.
+- [x] Tratar validação e e-mail duplicado sem perder o formulário ou navegar em caso de falha.
+
+**Implementação da tarefa 2:** formulário conectado à API, validação de senha alinhada e encaminhamento ao login após sucesso; erros mantêm o formulário.
 
 **Aceite:** conta persistida permite login após recarregar a página; senha inválida e e-mail duplicado não criam sessão local.
 
@@ -65,14 +67,18 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 
 **Contratos existentes:** `POST /api/auth/login` com `{ email, senha }`; `POST /api/auth/refresh`; `POST /api/auth/logout`. Login/refresh retornam `{ token, expirationAt }`; logout retorna 204.
 
-- [ ] Substituir `login`, `cadastro` e `logout` síncronos do contexto por operações assíncronas e adaptar seus consumidores.
-- [ ] Manter access token em memória, usando o cliente existente; restaurar sessão no carregamento via refresh e cookies. Distinguir inicialização, autenticado e não autenticado para evitar redirecionamentos prematuros.
-- [ ] Usar `id`, `sub`, `perfil` e `ativo` das claims para apresentação. `readJwtUsuarioClaims` apenas decodifica o JWT; a autorização continua no servidor.
-- [ ] Representar os três perfis `USUARIO`, `ADMINISTRADOR` e `SUPERUSUARIO`. Remover `BANCO_ADMINS_PADRAO`, `isEmailAdmin` e a lista local como fonte de permissão.
-- [ ] Criar guarda específica de superusuário para `/admin/superusuario`, hoje protegida apenas por `RotaAdmin`, e ajustar menus.
-- [ ] No logout, limpar token, contexto e dados da conta mesmo se houver erro, mas informar quando não for possível confirmar a revogação remota.
-- [ ] Não restaurar autenticação a partir de `motivafit_user`. Planejar descarte das chaves de autenticação do protótipo.
-- [ ] Tratar “Esqueceu a senha?” como recurso pendente: não há fluxo de recuperação identificado. A liberação de `/api/auth/google` no SecurityConfig também não significa que exista implementação de login Google.
+- [x] Substituir `login`, `cadastro` e `logout` síncronos do contexto por operações assíncronas e adaptar seus consumidores.
+- [x] Manter access token em memória, usando o cliente existente; restaurar sessão no carregamento via refresh e cookies. Distinguir inicialização, autenticado e não autenticado para evitar redirecionamentos prematuros.
+- [x] Usar `id`, `sub`, `perfil` e `ativo` das claims para apresentação. `readJwtUsuarioClaims` apenas decodifica o JWT; a autorização continua no servidor.
+- [x] Representar os três perfis `USUARIO`, `ADMINISTRADOR` e `SUPERUSUARIO`. Remover `BANCO_ADMINS_PADRAO`, `isEmailAdmin` e a lista local como fonte de permissão.
+- [x] Criar guarda específica de superusuário para `/admin/superusuario`, hoje protegida apenas por `RotaAdmin`, e ajustar menus.
+- [x] No logout, limpar token, contexto e dados da conta mesmo se houver erro, mas informar quando não for possível confirmar a revogação remota.
+- [x] Não restaurar autenticação a partir de `motivafit_user`. Planejar descarte das chaves de autenticação do protótipo.
+- [x] Tratar “Esqueceu a senha?” como recurso pendente: não há fluxo de recuperação identificado. A liberação de `/api/auth/google` no SecurityConfig também não significa que exista implementação de login Google.
+
+**Implementação da tarefa 2:** contexto assíncrono com restauração via refresh, atualização de perfil em cada renovação, renovação antes da expiração e guardas para os três perfis. As chaves locais antigas de identidade/permissão são removidas. Ao trocar a identidade, as telas são remontadas para descartar estado da conta anterior. Convites administrativos permanecem na entrega específica; a concessão fictícia local foi removida e a tela informa indisponibilidade. Recuperação de senha também está sinalizada como pendente.
+
+**Validação:** testes de interface com React/Vitest e HTTP simulado cobrem formulários, restauração em StrictMode, falhas, logout e restrições por perfil. Testes do backend verificam requisições diretas sem sessão e permissões administrativas. O teste ponta a ponta em navegador real com os dois serviços continua pendente.
 
 **Aceite:** senha incorreta falha; recarga restaura sessão válida; expiração encerra sessão sem loop; usuário comum não abre áreas administrativas; administrador não abre a área de superusuário. Requisições diretas também respeitam permissões no servidor.
 

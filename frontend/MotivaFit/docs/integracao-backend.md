@@ -1,6 +1,6 @@
 # Integração com o backend
 
-A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Os clientes ainda precisam ser conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
+A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login, restauração de sessão, logout e guardas por perfil já estão conectados. Os demais clientes serão conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
 
 ## Desenvolvimento local
 
@@ -27,11 +27,20 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 - Sem access token, a restauração exige chamada explícita a `refreshSession` durante a inicialização do contexto; uma consulta após logout não restaura a sessão implicitamente.
 - `refreshSession`, exportado também por `auth-api.ts`, compartilha a mesma operação usada na renovação automática. Falha na renovação limpa o token e propaga o erro.
 - Login/logout aguardam uma rotação já iniciada antes de alterar cookies. Limpar/trocar o token invalida respostas pendentes da sessão anterior, com `SESSAO_ALTERADA`.
-- `SESSION_CHANGED_EVENT` notifica os consumidores quando a identidade é limpa/trocada. Ao conectar o contexto de autenticação nas próximas tarefas, limpar os dados da conta nesse evento, ignorar resultados `SESSAO_ALTERADA` e cancelar consultas desmontadas com `AbortSignal`.
-- Cada tela deve distinguir carregamento, sucesso vazio, erro e envio em andamento; o cliente não transforma erros em arrays vazios. Esses estados visuais serão conectados junto de cada funcionalidade.
+- `SESSION_CHANGED_EVENT` notifica os consumidores quando a identidade é limpa/trocada. O contexto de autenticação já acompanha esse evento e as renovações; remonta as telas quando a identidade muda. Consumidores de dados devem ignorar resultados `SESSAO_ALTERADA` e cancelar consultas desmontadas com `AbortSignal`.
+- Cada tela deve distinguir carregamento, sucesso vazio, erro e envio em andamento; o cliente não transforma erros em arrays vazios. Esses estados já estão conectados aos formulários de autenticação e serão aplicados às demais funcionalidades.
 - Erros HTTP mantêm `ApiError.status`, `code`, `message` e `occurredAt`. Falha de transporte usa `REDE_INDISPONIVEL` (status 0), JSON inválido usa `RESPOSTA_API_INVALIDA`, cookie ausente/malformado usa `CSRF_AUSENTE`/`CSRF_INVALIDO`. A causa técnica é preservada sem expô-la na mensagem pública. Cancelamento preserva o erro original do sinal.
 - Não há repetição automática em falha de rede, inclusive em POST/PUT/DELETE: o servidor pode ter concluído a operação. A tela deve reconciliar o resultado ou usar idempotência quando suportada.
 - A coordenação de refresh é por aba. Coordenação entre abas não está implementada; evitar restaurações simultâneas em múltiplas abas até definir essa política.
+
+## Autenticação nas telas
+
+- O cadastro envia somente e-mail e senha, exige a política do backend (12 caracteres, maiúscula, minúscula, número e símbolo) e encaminha ao login. O nome não é solicitado porque a API não o persiste.
+- O contexto inicia em carregamento e restaura a sessão pelo refresh; as guardas aguardam essa verificação. O e-mail identifica a conta na interface.
+- Os perfis `USUARIO`, `ADMINISTRADOR` e `SUPERUSUARIO` controlam menus e rotas. A área de superusuário é exclusiva desse perfil; autorização efetiva permanece no servidor.
+- Tokens e permissões não são persistidos no navegador. `motivafit_user` e `motivafit_banco_admins` do protótipo são descartados. Preferências de tema são mantidas.
+- A sessão é renovada antes da expiração, além da renovação por 401. Alterações de perfil refletidas pelo refresh atualizam as guardas. Falha encerra a sessão local; falha de logout informa quando a revogação remota não pôde ser confirmada.
+- A promoção local de administradores foi removida. A tela de superusuário sinaliza que convites estarão disponíveis em entrega posterior. Recuperação de senha não possui implementação nesta entrega.
 
 ## Funcionalidades existentes e próximas integrações
 
@@ -41,6 +50,6 @@ Os clientes existentes cobrem autenticação, CRUD de treinos e catálogo. O bac
 
 ## Validação
 
-No frontend (Node 22.18+ ou 24): `npm test`, `npm run build`, `npm run lint`. Os testes HTTP usam o runner nativo do Node e respostas simuladas, cobrindo concorrência, isolamento de sessão, erros e cancelamento.
+No frontend (Node 22.18+ ou 24): `npm test`, `npm run build`, `npm run lint`. Os testes HTTP usam o runner nativo do Node; os testes de interface usam Vitest, Testing Library e jsdom. Ambos simulam respostas HTTP. `npm run test:http` e `npm run test:ui` permitem execução separada. Cobrem concorrência, isolamento, formulários, erros, expiração e guardas por perfil.
 
 No backend, com Maven e JDK 25: `mvn -Dtest=AuthControllerTest,SecurityConfigTest test`. Validar também no navegador o ciclo login → refresh → logout no ambiente de destino; testes unitários não comprovam atributos de cookies aplicados por um navegador real.
