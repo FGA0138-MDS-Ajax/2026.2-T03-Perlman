@@ -27,7 +27,7 @@ class AuthControllerTest {
     void setup() {
         usuarios = mock(UsuarioService.class);
         login = mock(LoginService.class);
-        controller = new AuthController(usuarios, login, 7, "https://frontend.test");
+        controller = new AuthController(usuarios, login, 7, "https://frontend.test", true);
     }
 
     @Test
@@ -53,8 +53,8 @@ class AuthControllerTest {
         var cookies = response.getHeaders().get("Set-Cookie");
         assertEquals(2, cookies.size());
         assertTrue(cookies.stream().anyMatch(cookie -> cookie.contains("refreshToken=refresh")
-                && cookie.contains("HttpOnly") && cookie.contains("Secure") && cookie.contains("SameSite=Lax")));
-        assertTrue(cookies.stream().anyMatch(cookie -> cookie.contains("csrfToken=") && !cookie.contains("HttpOnly")));
+                && cookie.contains("Path=/api/auth") && cookie.contains("HttpOnly") && cookie.contains("Secure") && cookie.contains("SameSite=Lax")));
+        assertTrue(cookies.stream().anyMatch(cookie -> cookie.contains("csrfToken=") && cookie.contains("Path=/;") && !cookie.contains("HttpOnly")));
     }
 
     @Test
@@ -79,6 +79,10 @@ class AuthControllerTest {
 
         assertEquals(204, response.getStatusCode().value());
         verify(login).logout("old-refresh");
+        assertTrue(response.getHeaders().get("Set-Cookie").stream()
+                .anyMatch(cookie -> cookie.startsWith("csrfToken=") && cookie.contains("Path=/;")));
+        assertTrue(response.getHeaders().get("Set-Cookie").stream()
+                .anyMatch(cookie -> cookie.startsWith("refreshToken=") && cookie.contains("Path=/api/auth;")));
         assertTrue(response.getHeaders().get("Set-Cookie").stream().allMatch(cookie -> cookie.contains("Max-Age=0")));
     }
 
@@ -90,6 +94,16 @@ class AuthControllerTest {
 
         MockHttpServletRequest wrongCsrf = validRequest("https://frontend.test", "different");
         assertThrows(AcessoNegadoException.class, () -> controller.refresh(wrongCsrf));
+    }
+
+    @Test
+    void ambienteLocalPodeDesabilitarSecureExplicitamente() {
+        controller = new AuthController(usuarios, login, 7, "http://localhost:3000", false);
+        when(login.login(any(LoginRequestDTO.class))).thenReturn(
+                new LoginService.LoginResult(new LoginResponseDTO("access", new Date()), "refresh"));
+        var response = controller.login(new LoginRequestDTO("user@test.com", "senha"));
+        assertTrue(response.getHeaders().get("Set-Cookie").stream()
+                .noneMatch(cookie -> cookie.contains("Secure")));
     }
 
     private MockHttpServletRequest validRequest() {

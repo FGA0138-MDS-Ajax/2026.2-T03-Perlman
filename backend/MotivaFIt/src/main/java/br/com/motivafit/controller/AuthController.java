@@ -40,15 +40,18 @@ public class AuthController {
     private final LoginService loginService;
     private final long refreshCookieMaxAge;
     private final String allowedOrigin;
+    private final boolean secureCookies;
     private final SecureRandom random = new SecureRandom();
 
     public AuthController(UsuarioService usuarioService, LoginService loginService,
                           @Value("${security.jwt.refresh-expiration-days:7}") long refreshDays,
-                          @Value("${security.cors.allowed-origin:http://localhost:3000}") String allowedOrigin) {
+                          @Value("${security.cors.allowed-origin:http://localhost:3000}") String allowedOrigin,
+                          @Value("${security.cookies.secure:true}") boolean secureCookies) {
         this.usuarioService = usuarioService;
         this.loginService = loginService;
         this.refreshCookieMaxAge = refreshDays * 86400;
         this.allowedOrigin = allowedOrigin;
+        this.secureCookies = secureCookies;
     }
 
     @PostMapping("/cadastro")
@@ -148,17 +151,17 @@ public class AuthController {
     }
 
     private ResponseCookie refreshCookie(String value) {
-        return ResponseCookie.from("refreshToken", value).httpOnly(true).secure(true)
+        return ResponseCookie.from("refreshToken", value).httpOnly(true).secure(secureCookies)
                 .sameSite("Lax").path("/api/auth").maxAge(refreshCookieMaxAge).build();
     }
 
     private ResponseCookie csrfCookie(String value) {
-        return ResponseCookie.from("csrfToken", value).httpOnly(false).secure(true)
-                .sameSite("Lax").path("/api/auth").maxAge(refreshCookieMaxAge).build();
+        return ResponseCookie.from("csrfToken", value).httpOnly(false).secure(secureCookies)
+                .sameSite("Lax").path("/").maxAge(refreshCookieMaxAge).build();
     }
 
     private ResponseCookie expiredCookie(String name, boolean httpOnly) {
-        return ResponseCookie.from(name, "").httpOnly(httpOnly).secure(true)
-                .sameSite("Lax").path("/api/auth").maxAge(0).build();
+        return ResponseCookie.from(name, "").httpOnly(httpOnly).secure(secureCookies)
+                .sameSite("Lax").path(httpOnly ? "/api/auth" : "/").maxAge(0).build();
     }
 }

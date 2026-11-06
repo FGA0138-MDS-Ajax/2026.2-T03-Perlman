@@ -11,7 +11,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Dumbbell, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Dumbbell, ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth, isEmailAdmin } from "@/lib/auth-context";
 

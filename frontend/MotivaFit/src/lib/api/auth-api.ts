@@ -5,7 +5,7 @@ import type {
     UsuarioRequestDTO,
     UsuarioResponseDTO,
 } from "@/lib/api/contracts";
-import { apiRequest, readCsrfCookie, setAccessToken } from "@/lib/api/http-client";
+import { apiRequest, finishPendingRefresh, readCsrfCookie, setAccessToken } from "@/lib/api/http-client";
 
 function decodeBase64Url(value: string): string {
     const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
@@ -60,6 +60,8 @@ export async function registerAccount(request: UsuarioRequestDTO): Promise<Usuar
 }
 
 export async function login(request: LoginRequestDTO): Promise<LoginResponseDTO> {
+    setAccessToken(null);
+    await finishPendingRefresh();
     const response = await apiRequest<LoginResponseDTO>("/api/auth/login", {
         method: "POST",
         authenticated: false,
@@ -69,17 +71,11 @@ export async function login(request: LoginRequestDTO): Promise<LoginResponseDTO>
     return response;
 }
 
-export async function refreshSession(): Promise<LoginResponseDTO> {
-    const response = await apiRequest<LoginResponseDTO>("/api/auth/refresh", {
-        method: "POST",
-        authenticated: false,
-        headers: { "X-CSRF-TOKEN": readCsrfCookie() },
-    });
-    setAccessToken(response.token);
-    return response;
-}
+export { refreshSession } from "@/lib/api/http-client";
 
 export async function logout(): Promise<void> {
+    setAccessToken(null);
+    await finishPendingRefresh();
     try {
         await apiRequest<void>("/api/auth/logout", {
             method: "POST",

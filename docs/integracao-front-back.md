@@ -1,0 +1,221 @@
+# Plano de integração entre frontend e backend
+
+Data da análise: 05/11/2026. Escopo: planejar a integração do MotivaFit por funcionalidade, com base no código atual. Este documento não representa funcionalidades já integradas.
+
+## 1. Diagnóstico e premissas
+
+O frontend React/TypeScript está em `frontend/MotivaFit`; o backend Spring Boot está em `backend/MotivaFIt`. Os caminhos nas seções abaixo são relativos a essas pastas, salvo indicação contrária.
+
+- As telas usam estado local, listas fixas e `localStorage`. Login e cadastro locais não validam a senha no servidor; os privilégios administrativos são derivados de uma lista de e-mails no navegador.
+- Já existem clientes reutilizáveis em `src/lib/api/`: `http-client.ts`, `auth-api.ts`, `treinos-api.ts`, `catalogo-exercicios-api.ts` e `contracts.ts`. Eles ainda precisam ser conectados às telas.
+- `src/App.tsx` não registra `pagina-treinos.tsx`; a página principal usa fichas fixas de `workout-plans.ts`. É necessário conectar a navegação ao editor de treinos.
+- A documentação `frontend/MotivaFit/docs/integracao-backend.md` está parcialmente desatualizada: o backend já possui controllers de exercícios, registros diários e convites administrativos. Atualizá-la durante a implementação.
+- Inscrição em ficha, cópia de treino público, execução de exercício e conclusão de sessão são conceitos diferentes. Não converter um no outro silenciosamente.
+- Rotas explicitamente marcadas como **propostas** neste plano ainda precisam ser implementadas e ter seus contratos definidos. As demais foram identificadas no código; sua presença não comprova funcionamento em ambiente integrado.
+
+## 2. Sequência de entrega
+
+| Ordem | Entrega | Dependências |
+| --- | --- | --- |
+| 1 | Base HTTP, cookies, erros e configuração | Nenhuma |
+| 2 | Cadastro, login, restauração de sessão e perfis | 1 |
+| 3 | Consulta de catálogo e CRUD de treinos | 2; identificação de propriedade do treino |
+| 4 | Exercícios da ficha e cópia de treinos públicos | 3; correções de autorização e persistência |
+| 5 | Registros de execução, histórico e indicadores pessoais | 4; decisão sobre sessão concluída |
+| 6 | Convites e manutenção administrativa do catálogo | 2 e 3; correções de identidade nos convites |
+| 7 | Inscrições, gestão de alunos e relatórios globais | Contratos novos; decisão sobre inscrições e sessões |
+| 8 | Remoção dos fluxos locais e validação integrada | Funcionalidades do escopo escolhido prontas |
+
+As entregas 5 e 6 podem avançar independentemente após suas dependências. Cada entrega deve reunir contrato, backend quando necessário, cliente, tela e validação funcional.
+
+## 3. Base compartilhada de integração
+
+**Arquivos:** `src/lib/api/http-client.ts`, `contracts.ts`, `vite.config.ts`, `nginx.conf`; backend `config/SecurityConfig.java` e `controller/AuthController.java`.
+
+- [x] Configurar `VITE_API_BASE_URL` por ambiente e `CORS_ALLOWED_ORIGIN` com a origem exata do navegador. O Vite usa a porta 3000; o cliente usa a mesma origem como padrão, com proxy para o backend na porta 8080. Variáveis `VITE_*` são públicas e não devem conter segredos.
+- [x] Definir HTTPS e encaminhamento de `/api` no ambiente compartilhado, preferencialmente sob a mesma origem do frontend. O Nginx encaminha `/api` ao backend; HTTPS termina no proxy de entrada do ambiente. Definir a URL da API no build do Vite.
+- [x] Corrigir a acessibilidade do cookie CSRF: o cookie antigo usava `Path=/api/auth`, mas o frontend o lê com `document.cookie` em páginas como `/principal`. Usar `Path=/` para esse cookie e ajustar sua expiração no logout. Manter o refresh token `HttpOnly` restrito a `/api/auth`.
+- [x] Verificar também o host dos cookies: JavaScript do frontend não lê cookies de outro host. CORS sozinho não resolve isso. Preferir a mesma origem; se houver hosts distintos, definir explicitamente outra entrega segura do token CSRF.
+- [x] Preservar `credentials: include`, `Secure`, a política de `SameSite` apropriada à topologia e a validação de `Origin`/`X-CSRF-TOKEN` do backend. Definir configuração local compatível, sem depender de exceções específicas do navegador para HTTP.
+- [x] Centralizar erro de rede, `ApiError`, respostas inválidas e estados 400/401/403/404/409/500. Não converter indisponibilidade em lista vazia ou sucesso local.
+- [x] Implementar renovação compartilhada de sessão: uma requisição de refresh por vez, no máximo uma repetição da chamada protegida após 401, sem recursão em login/refresh/logout. Não repetir mutações automaticamente após falhas de rede ambíguas.
+- [ ] Usar estados de carregamento, vazio, erro recuperável e envio em andamento; limpar dados da conta anterior no logout/troca de usuário e descartar respostas atrasadas.
+
+**Implementação em 05/11/2026:** base HTTP/configuração concluída, com testes automatizados de concorrência, falhas, isolamento de sessão e cookies. O último item permanece pendente na camada visual e será aplicado ao conectar contexto/telas nas tarefas seguintes; a infraestrutura já emite mudança de sessão e descarta respostas antigas. O aceite completo no navegador e a instalação de HTTPS dependem do ambiente de destino. Consulte [configuração e limites](../frontend/MotivaFit/docs/integracao-backend.md).
+
+**Aceite:** login, refresh e logout funcionam no navegador na topologia escolhida; múltiplos 401 simultâneos não provocam várias rotações do refresh; erros são exibidos sem dados fictícios.
+
+## 4. Cadastro de conta
+
+**Tela/cliente:** `pages-user/pagina-cadastro.tsx`, `lib/auth-context.tsx`, `lib/api/auth-api.ts`.
+
+**Contrato existente:** `POST /api/auth/cadastro`, corpo `{ email, senha }`, resposta `UsuarioResponseDTO` com `id`, `email`, `perfil`, `ativo`.
+
+- [ ] Tornar o cadastro assíncrono e chamar `registerAccount`; não criar identidade usando `Date.now()`.
+- [ ] Alinhar validação de senha: a tela exige seis caracteres, enquanto o backend exige pelo menos 12, com maiúscula, minúscula, número e símbolo. Manter confirmação de senha apenas na interface.
+- [ ] Resolver o campo nome: a tela o exige, mas a API não o recebe nem retorna. Proposta inicial: retirar a obrigatoriedade e exibir e-mail; se nome persistido for requisito, adicionar campo, migration e DTOs antes de anunciá-lo como salvo.
+- [ ] Após cadastro, encaminhar para login. Caso seja adotado login automático, executar uma chamada real de login; a resposta do cadastro não contém token.
+- [ ] Tratar validação e e-mail duplicado sem perder o formulário ou navegar em caso de falha.
+
+**Aceite:** conta persistida permite login após recarregar a página; senha inválida e e-mail duplicado não criam sessão local.
+
+## 5. Login, logout, sessão e autorização da interface
+
+**Arquivos:** `pages-user/pagina-login.tsx`, `lib/auth-context.tsx`, `App.tsx`, `components/admin-layout.tsx` e pontos de logout.
+
+**Contratos existentes:** `POST /api/auth/login` com `{ email, senha }`; `POST /api/auth/refresh`; `POST /api/auth/logout`. Login/refresh retornam `{ token, expirationAt }`; logout retorna 204.
+
+- [ ] Substituir `login`, `cadastro` e `logout` síncronos do contexto por operações assíncronas e adaptar seus consumidores.
+- [ ] Manter access token em memória, usando o cliente existente; restaurar sessão no carregamento via refresh e cookies. Distinguir inicialização, autenticado e não autenticado para evitar redirecionamentos prematuros.
+- [ ] Usar `id`, `sub`, `perfil` e `ativo` das claims para apresentação. `readJwtUsuarioClaims` apenas decodifica o JWT; a autorização continua no servidor.
+- [ ] Representar os três perfis `USUARIO`, `ADMINISTRADOR` e `SUPERUSUARIO`. Remover `BANCO_ADMINS_PADRAO`, `isEmailAdmin` e a lista local como fonte de permissão.
+- [ ] Criar guarda específica de superusuário para `/admin/superusuario`, hoje protegida apenas por `RotaAdmin`, e ajustar menus.
+- [ ] No logout, limpar token, contexto e dados da conta mesmo se houver erro, mas informar quando não for possível confirmar a revogação remota.
+- [ ] Não restaurar autenticação a partir de `motivafit_user`. Planejar descarte das chaves de autenticação do protótipo.
+- [ ] Tratar “Esqueceu a senha?” como recurso pendente: não há fluxo de recuperação identificado. A liberação de `/api/auth/google` no SecurityConfig também não significa que exista implementação de login Google.
+
+**Aceite:** senha incorreta falha; recarga restaura sessão válida; expiração encerra sessão sem loop; usuário comum não abre áreas administrativas; administrador não abre a área de superusuário. Requisições diretas também respeitam permissões no servidor.
+
+## 6. Perfil e identificação do usuário
+
+**Estado atual:** não há endpoint de perfil atual/editável; os DTOs não incluem nome. O cadastro não fornece dados suficientes para as colunas administrativas de nome/data de cadastro.
+
+- [ ] Para a primeira entrega, usar identidade real do JWT e e-mail como identificação visual.
+- [ ] Se perfil editável fizer parte do escopo, definir **propostas** `GET /api/usuarios/me` e `PATCH /api/usuarios/me`, campos permitidos, validação e persistência de nome.
+- [ ] Impedir alteração de perfil de autorização pelo endpoint de edição pessoal; definir processo separado para e-mail/senha se necessário.
+
+**Aceite:** a identidade exibida corresponde à conta autenticada; nenhum campo aparece como persistido se estiver apenas no navegador.
+
+## 7. Catálogo de exercícios
+
+**Tela/cliente:** seletores de `pages-user/pagina-treinos.tsx` e `lib/api/catalogo-exercicios-api.ts`.
+
+**Contratos existentes:** `GET /api/catalogo-exercicios` e `GET /api/catalogo-exercicios/{id}`, autenticados. Resposta: `id`, `nome`, `modalidade`, `grupoMuscular`.
+
+- [ ] Trocar `CATALOGO_MOTIVAFIT` por consulta real e manter filtros de nome/grupo/modalidade.
+- [ ] Mapear `MUSCULACAO`/`AEROBICO` para rótulos da interface; manter IDs numéricos nos contratos e conversão explícita onde a UI usa strings.
+- [ ] Não inferir do catálogo `metaPadrao`, `metaRecordePadrao` ou `origem`: esses campos locais não existem no DTO. Metas devem ser informadas na ficha ou receber padrões de apresentação claramente definidos.
+- [ ] Resolver “Meus exercícios”: criação pessoal não é suportada pelo catálogo global atual. Proposta inicial: restringir o usuário comum à seleção do catálogo; se criação pessoal for requisito, implementar propriedade, visibilidade e rotas próprias antes de habilitá-la.
+
+**Aceite:** itens vêm do servidor, filtros funcionam e indisponibilidade oferece nova tentativa; usuário comum não ganha permissão de escrita no catálogo global.
+
+## 8. Criar, listar, editar e excluir treinos
+
+**Tela/cliente:** `pages-user/pagina-treinos.tsx`, `pages-user/pagina-principal.tsx`, `App.tsx`, `lib/api/treinos-api.ts`.
+
+**Contratos existentes:** `GET/POST /api/treinos`; `GET/PUT/DELETE /api/treinos/{id}`. Escrita recebe `{ nome, tipo, visibilidade? }`; resposta inclui `id`, `nome`, `tipo`, `visibilidade`, `createdAt`, `updatedAt`. Exclusão é lógica.
+
+- [ ] Registrar uma rota protegida para o editor, por exemplo `/treinos`, e conectar os links da página principal.
+- [ ] Substituir `TREINOS_INICIAIS` e `@motivafit:treinos` pelas operações do cliente existente.
+- [ ] Separar visualmente treinos próprios e públicos de terceiros: a listagem atual retorna ambos, mas o DTO não informa propriedade. Acrescentar indicador como `meuTreino`/`podeEditar` ou separar consultas no backend antes de exibir ações de edição.
+- [ ] Enviar enums e visibilidade reais; usar datas ISO retornadas pelo servidor e formatá-las apenas na apresentação.
+- [ ] Integrar a composição de exercícios conforme a seção seguinte. `TreinoResponseDTO` não contém a lista de exercícios.
+- [ ] Confirmar exclusão e atualizar a listagem apenas após sucesso. A edição/exclusão de treino de terceiros deve continuar bloqueada no backend, inclusive quando público.
+
+**Aceite:** CRUD persiste após recarga e nova sessão; treino público de terceiros é consultável, mas não editável; treino arquivado sai da listagem e seus registros históricos permanecem.
+
+## 9. Exercícios associados ao treino e metas
+
+**Backend existente:** `ExercicioController` e `ExercicioService`; `GET/POST /api/treinos/{treinoId}/exercicios`. Corpo de criação: `{ meta, metaRecorde?, treinoId, catalogoExercicioId }`; resposta inclui ID da associação e os mesmos campos.
+
+**Bloqueadores identificados:** o controller não aplica `@Valid`; o serviço não recebe o usuário autenticado nem verifica propriedade/visibilidade do treino. Não existem rotas de atualização/exclusão da associação.
+
+- [ ] Antes de conectar a escrita, receber o principal autenticado e validar leitura de treino próprio/público, escrita apenas no próprio, exclusão lógica do treino e catálogo ativo. Validar coerência entre `treinoId` da URL e do corpo, ou remover a duplicidade do contrato.
+- [ ] Aplicar `@Valid` e substituir `RuntimeException` genérica por erros de aplicação com status e mensagens adequados.
+- [ ] Implementar **propostas** `PUT/DELETE /api/treinos/{treinoId}/exercicios/{id}`, garantindo que a associação pertença ao treino autorizado e que a remoção preserve o histórico.
+- [ ] Criar `src/lib/api/exercicios-api.ts`; usar o ID da associação para editar/remover e `catalogoExercicioId` para obter nome/grupo. Não confundir os dois IDs.
+- [ ] Ao salvar a ficha, persistir cabeçalho e inclusões/alterações/remoções. Definir tratamento de falha parcial: manter rascunho e IDs já confirmados, mostrar pendências e evitar duplicar itens na repetição. Se o requisito for salvamento integral, criar operação transacional de ficha completa no backend.
+- [ ] Definir ordenação persistida caso a ordem dos exercícios seja relevante; o contrato atual não possui campo de posição.
+
+**Aceite:** ficha recarrega com suas metas e exercícios; falha intermediária não é anunciada como sucesso integral; outra conta não consulta exercícios de treino privado nem altera associações de terceiros; remoção não destrói registros anteriores.
+
+## 10. Treinos públicos, templates e inscrições em fichas
+
+**Existente:** `POST /api/treinos/{id}/adicionar` cria uma cópia privada de treino público de outro usuário. Copia exercícios de catálogo ativo, sem registros nem metas de recorde. Ainda falta cliente frontend para essa chamada.
+
+**Diferença de domínio:** `workout-enrollments.ts` registra inscrição por e-mail e ID de ficha. O backend não possui esse vínculo; copiar um treino não permite calcular inscritos por ficha de origem.
+
+- [ ] Adicionar operação de cópia em `treinos-api.ts`, usar a listagem real de treinos públicos e substituir templates fixos quando forem equivalentes a esses treinos.
+- [ ] Apresentar a ação existente como “Adicionar aos meus treinos”; atualizar a listagem usando o ID da cópia. Tratar 409 ao tentar copiar treino próprio e impedir duplo envio na interface.
+- [ ] Decidir se a experiência de inscrição permanece como requisito. Se permanecer, criar entidade/migration de inscrição com usuário, ficha de origem, estado e datas; definir unicidade e cancelamento sem perda de histórico.
+- [ ] Para inscrições, definir **propostas** `GET/POST /api/inscricoes` e `DELETE /api/inscricoes/{id}`, autorização do titular e resposta que permita identificar a ficha. Só então substituir `enrollInWorkoutPlan`, `leaveWorkoutPlan` e consultas locais.
+- [ ] Definir campos das fichas como descrição/frequência, hoje presentes em `WORKOUT_PLANS` e ausentes no DTO de treino. Persisti-los se necessários ou ajustar os cartões.
+
+**Aceite:** cópia é independente do original e não carrega recordes/histórico; se houver inscrição, inscrever/cancelar persiste entre dispositivos e não altera inscrições de outra conta. Contagem de inscritos não é inferida de cópias sem relação de origem.
+
+## 11. Execução de exercícios, conclusão e histórico pessoal
+
+**Existente:** `POST /api/registros` e `GET /api/registros?pagina=0&tamanho=50`, vinculados ao usuário autenticado. A listagem retorna array, com tamanho limitado a 100, sem envelope com total.
+
+**Contrato de criação:** `catalogoId`, `tempoS` e métricas por modalidade; opcionais `treinoId`, `exercicioId`, `cargaKg`, `repeticoes`, `series`, `distanciaM`, `executadoEm`, `chaveIdempotencia`, observadas as validações do serviço. `catalogoId` aqui corresponde ao item chamado `catalogoExercicioId` na associação da ficha.
+
+- [ ] Adicionar DTOs de registros em `contracts.ts` e criar `registros-api.ts`.
+- [ ] Criar formulário de execução com unidades explícitas: segundos, metros e quilogramas. Aplicar regras de musculação/aeróbico do `RegistroDiarioService`; não tentar extrair números de `meta`, que é texto livre.
+- [ ] Gerar chave de idempotência por execução e reutilizá-la ao repetir a mesma submissão. Usar IDs reais e somente vincular a treinos do usuário.
+- [ ] Carregar histórico paginado, oferecendo “Carregar mais” ou equivalente. Não interpretar apenas a primeira página como histórico completo.
+- [ ] Resolver o botão “Concluir treino”: o histórico local guarda uma conclusão de ficha, enquanto a API guarda uma execução de exercício. Proposta para preservar a experiência: criar sessão de treino com ID próprio, estado, início/conclusão e relação com registros, além de endpoint de conclusão idempotente e transacional. Contrato e migration ainda precisam ser definidos.
+- [ ] Até existir sessão, exibir registros como execuções de exercícios. Não contabilizar cada exercício como um treino concluído nem agrupar por dia como se isso identificasse uma sessão.
+- [ ] Substituir `workout-history.ts` como fonte de dados e recalcular indicadores de `pagina-principal.tsx` a partir da API. Para sequência de dias, definir fuso de negócio (proposta: `America/Sao_Paulo`) e testar virada de dia. Para totais, consultar todas as páginas necessárias ou criar agregação no backend.
+
+**Aceite:** registro persiste e repetição com a mesma chave não duplica; cada modalidade valida suas métricas; histórico mostra apenas a conta atual; arquivamento do treino preserva nomes históricos; totais e sequência não dependem do navegador ou de uma página incompleta.
+
+## 12. Convites e promoção de administradores
+
+**Tela:** `pages-admin/pagina-superusuario.tsx`; substituir `adicionarAdmin` local.
+
+**Contratos existentes:** `POST /api/admin/convites` com `{ convidadorId, email }`, restrito a `SUPERUSUARIO`, retorna `{ id, email, token, expiraEm }`; `POST /api/admin/convites/aceite` com `{ usuarioId, token }`, autenticado, retorna 204.
+
+- [ ] Corrigir o backend para derivar convidador/beneficiário do principal, ou validar igualdade com os IDs enviados. Atualmente o serviço usa os IDs do corpo sem vinculá-los à identidade autenticada.
+- [ ] Criar `admin-api.ts` e DTOs de convite; trocar cadastro local de e-mail por emissão de convite, exibindo validade e link/token de forma controlada. A API atual devolve token; não pressupor envio de e-mail implementado.
+- [ ] Criar tela de aceite com preservação do convite durante login/cadastro, sem permitir promoção direta pelo navegador.
+- [ ] Após aceite, renovar a sessão para refletir o novo perfil. Tratar convite expirado, já usado, e-mail incompatível e convite pendente duplicado.
+- [ ] Se for necessária lista de administradores/convites, definir endpoints novos; os POSTs existentes não fornecem essa listagem.
+
+**Aceite:** apenas superusuário emite convites; usuário autenticado aceita somente para a própria conta elegível; adulterar IDs não muda convidador/beneficiário; perfil atualizado sobrevive à recarga.
+
+## 13. Manutenção administrativa do catálogo
+
+**Existente:** `POST /api/admin/catalogo-exercicios`, `PUT/DELETE /api/admin/catalogo-exercicios/{id}`, restritos a `ADMINISTRADOR` e `SUPERUSUARIO`. Corpo de criação/edição: `{ nome, modalidade, grupoMuscular }`; DELETE desativa o item.
+
+- [ ] Criar seção administrativa de catálogo, usando o cliente já existente e guarda de perfil.
+- [ ] Integrar criação, edição e confirmação de desativação; invalidar consultas do catálogo após sucesso.
+- [ ] Definir se será necessário visualizar itens inativos; a consulta de catálogo disponível não deve ser presumida uma listagem administrativa completa.
+- [ ] Preservar associações/histórico existentes e impedir seleção de item inativo em novas inclusões.
+
+**Aceite:** alterações aparecem nos seletores reais; usuário comum recebe 403 ao tentar escrever; desativação não apaga registros históricos.
+
+## 14. Gestão administrativa de alunos e fichas
+
+**Telas:** `pages-admin/pagina-dashboard-admin.tsx`, `pagina-treinos-admin.tsx`. Usuários vivem em estado React; fichas e contagens vêm de dados locais; “Gerenciar Ficha” está desabilitado.
+
+- [ ] Definir **propostas** `GET/POST /api/admin/usuarios` e `PATCH /api/admin/usuarios/{id}/status`, com busca, paginação, filtros e permissões explícitas. Não usar cadastro público para simular provisionamento administrativo sem definir ativação/credenciais.
+- [ ] Definir contrato para nome, e-mail, status e data de cadastro; decidir se a ação de excluir será desativação ou outro fluxo, preservando histórico.
+- [ ] Garantir que desativação bloqueie acesso/renovação de sessão conforme a política implementada e que administradores não possam escalar privilégios por esse fluxo.
+- [ ] Definir gestão de fichas oficiais: propriedade, quem pode editar e campos necessários. O CRUD pessoal de treinos não concede administração global sobre treinos de alunos.
+- [ ] Integrar contagens de inscritos somente após implementar o vínculo descrito na seção 10; habilitar “Gerenciar Ficha” apenas quando houver fluxo completo.
+
+**Aceite:** busca, criação e mudança de status persistem; ações indevidas são bloqueadas no servidor; dados e contagens são consistentes em navegadores diferentes.
+
+## 15. Relatórios e métricas administrativas
+
+**Tela:** `pages-admin/pagina-relatorios-admin.tsx`, além dos cartões do dashboard. Não existem endpoints agregados administrativos identificados.
+
+- [ ] Definir **propostas** `GET /api/admin/relatorios/resumo` e `GET /api/admin/relatorios/alunos`, restritos aos perfis administrativos, com período, paginação e filtros.
+- [ ] Especificar fórmulas antes de implementar: alunos identificados, inscrições ativas, sessões concluídas, última sessão e alunos ativos nos últimos 30 dias; decidir se atividade usa sessão concluída ou execução registrada e ajustar os rótulos.
+- [ ] Agregar no backend por ID estável de usuário, com datas e fuso acordados. Não buscar registros de todas as contas pelo endpoint pessoal nem atribuir identidade por e-mail armazenado no navegador.
+- [ ] Remover cálculos globais baseados em `getWorkoutHistory`/`getWorkoutEnrollments` e eventos de `localStorage`.
+- [ ] Exibir carregamento, ausência de dados e falha de consulta separadamente; permitir repetição e manter filtros.
+
+**Aceite:** totais batem com conjunto conhecido no banco, incluindo limites de período e múltiplas execuções na mesma sessão; usuário comum não consulta relatórios; resultados não dependem de dados locais.
+
+## 16. Validação e encerramento da integração
+
+- [ ] Atualizar testes de controllers/services afetados e adicionar cenários de autorização entre duas contas, sobretudo em exercícios e convites.
+- [ ] Introduzir infraestrutura de testes frontend para fluxos de sessão e formulários; o `package.json` atual não possui script de testes. Priorizar comportamento de falha, restauração e prevenção de duplicidade.
+- [ ] Executar testes do backend (`./mvnw test`, em `backend/MotivaFIt`, com as dependências de ambiente necessárias), build (`npm run build`) e lint (`npm run lint`) do frontend.
+- [ ] Validar no navegador com backend e banco reais: cadastro → login → catálogo → ficha com exercícios → execução → histórico → recarga → logout; executar também os fluxos administrativos com cada perfil.
+- [ ] Cobrir cookies/CSRF, sessão expirada, indisponibilidade, duplo envio, falha parcial, listas vazias e acesso por outra conta. Testar persistência em outro navegador/dispositivo.
+- [ ] Retirar listas fixas e persistência local de domínio das funcionalidades integradas. Preferências visuais, como tema, podem permanecer locais. Não importar silenciosamente histórico/identidades fictícias; se houver migração, definir mapeamento, consentimento e deduplicação separados.
+- [ ] Atualizar a documentação antiga e exemplos de ambiente, sem incluir credenciais. Registrar funcionalidades adiadas e impedir que seus botões aparentem sucesso local.
+
+**Concluído quando:** cada funcionalidade do escopo aprovado usa dados persistidos da API, possui autorização no servidor, estados de falha visíveis e critérios de aceite verificados. Este plano foi produzido por inspeção estática; não foram executados testes nem comprovada a operação conjunta dos serviços nesta etapa.

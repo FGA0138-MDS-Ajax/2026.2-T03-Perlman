@@ -145,13 +145,6 @@ export default function PaginaPrincipal() {
                         <Home className="h-4 w-4" />
                         Início
                     </Button>
-<<<<<<< HEAD
-                    <Button variant="ghost" className="justify-start gap-2.5" asChild>
-                        <Link to="/treinos">
-                            <Dumbbell className="h-4 w-4" />
-                            Meus Treinos
-                        </Link>
-=======
                     <Button
                         variant="ghost"
                         className="justify-start gap-2.5"
@@ -161,7 +154,6 @@ export default function PaginaPrincipal() {
                     >
                         <Dumbbell className="h-4 w-4" />
                         Meus Treinos
->>>>>>> developer
                     </Button>
                     <Separator className="my-3" />
 

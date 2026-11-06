@@ -4,11 +4,15 @@ services:
     working_dir: /app
     init: true
     ports:
-      - "5173:5173"
+      - "3000:3000"
+    environment:
+      API_PROXY_TARGET: http://host.docker.internal:8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - .:/app
       - frontend_node_modules:/app/node_modules
-    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 5173 --strictPort"
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 3000 --strictPort"
 
 volumes:
   frontend_node_modules:
