@@ -1,6 +1,6 @@
 # Integração com o backend
 
-A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login, restauração de sessão, logout, guardas por perfil, consulta do catálogo, CRUD de treinos, ficha de exercícios e cópia de treino público já estão conectados. Os demais clientes serão conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
+A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login, restauração de sessão, logout, guardas por perfil, consulta do catálogo, CRUD de treinos, ficha de exercícios, cópia de treino público, registro de execução, histórico paginado e indicadores pessoais já estão conectados. Os demais clientes serão conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
 
 ## Desenvolvimento local
 
@@ -49,11 +49,11 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 - Datas do servidor são formatadas em `America/Sao_Paulo`. `@motivafit:treinos` e `@motivafit:meus-exercicios` são removidas ao abrir a tela.
 - Na mesma tela, após criar ou atualizar o treino, a ficha envia inclusões, alterações de meta e remoções. O id da associação edita ou remove; `catalogoExercicioId` só identifica o item do catálogo. Falha no meio mantém o que já foi confirmado e a repetição não reenvia essa parte. A ordem exibida é a de inclusão.
 - Treino público de outra pessoa oferece “Adicionar aos meus treinos” (`POST /api/treinos/{id}/adicionar`). A cópia é outro treino privado, sem recordes nem histórico. Inscrição, descrição e frequência das fichas locais continuam só no navegador.
-- A tela de realizar treino envia cada exercício a `POST /api/registros`. Histórico paginado e os indicadores da página principal ainda não usam essa API.
+- A tela de realizar treino envia cada exercício a `POST /api/registros`, com minutos convertidos para `tempoS`, carga em kg e distância em m. A chave de idempotência é reutilizada na repetição da mesma gravação. O histórico da página principal usa `GET /api/registros` com “Carregar mais”. Os indicadores percorrem todas as páginas e usam o fuso `America/Sao_Paulo`. Não há conclusão de sessão: cada linha é uma execução de exercício.
 
 ## Funcionalidades existentes e próximas integrações
 
-Os clientes existentes cobrem autenticação, CRUD de treinos, catálogo, ficha de exercícios e cópia de treino público. Perfil editável, inscrições, sessões concluídas e relatórios agregados ainda exigem contratos novos. Convites administrativos continuam na entrega própria.
+Os clientes existentes cobrem autenticação, CRUD de treinos, catálogo, ficha de exercícios, cópia de treino público e execuções. Perfil editável, inscrições, sessões concluídas e relatórios agregados ainda exigem contratos novos. Convites administrativos continuam na entrega própria. Os painéis administrativos ainda leem o histórico local antigo.
 
 `readJwtUsuarioClaims` apenas decodifica o JWT para apresentação. A autorização efetiva é responsabilidade do backend.
 

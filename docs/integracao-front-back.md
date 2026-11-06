@@ -21,12 +21,12 @@ O frontend React/TypeScript está em `frontend/MotivaFit`; o backend Spring Boot
 | 2 | Cadastro, login, restauração de sessão e perfis — implementado | 1 |
 | 3 | Consulta de catálogo e CRUD de treinos — implementado | 2; identificação de propriedade do treino |
 | 4 | Exercícios da ficha e cópia de treinos públicos — implementado | 3; correções de autorização e persistência |
-| 5 | Registros de execução, histórico e indicadores pessoais | 4; decisão sobre sessão concluída |
-| 6 | Convites e manutenção administrativa do catálogo | 2 e 3; correções de identidade nos convites |
-| 7 | Inscrições, gestão de alunos e relatórios globais | Contratos novos; decisão sobre inscrições e sessões |
-| 8 | Remoção dos fluxos locais e validação integrada | Funcionalidades do escopo escolhido prontas |
+| 5 | Registros de execução, histórico e indicadores pessoais — implementado | 4; decisão sobre sessão concluída |
+| 6 | Convites e manutenção administrativa do catálogo — pendente | 2 e 3; correções de identidade nos convites |
+| 7 | Inscrições, gestão de alunos e relatórios globais — pendente; parte sem contrato no backend | Contratos novos; decisão sobre inscrições e sessões |
+| 8 | Remoção dos fluxos locais e validação integrada — pendente | Funcionalidades do escopo escolhido prontas |
 
-As entregas 5 e 6 podem avançar independentemente após suas dependências. Cada entrega deve reunir contrato, backend quando necessário, cliente, tela e validação funcional.
+As entregas 5 e 6 podem avançar independentemente após suas dependências. Cada entrega deve reunir contrato, backend quando necessário, cliente, tela e validação funcional. O inventário do que ainda falta, conferido no código em 06/11/2026, está na seção 17.
 
 ## 3. Base compartilhada de integração
 
@@ -161,13 +161,15 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 
 **Contrato de criação:** `catalogoId`, `tempoS` e métricas por modalidade; opcionais `treinoId`, `exercicioId`, `cargaKg`, `repeticoes`, `series`, `distanciaM`, `executadoEm`, `chaveIdempotencia`, observadas as validações do serviço. `catalogoId` aqui corresponde ao item chamado `catalogoExercicioId` na associação da ficha.
 
-- [ ] Adicionar DTOs de registros em `contracts.ts` e criar `registros-api.ts`.
-- [ ] Criar formulário de execução com unidades explícitas: segundos, metros e quilogramas. Aplicar regras de musculação/aeróbico do `RegistroDiarioService`; não tentar extrair números de `meta`, que é texto livre.
-- [ ] Gerar chave de idempotência por execução e reutilizá-la ao repetir a mesma submissão. Usar IDs reais e somente vincular a treinos do usuário.
-- [ ] Carregar histórico paginado, oferecendo “Carregar mais” ou equivalente. Não interpretar apenas a primeira página como histórico completo.
-- [ ] Resolver o botão “Concluir treino”: o histórico local guarda uma conclusão de ficha, enquanto a API guarda uma execução de exercício. Proposta para preservar a experiência: criar sessão de treino com ID próprio, estado, início/conclusão e relação com registros, além de endpoint de conclusão idempotente e transacional. Contrato e migration ainda precisam ser definidos.
-- [ ] Até existir sessão, exibir registros como execuções de exercícios. Não contabilizar cada exercício como um treino concluído nem agrupar por dia como se isso identificasse uma sessão.
-- [ ] Substituir `workout-history.ts` como fonte de dados e recalcular indicadores de `pagina-principal.tsx` a partir da API. Para sequência de dias, definir fuso de negócio (proposta: `America/Sao_Paulo`) e testar virada de dia. Para totais, consultar todas as páginas necessárias ou criar agregação no backend.
+- [x] Adicionar DTOs de registros em `contracts.ts` e criar `registros-api.ts`.
+- [x] Criar formulário de execução com unidades explícitas: segundos, metros e quilogramas. Aplicar regras de musculação/aeróbico do `RegistroDiarioService`; não tentar extrair números de `meta`, que é texto livre.
+- [x] Gerar chave de idempotência por execução e reutilizá-la ao repetir a mesma submissão. Usar IDs reais e somente vincular a treinos do usuário.
+- [x] Carregar histórico paginado, oferecendo “Carregar mais” ou equivalente. Não interpretar apenas a primeira página como histórico completo.
+- [x] Resolver o botão “Concluir treino”: o histórico local guarda uma conclusão de ficha, enquanto a API guarda uma execução de exercício. Proposta para preservar a experiência: criar sessão de treino com ID próprio, estado, início/conclusão e relação com registros, além de endpoint de conclusão idempotente e transacional. Contrato e migration ainda precisam ser definidos.
+- [x] Até existir sessão, exibir registros como execuções de exercícios. Não contabilizar cada exercício como um treino concluído nem agrupar por dia como se isso identificasse uma sessão.
+- [x] Substituir `workout-history.ts` como fonte de dados e recalcular indicadores de `pagina-principal.tsx` a partir da API. Para sequência de dias, definir fuso de negócio (proposta: `America/Sao_Paulo`) e testar virada de dia. Para totais, consultar todas as páginas necessárias ou criar agregação no backend.
+
+**Implementação da tarefa 5:** `registros-api.ts` cria com `POST /api/registros` e lista com `GET /api/registros`. A tela de realizar treino pede minutos e envia `tempoS` em segundos; carga fica em kg e distância em m. A meta continua texto e não é interpretada como número. Cada exercício pendente ganha uma chave e a reutiliza se aquela gravação falhar. Não foi criada sessão de treino, porque o contrato e a migration continuam em aberto. O botão que gravava “treino concluído” no navegador saiu da página principal. O histórico lista execuções, mostra o nome do exercício e o nome do treino gravados no registro, e oferece “Carregar mais” enquanto a página voltar cheia. Os totais percorrem todas as páginas de 100. Semana e sequência usam `America/Sao_Paulo`. A sequência conta dias com execução e não trata o dia como sessão. Inscrições locais permanecem. `workout-history.ts` continua só nos relatórios administrativos, que são a entrega 7.
 
 **Aceite:** registro persiste e repetição com a mesma chave não duplica; cada modalidade valida suas métricas; histórico mostra apenas a conta atual; arquivamento do treino preserva nomes históricos; totais e sequência não dependem do navegador ou de uma página incompleta.
 
@@ -223,7 +225,7 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 ## 16. Validação e encerramento da integração
 
 - [ ] Atualizar testes de controllers/services afetados e adicionar cenários de autorização entre duas contas, sobretudo em exercícios e convites.
-- [ ] Introduzir infraestrutura de testes frontend para fluxos de sessão e formulários; o `package.json` atual não possui script de testes. Priorizar comportamento de falha, restauração e prevenção de duplicidade.
+- [ ] Manter os testes de frontend já existentes (`npm run test:ui` em `frontend/MotivaFit`) e ampliá-los para convite, catálogo administrativo e relatórios quando essas telas existirem. O script de testes já existe; a validação integrada no navegador com backend real continua pendente.
 - [ ] Executar testes do backend (`./mvnw test`, em `backend/MotivaFIt`, com as dependências de ambiente necessárias), build (`npm run build`) e lint (`npm run lint`) do frontend.
 - [ ] Validar no navegador com backend e banco reais: cadastro → login → catálogo → ficha com exercícios → execução → histórico → recarga → logout; executar também os fluxos administrativos com cada perfil.
 - [ ] Cobrir cookies/CSRF, sessão expirada, indisponibilidade, duplo envio, falha parcial, listas vazias e acesso por outra conta. Testar persistência em outro navegador/dispositivo.
@@ -231,3 +233,39 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 - [ ] Atualizar a documentação antiga e exemplos de ambiente, sem incluir credenciais. Registrar funcionalidades adiadas e impedir que seus botões aparentem sucesso local.
 
 **Concluído quando:** cada funcionalidade do escopo aprovado usa dados persistidos da API, possui autorização no servidor, estados de falha visíveis e critérios de aceite verificados. Este plano foi produzido por inspeção estática; não foram executados testes nem comprovada a operação conjunta dos serviços nesta etapa.
+
+## 17. O que ainda falta integrar
+
+Conferido em 06/11/2026. As entregas 1 a 5 estão nas telas do aluno: cadastro, login, sessão, catálogo para montar treino, CRUD de treino, ficha, cópia de treino público, execução e histórico pessoal em `/principal`. A meta da ficha é numérica na tela e continua gravada no texto `meta` que a API já aceita.
+
+O backend não está completo para todas as telas administrativas e para os requisitos posteriores ao MVP. Só dá para ligar uma tela nova onde o controller já existe. Onde não há endpoint, a tela continua local e não deve aparentar que gravou no servidor.
+
+### Telas ainda não feitas, com API já existente
+
+- Catálogo administrativo. O backend expõe `POST`, `PUT` e `DELETE /api/admin/catalogo-exercicios`, e o cliente já tem `criarExercicioCatalogo`, `atualizarExercicioCatalogo` e `desativarExercicioCatalogo`. Não há rota nem tela. O menu **Treinos** (`/admin/treinos`) não é essa manutenção: ele lista as três fichas fixas de `workout-plans.ts`.
+- Convite de administrador. `POST /api/admin/convites` existe e é restrito a `SUPERUSUARIO`. A rota `/admin/superusuario` só avisa que a emissão estará disponível em breve. Falta o formulário de e-mail, a exibição controlada do token e da validade, e o tratamento de convite duplicado. O corpo ainda manda `convidadorId`; a entrega 6 continua exigindo que o servidor use a identidade autenticada.
+- Aceite do convite. `POST /api/admin/convites/aceite` existe. Não há rota de aceite, nem preservação do token durante login ou cadastro, nem renovação da sessão depois da promoção.
+
+### Telas que existem, mas ainda não falam com o backend
+
+- `/admin` (`pagina-dashboard-admin.tsx`) cria, busca e apaga alunos só no estado da página. Os cartões usam `getWorkoutHistory` e `getWorkoutEnrollments`. Não há `GET` ou `PATCH /api/admin/usuarios`.
+- `/admin/treinos` conta inscrições dessas fichas no `localStorage`. **Gerenciar Ficha** não tem fluxo. Não há API de inscrição nem de ficha oficial.
+- `/admin/relatorios` calcula frequência, ranking e exercícios a partir do histórico local. Não há `GET /api/admin/relatorios/resumo` nem `GET /api/admin/relatorios/alunos`.
+- `/principal` ainda oferece inscrição nas três fichas fixas. Isso não é requisito da Visão e não tem API. A cópia de treino público já está em `/treinos`.
+
+### Requisitos até a Sprint 7 sem tela e sem endpoint
+
+- RF-12, Should: gráficos de evolução de carga, frequência e pace ao longo do tempo. `/principal` só mostra execuções na semana e a sequência de dias. Os registros já vêm de `GET /api/registros`; não existe endpoint de série temporal.
+- RF-14 a RF-17, painel administrativo: usuários ativos em 30 dias, frequência média, ranking dos dez por tempo e os três exercícios mais feitos. As telas atuais não consultam o banco.
+- RF-18 e RF-19, Should: criar e remover desafio entre amigos. Não há rota, página nem controller.
+
+### Fora desse conjunto, também sem contrato
+
+- Recuperação de senha: o login aponta o recurso como pendente. Não há endpoint.
+- Login com Google (RF-24, Could, Sprint 9): a liberação em `SecurityConfig` não é uma implementação.
+- Sessão de treino concluído: não há entidade nem endpoint. O histórico lista execuções de exercício, como a entrega 5 decidiu.
+- Recorde calculado (RF-20, Sprint 8) e conquistas (RF-22, Sprint 9) não entram na integração até a Sprint 7.
+
+### O que retirar quando as telas acima forem reais
+
+`workout-plans.ts`, `workout-enrollments.ts` e `workout-history.ts` deixam de ser fonte de domínio. Tema pode continuar no navegador. Botões dessas telas não devem confirmar uma gravação que só existiu na página.

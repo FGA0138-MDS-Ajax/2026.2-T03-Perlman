@@ -95,8 +95,16 @@ export interface RegistroDiarioRequestDTO {
 export interface RegistroDiarioResponseDTO {
     id: number;
     catalogoId: number;
+    treinoId: number | null;
+    exercicioId: number | null;
+    treinoNome: string | null;
     exercicioNome: string;
+    cargaKg: number | null;
+    repeticoes: number | null;
+    series: number | null;
     tempoS: number;
+    distanciaM: number | null;
+    executadoEm: string;
 }
 
 export interface ApiErroResponse {

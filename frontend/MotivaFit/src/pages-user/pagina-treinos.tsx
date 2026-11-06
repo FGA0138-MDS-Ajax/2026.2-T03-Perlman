@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Dumbbell, Home, LogOut, Play, Plus, Shield, Trash2, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,8 @@ import { ApiError } from "@/lib/api/http-client";
 import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
 import { adicionarExercicioAoTreino, atualizarExercicioDoTreino, listarExerciciosDoTreino, removerExercicioDoTreino } from "@/lib/api/exercicios-api";
 import { atualizarTreino, copiarTreinoPublico, criarTreino, excluirTreino, listarTreinos } from "@/lib/api/treinos-api";
-import type { CatalogoExercicioResponseDTO, ExercicioResponseDTO, TipoTreinoBackend, TreinoResponseDTO, VisibilidadeBackend } from "@/lib/api/contracts";
+import type { CatalogoExercicioResponseDTO, ExercicioResponseDTO, ModalidadeBackend, TipoTreinoBackend, TreinoResponseDTO, VisibilidadeBackend } from "@/lib/api/contracts";
+import { camposVazios, formatarMetaVisivel, lerMeta, paceDosCampos, serializarMeta, validarMeta, type CamposMeta } from "@/lib/meta-exercicio";
 import {
     ROTULO_TIPO,
     ROTULO_VISIBILIDADE,
@@ -81,35 +82,34 @@ function iniciais(email: string): string {
 type ExercicioSelecionado = {
     chave: string;
     catalogoExercicioId: number;
-    meta: string;
-    metaRecorde: string;
+    modalidade: ModalidadeBackend;
+    campos: CamposMeta;
     metaOriginal: string;
-    recordeOriginal: string;
+    metaRecorde: string;
     persistidoId: number | null;
     removido: boolean;
 };
 
+function metaDoItem(item: ExercicioSelecionado): string {
+    return serializarMeta(item.campos) ?? "";
+}
+
 function validarExerciciosSelecionados(itens: ExercicioSelecionado[], nomeDe: (id: number) => string): string | null {
     for (const item of itens) {
         if (item.removido) continue;
-        const nome = nomeDe(item.catalogoExercicioId);
-        const meta = item.meta.trim();
-        if (!meta) return `Informe a meta de ${nome}.`;
-        if (meta.length > 255) return `A meta de ${nome} deve ter no máximo 255 caracteres.`;
-        if (item.metaRecorde.trim().length > 255) return `O recorde de ${nome} deve ter no máximo 255 caracteres.`;
+        const erro = validarMeta(item.campos, nomeDe(item.catalogoExercicioId));
+        if (erro) return erro;
     }
     return null;
 }
 
 function exercicioAlterado(item: ExercicioSelecionado): boolean {
-    return item.persistidoId !== null
-        && !item.removido
-        && (item.meta.trim() !== item.metaOriginal || item.metaRecorde.trim() !== item.recordeOriginal);
+    return item.persistidoId !== null && !item.removido && metaDoItem(item) !== item.metaOriginal;
 }
 
 function pedidoDoExercicio(treinoId: number, item: ExercicioSelecionado) {
     return {
-        meta: item.meta.trim(),
+        meta: metaDoItem(item),
         metaRecorde: item.metaRecorde.trim() || null,
         treinoId,
         catalogoExercicioId: item.catalogoExercicioId,
@@ -117,14 +117,12 @@ function pedidoDoExercicio(treinoId: number, item: ExercicioSelecionado) {
 }
 
 function confirmarExercicio(item: ExercicioSelecionado, resposta: ExercicioResponseDTO): ExercicioSelecionado {
-    const recorde = resposta.metaRecorde ?? "";
     return {
         ...item,
         persistidoId: resposta.id,
-        meta: resposta.meta,
-        metaRecorde: recorde,
+        campos: lerMeta(item.modalidade, resposta.meta) ?? item.campos,
         metaOriginal: resposta.meta,
-        recordeOriginal: recorde,
+        metaRecorde: resposta.metaRecorde ?? "",
         removido: false,
     };
 }
@@ -195,7 +193,15 @@ export default function PaginaTreinos() {
     const copiaEmAndamento = useRef(false);
     const formularioRef = useRef<HTMLDivElement>(null);
     const levarAoTreino = useRef(false);
+    const location = useLocation();
+    const meusTreinosRef = useRef<HTMLDivElement>(null);
     const [aba, setAba] = useState<"conta" | "publicos">("conta");
+    const [pedidoRealizar, setPedidoRealizar] = useState<string | null>(null);
+    const realizarPedido = Boolean((location.state as { realizar?: boolean } | null)?.realizar);
+    if (realizarPedido && pedidoRealizar !== location.key) {
+        setPedidoRealizar(location.key);
+        setAba("conta");
+    }
 
     useEffect(() => {
         montado.current = true;
@@ -210,6 +216,11 @@ export default function PaginaTreinos() {
         levarAoTreino.current = false;
         formularioRef.current?.scrollIntoView?.({ block: "start" });
     }, [aba, formularioAberto, editando]);
+
+    useEffect(() => {
+        if (!realizarPedido || aba !== "conta" || treinos.status !== "sucesso") return;
+        meusTreinosRef.current?.scrollIntoView?.({ block: "start" });
+    }, [realizarPedido, location.key, aba, treinos.status]);
 
     useEffect(() => {
         if (treinos.status !== "sucesso") return;
@@ -256,16 +267,19 @@ export default function PaginaTreinos() {
         void listarExerciciosDoTreino(treino.id).then(
             (lista) => {
                 if (!montado.current) return;
-                setSelecionados(lista.map((item) => ({
-                    chave: `salvo-${item.id}`,
-                    catalogoExercicioId: item.catalogoExercicioId,
-                    meta: item.meta,
-                    metaRecorde: item.metaRecorde ?? "",
-                    metaOriginal: item.meta,
-                    recordeOriginal: item.metaRecorde ?? "",
-                    persistidoId: item.id,
-                    removido: false,
-                })));
+                setSelecionados(lista.map((item) => {
+                    const modalidade = itensCatalogo.find((catalogo) => catalogo.id === item.catalogoExercicioId)?.modalidade ?? treino.tipo;
+                    return {
+                        chave: `salvo-${item.id}`,
+                        catalogoExercicioId: item.catalogoExercicioId,
+                        modalidade,
+                        campos: lerMeta(modalidade, item.meta) ?? camposVazios(modalidade),
+                        metaOriginal: item.meta,
+                        metaRecorde: item.metaRecorde ?? "",
+                        persistidoId: item.id,
+                        removido: false,
+                    };
+                }));
             },
             (error: unknown) => {
                 if (!montado.current || ignorarConsulta(error)) return;
@@ -278,10 +292,10 @@ export default function PaginaTreinos() {
         setSelecionados((atual) => [...atual, {
             chave: `novo-${item.id}-${atual.length}-${Date.now()}`,
             catalogoExercicioId: item.id,
-            meta: "",
-            metaRecorde: "",
+            modalidade: item.modalidade,
+            campos: camposVazios(item.modalidade),
             metaOriginal: "",
-            recordeOriginal: "",
+            metaRecorde: "",
             persistidoId: null,
             removido: false,
         }]);
@@ -410,7 +424,7 @@ export default function PaginaTreinos() {
                         <Link to="/treinos"><Dumbbell className="h-4 w-4" />Meus Treinos</Link>
                     </Button>
                     <Button variant="ghost" className="justify-start gap-2.5" asChild>
-                        <Link to="/treinos"><Play className="h-4 w-4" />Realizar treino</Link>
+                        <Link to="/treinos" state={{ realizar: true }}><Play className="h-4 w-4" />Realizar treino</Link>
                     </Button>
                     {isAdmin && (
                         <>
@@ -488,7 +502,7 @@ export default function PaginaTreinos() {
                                 <CardHeader>
                                     <CardTitle>{editando ? "Editar treino" : "Novo treino"}</CardTitle>
                                     <CardDescription>
-                                        O treino é gravado primeiro. Cada exercício escolhido é associado em seguida, com a meta informada.
+                                        O treino é gravado primeiro. Cada exercício escolhido é associado em seguida, com a meta numérica da modalidade.
                                     </CardDescription>
                                 </CardHeader>
                                 <form onSubmit={(event) => { void salvarTreino(event); }}>
@@ -540,8 +554,7 @@ export default function PaginaTreinos() {
                                             <ExerciciosSelecionados
                                                 itens={selecionados}
                                                 nomeDe={nomeDoCatalogo}
-                                                onMeta={(chave, meta) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, meta } : item))}
-                                                onRecorde={(chave, metaRecorde) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, metaRecorde } : item))}
+                                                onCampo={(chave, campo, valor) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, campos: { ...item.campos, [campo]: valor } } : item))}
                                                 onRemover={(chave) => setSelecionados((atual) => atual.flatMap((item) => {
                                                     if (item.chave !== chave) return [item];
                                                     if (item.persistidoId === null) return [];
@@ -571,7 +584,7 @@ export default function PaginaTreinos() {
                         <div className="space-y-6">
                             {erroCopia && <p role="alert" className="text-sm text-destructive">{erroCopia}</p>}
                             {treinos.status === "sucesso" && aba == "conta" && (
-
+                                <div ref={meusTreinosRef} id="meus-treinos">
                                 <ListaTreinos
                                     titulo="Meus treinos"
                                     vazio="Nenhum treino criado."
@@ -581,6 +594,7 @@ export default function PaginaTreinos() {
                                     onEditar={abrirEdicao}
                                     onExcluir={(treino) => { setErroExclusao(""); setExclusao(treino); }}
                                 />
+                                </div>
                             )}
 
                             {treinos.status === "sucesso" && aba == "publicos" && (
@@ -650,7 +664,7 @@ function ExerciciosVisiveis({
     return (
         <ul className="space-y-1 text-sm">
             {ficha.dados.map((item) => (
-                <li key={item.id}>{nomeDe(item.catalogoExercicioId)} — {item.meta}{item.metaRecorde ? ` · recorde ${item.metaRecorde}` : ""}</li>
+                <li key={item.id}>{nomeDe(item.catalogoExercicioId)} — {formatarMetaVisivel(item.meta)}</li>
             ))}
         </ul>
     );
@@ -659,15 +673,13 @@ function ExerciciosVisiveis({
 function ExerciciosSelecionados({
     itens,
     nomeDe,
-    onMeta,
-    onRecorde,
+    onCampo,
     onRemover,
     onDesfazer,
 }: {
     itens: ExercicioSelecionado[];
     nomeDe: (id: number) => string;
-    onMeta: (chave: string, meta: string) => void;
-    onRecorde: (chave: string, recorde: string) => void;
+    onCampo: (chave: string, campo: string, valor: string) => void;
     onRemover: (chave: string) => void;
     onDesfazer: (chave: string) => void;
 }) {
@@ -680,7 +692,8 @@ function ExerciciosSelecionados({
                 <ul className="space-y-3">
                     {itens.map((item) => {
                         const nome = nomeDe(item.catalogoExercicioId);
-                        const idMeta = `meta-${item.chave}`;
+                        const pace = paceDosCampos(item.campos);
+                        const metaAnterior = item.metaOriginal && !lerMeta(item.modalidade, item.metaOriginal) ? item.metaOriginal : "";
                         return (
                             <li key={item.chave} className="space-y-2 rounded-lg border p-3">
                                 <p className="text-sm font-medium">{nome}</p>
@@ -691,14 +704,20 @@ function ExerciciosSelecionados({
                                     </>
                                 ) : (
                                     <>
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor={idMeta}>Meta de {nome}</Label>
-                                            <Input id={idMeta} value={item.meta} maxLength={255} onChange={(event) => onMeta(item.chave, event.target.value)} />
-                                        </div>
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor={`recorde-${item.chave}`}>Recorde de {nome}</Label>
-                                            <Input id={`recorde-${item.chave}`} value={item.metaRecorde} maxLength={255} onChange={(event) => onRecorde(item.chave, event.target.value)} />
-                                        </div>
+                                        {metaAnterior && <p className="text-xs text-muted-foreground">Meta anterior, em texto: {metaAnterior}</p>}
+                                        {item.campos.modalidade === "MUSCULACAO" ? (
+                                            <>
+                                                <CampoMeta id={`series-${item.chave}`} rotulo={`Séries de ${nome}`} valor={item.campos.series} onChange={(valor) => onCampo(item.chave, "series", valor)} />
+                                                <CampoMeta id={`repeticoes-${item.chave}`} rotulo={`Repetições de ${nome}`} valor={item.campos.repeticoes} onChange={(valor) => onCampo(item.chave, "repeticoes", valor)} />
+                                                <CampoMeta id={`carga-${item.chave}`} rotulo={`Carga de ${nome} (kg)`} valor={item.campos.cargaKg} onChange={(valor) => onCampo(item.chave, "cargaKg", valor)} />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <CampoMeta id={`tempo-${item.chave}`} rotulo={`Tempo de ${nome} (s)`} valor={item.campos.tempoS} onChange={(valor) => onCampo(item.chave, "tempoS", valor)} />
+                                                <CampoMeta id={`distancia-${item.chave}`} rotulo={`Distância de ${nome} (m)`} valor={item.campos.distanciaM} onChange={(valor) => onCampo(item.chave, "distanciaM", valor)} />
+                                                <p className="text-sm text-muted-foreground">{pace === null ? "O pace aparece quando tempo e distância são positivos." : `Pace: ${pace} s/km`}</p>
+                                            </>
+                                        )}
                                         <Button type="button" variant="outline" size="sm" onClick={() => onRemover(item.chave)}>Remover {nome}</Button>
                                     </>
                                 )}
@@ -707,6 +726,15 @@ function ExerciciosSelecionados({
                     })}
                 </ul>
             )}
+        </div>
+    );
+}
+
+function CampoMeta({ id, rotulo, valor, onChange }: { id: string; rotulo: string; valor: string; onChange: (valor: string) => void }) {
+    return (
+        <div className="space-y-1.5">
+            <Label htmlFor={id}>{rotulo}</Label>
+            <Input id={id} inputMode="decimal" value={valor} onChange={(event) => onChange(event.target.value)} />
         </div>
     );
 }
@@ -822,7 +850,7 @@ function PainelCatalogo({
                 <h2 className="font-heading text-lg font-bold">Catálogo de exercícios</h2>
                 <p className="text-sm text-muted-foreground">
                     {onAdicionar
-                        ? "Escolha um exercício do catálogo e informe a meta no treino. Exercícios pessoais não fazem parte do catálogo."
+                        ? "Escolha um exercício do catálogo e informe a meta numérica no treino. Exercícios pessoais não fazem parte do catálogo."
                         : "Abra a criação ou a edição de um treino para associar exercícios do catálogo."}
                 </p>
             </div>

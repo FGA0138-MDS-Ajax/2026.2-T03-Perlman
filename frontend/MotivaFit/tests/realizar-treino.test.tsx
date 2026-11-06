@@ -14,6 +14,10 @@ const sessao = () => Response.json({ token: token(), expirationAt: new Date(Date
 const treino = { id: 7, nome: 'Treino A', tipo: 'MUSCULACAO', visibilidade: 'PRIVADO', createdAt: '2026-11-05T18:30:00.000Z', updatedAt: '2026-11-05T18:30:00.000Z', meuTreino: true, podeEditar: true };
 const supino = { id: 1, nome: 'Supino reto', modalidade: 'MUSCULACAO', grupoMuscular: 'Peitoral' };
 const exercicio = { id: 21, meta: '3x12', metaRecorde: null, treinoId: 7, catalogoExercicioId: 1 };
+const resposta = {
+    id: 9, catalogoId: 1, treinoId: 7, exercicioId: 21, treinoNome: 'Treino A', exercicioNome: 'Supino reto',
+    cargaKg: 20.5, repeticoes: 10, series: 4, tempoS: 90, distanciaM: null, executadoEm: '2026-11-06T15:00:00.000Z',
+};
 
 function mount(tipo: string, modalidade: string, registrar?: (body: unknown) => Response) {
     document.cookie = 'csrfToken=csrf; Path=/';
@@ -22,7 +26,7 @@ function mount(tipo: string, modalidade: string, registrar?: (body: unknown) => 
         if (endereco.includes('/api/auth/refresh')) return Promise.resolve(sessao());
         if (endereco.includes('/api/catalogo-exercicios')) return Promise.resolve(Response.json([{ ...supino, modalidade }]));
         if (endereco.includes('/exercicios')) return Promise.resolve(Response.json([exercicio]));
-        if (endereco.includes('/api/registros')) return Promise.resolve(registrar ? registrar(JSON.parse(String(init?.body))) : Response.json({ id: 9, catalogoId: 1, exercicioNome: 'Supino reto', tempoS: 90 }));
+        if (endereco.includes('/api/registros')) return Promise.resolve(registrar ? registrar(JSON.parse(String(init?.body))) : Response.json(resposta));
         if (endereco.includes('/api/treinos/7')) return Promise.resolve(Response.json({ ...treino, tipo }));
         return Promise.resolve(Response.json({ codigo: 'ERRO', mensagem: 'não mapeado', dataHora: '2026-11-05T18:30:00Z' }, { status: 500 }));
     }));
@@ -37,7 +41,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); setAccessToken(null); });
 describe('realizar treino', () => {
     it('mostra séries, repetições e carga para musculação e envia o que foi realizado', async () => {
         const corpos: unknown[] = [];
-        mount('MUSCULACAO', 'MUSCULACAO', (body) => { corpos.push(body); return Response.json({ id: 9, catalogoId: 1, exercicioNome: 'Supino reto', tempoS: 90 }); });
+        mount('MUSCULACAO', 'MUSCULACAO', (body) => { corpos.push(body); return Response.json(resposta); });
         expect(await screen.findByRole('heading', { name: 'Treino A' })).toBeTruthy();
         expect(screen.getByText('Meta: 3x12')).toBeTruthy();
         expect(screen.getByLabelText('Séries de Supino reto')).toBeTruthy();
@@ -64,5 +68,29 @@ describe('realizar treino', () => {
         expect(screen.queryByLabelText('Séries de Supino reto')).toBeNull();
         expect(screen.queryByLabelText('Repetições de Supino reto')).toBeNull();
         expect(screen.queryByLabelText('Carga de Supino reto (kg)')).toBeNull();
+    });
+
+    it('reutiliza a chave quando a mesma execução falha e é enviada de novo', async () => {
+        const corpos: { chaveIdempotencia?: string }[] = [];
+        let chamadas = 0;
+        mount('MUSCULACAO', 'MUSCULACAO', (body) => {
+            corpos.push(body as { chaveIdempotencia?: string });
+            chamadas += 1;
+            if (chamadas === 1) {
+                return Response.json({ codigo: 'ERRO', mensagem: 'falhou', dataHora: '2026-11-06T15:00:00Z' }, { status: 500 });
+            }
+            return Response.json(resposta);
+        });
+        expect(await screen.findByLabelText('Séries de Supino reto')).toBeTruthy();
+        fireEvent.change(screen.getByLabelText('Séries de Supino reto'), { target: { value: '4' } });
+        fireEvent.change(screen.getByLabelText('Repetições de Supino reto'), { target: { value: '10' } });
+        fireEvent.change(screen.getByLabelText('Tempo de Supino reto (minutos)'), { target: { value: '1,5' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
+        expect((await screen.findByRole('alert')).textContent).toContain('falhou');
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
+        expect(await screen.findByText('Execução registrada.')).toBeTruthy();
+        expect(corpos).toHaveLength(2);
+        expect(corpos[0].chaveIdempotencia).toMatch(/^[0-9a-f-]{36}$/);
+        expect(corpos[1].chaveIdempotencia).toBe(corpos[0].chaveIdempotencia);
     });
 });

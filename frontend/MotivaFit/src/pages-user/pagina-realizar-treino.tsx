@@ -12,6 +12,7 @@ import { listarExerciciosDoTreino } from "@/lib/api/exercicios-api";
 import { registrarExecucao } from "@/lib/api/registros-api";
 import { buscarTreino } from "@/lib/api/treinos-api";
 import type { CatalogoExercicioResponseDTO, ExercicioResponseDTO, ModalidadeBackend, TreinoResponseDTO } from "@/lib/api/contracts";
+import { formatarMetaVisivel } from "@/lib/meta-exercicio";
 import { ROTULO_TIPO } from "@/lib/treinos-apresentacao";
 
 type Consulta<T> = { status: "carregando" } | { status: "sucesso"; dados: T } | { status: "erro"; mensagem: string };
@@ -162,7 +163,7 @@ export default function PaginaRealizarTreino() {
                 <nav className="flex flex-1 flex-col gap-1.5">
                     <Button variant="ghost" className="justify-start gap-2.5" asChild><Link to="/principal"><Home className="h-4 w-4" />Início</Link></Button>
                     <Button variant="ghost" className="justify-start gap-2.5" asChild><Link to="/treinos"><Dumbbell className="h-4 w-4" />Meus Treinos</Link></Button>
-                    <Button variant="secondary" className="justify-start gap-2.5" asChild><Link to="/treinos"><Play className="h-4 w-4" />Realizar treino</Link></Button>
+                    <Button variant="secondary" className="justify-start gap-2.5" asChild><Link to="/treinos" state={{ realizar: true }}><Play className="h-4 w-4" />Realizar treino</Link></Button>
                 </nav>
             </aside>
             <main className="flex-1 space-y-6 p-6">
@@ -196,7 +197,7 @@ export default function PaginaRealizarTreino() {
                                         <Card key={exercicio.id}>
                                             <CardHeader>
                                                 <CardTitle className="text-lg">{nome}</CardTitle>
-                                                <CardDescription>Meta: {exercicio.meta}{exercicio.metaRecorde ? `. Recorde: ${exercicio.metaRecorde}` : ""}</CardDescription>
+                                                <CardDescription>Meta: {formatarMetaVisivel(exercicio.meta)}</CardDescription>
                                             </CardHeader>
                                             <CardContent className="space-y-3">
                                                 {atual.registrado && <p className="text-sm text-muted-foreground">Este exercício já foi salvo.</p>}
