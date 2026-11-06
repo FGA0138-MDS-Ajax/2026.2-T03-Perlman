@@ -328,7 +328,9 @@ export default function PaginaPrincipal() {
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <h2 className="text-xl font-heading font-bold">Fichas de Treino</h2>
-                                <p className="text-sm text-muted-foreground">Inscreva-se ou cancele suas fichas.</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Inscrição, descrição e frequência destas fichas ficam só neste navegador. Para copiar um treino público, abra Meus treinos.
+                                </p>
                             </div>
                             <Button variant="outline" asChild>
                                 <Link to="/treinos">Abrir meus treinos</Link>

@@ -1,6 +1,6 @@
 # Integração com o backend
 
-A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login, restauração de sessão, logout, guardas por perfil, consulta do catálogo e CRUD de treinos já estão conectados. Os demais clientes serão conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
+A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login, restauração de sessão, logout, guardas por perfil, consulta do catálogo, CRUD de treinos, ficha de exercícios e cópia de treino público já estão conectados. Os demais clientes serão conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
 
 ## Desenvolvimento local
 
@@ -47,11 +47,13 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 - `GET /api/catalogo-exercicios` alimenta a consulta, com filtro local por nome, grupo muscular e modalidade. Os rótulos de `MUSCULACAO` e `AEROBICO` ficam só na apresentação. Não há meta padrão nem exercício pessoal: o catálogo global não possui esses campos, e esta tela não chama as rotas administrativas.
 - `GET/POST /api/treinos` e `PUT/DELETE /api/treinos/{id}` substituem a lista local. A resposta inclui `meuTreino` e `podeEditar`. Ações de edição aparecem apenas quando `podeEditar` é verdadeiro. A exclusão pede confirmação e só altera a lista depois do sucesso.
 - Datas do servidor são formatadas em `America/Sao_Paulo`. `@motivafit:treinos` e `@motivafit:meus-exercicios` são removidas ao abrir a tela.
-- Na mesma tela, após criar ou atualizar o treino, cada exercício novo é enviado a `POST /api/treinos/{id}/exercicios` com a meta informada. Exercício já gravado não é alterado nem removido por esta tela. Cópia de treino público, execução e histórico continuam fora desta entrega.
+- Na mesma tela, após criar ou atualizar o treino, a ficha envia inclusões, alterações de meta e remoções. O id da associação edita ou remove; `catalogoExercicioId` só identifica o item do catálogo. Falha no meio mantém o que já foi confirmado e a repetição não reenvia essa parte. A ordem exibida é a de inclusão.
+- Treino público de outra pessoa oferece “Adicionar aos meus treinos” (`POST /api/treinos/{id}/adicionar`). A cópia é outro treino privado, sem recordes nem histórico. Inscrição, descrição e frequência das fichas locais continuam só no navegador.
+- A tela de realizar treino envia cada exercício a `POST /api/registros`. Histórico paginado e os indicadores da página principal ainda não usam essa API.
 
 ## Funcionalidades existentes e próximas integrações
 
-Os clientes existentes cobrem autenticação, CRUD de treinos e catálogo. A tela de treinos já usa catálogo e cabeçalho do treino. O backend também possui exercícios de ficha, registros diários, cópia de treino público e convites; seus clientes/telas e correções de autorização estão detalhados no plano. Perfil editável, inscrições, sessões concluídas e relatórios agregados ainda exigem contratos novos.
+Os clientes existentes cobrem autenticação, CRUD de treinos, catálogo, ficha de exercícios e cópia de treino público. Perfil editável, inscrições, sessões concluídas e relatórios agregados ainda exigem contratos novos. Convites administrativos continuam na entrega própria.
 
 `readJwtUsuarioClaims` apenas decodifica o JWT para apresentação. A autorização efetiva é responsabilidade do backend.
 

@@ -50,13 +50,16 @@ describe('catálogo e treinos', () => {
         });
         expect(await screen.findByRole('heading', { name: 'Treino A' })).toBeTruthy();
         const meus = screen.getByRole('heading', { name: 'Meus treinos' }).parentElement!;
-        const publicos = screen.getByRole('heading', { name: 'Treinos públicos de outras pessoas' }).parentElement!;
         expect(within(meus).getByRole('button', { name: 'Editar' })).toBeTruthy();
         expect(within(meus).getByRole('link', { name: 'Realizar treino' }).getAttribute('href')).toBe('/treinos/7/realizar');
-        expect(within(publicos).queryByRole('link', { name: 'Realizar treino' })).toBeNull();
         expect(await within(meus).findByText('Supino reto — 3x12')).toBeTruthy();
+        expect(within(meus).queryByRole('button', { name: 'Adicionar aos meus treinos' })).toBeNull();
+        fireEvent.click(screen.getByRole('button', { name: 'Treinos da Públicos' }));
+        const publicos = screen.getByRole('heading', { name: 'Treinos públicos de outras pessoas' }).parentElement!;
+        expect(within(publicos).queryByRole('link', { name: 'Realizar treino' })).toBeNull();
         expect(within(publicos).getByRole('heading', { name: 'Treino público' })).toBeTruthy();
         expect(within(publicos).queryByRole('button', { name: 'Editar' })).toBeNull();
+        expect(within(publicos).getByRole('button', { name: 'Adicionar aos meus treinos' })).toBeTruthy();
         expect(within(publicos).getByText(/não alterá-lo/)).toBeTruthy();
         expect(document.body.textContent).toContain(formatarDataTreino(criadoEm));
         expect(screen.getByText('Supino reto')).toBeTruthy();
@@ -148,7 +151,8 @@ describe('catálogo e treinos', () => {
         });
         await screen.findByRole('heading', { name: 'Treino A' });
         fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
-        expect(await screen.findByText('Meta: 3x12. Recorde: 50kg')).toBeTruthy();
+        expect((await screen.findByLabelText('Meta de Supino reto') as HTMLInputElement).value).toBe('3x12');
+        expect((screen.getByLabelText('Recorde de Supino reto') as HTMLInputElement).value).toBe('50kg');
         fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
         fireEvent.click(screen.getByRole('button', { name: 'Criar treino' }));
         fireEvent.change(screen.getByLabelText('Nome do treino'), { target: { value: 'Corrida leve' } });
@@ -190,6 +194,78 @@ describe('catálogo e treinos', () => {
         expect(await screen.findByText('Nenhum treino criado.')).toBeTruthy();
         expect(screen.queryByRole('heading', { name: 'Treino A' })).toBeNull();
         expect(chamadas('DELETE')).toHaveLength(2);
+    });
+
+    it('altera e remove exercício já gravado e não repete o que já foi confirmado', async () => {
+        const supinoSalvo = { id: 21, meta: '3x12', metaRecorde: '50kg', treinoId: 7, catalogoExercicioId: supino.id };
+        const corridaSalva = { id: 22, meta: '5 km', metaRecorde: null, treinoId: 7, catalogoExercicioId: corrida.id };
+        let falhouCorrida = true;
+        mount((url, init) => {
+            if (url.includes('/api/auth/refresh')) return sessao();
+            if (url.includes('/api/catalogo-exercicios')) return Response.json([supino, corrida]);
+            const metodo = init?.method ?? 'GET';
+            if (url.includes('/exercicios/22') && metodo === 'PUT') {
+                if (falhouCorrida) { falhouCorrida = false; return erro(500, 'Falha ao alterar'); }
+                return Response.json({ ...corridaSalva, meta: '6 km' });
+            }
+            if (url.includes('/exercicios/21') && metodo === 'PUT') return Response.json({ ...supinoSalvo, meta: '4x10' });
+            if (url.includes('/exercicios/21') && metodo === 'DELETE') return new Response(null, { status: 204 });
+            if (url.includes('/exercicios')) return Response.json([supinoSalvo, corridaSalva]);
+            if (metodo === 'PUT') return Response.json(meu);
+            return Response.json([meu]);
+        });
+        await screen.findByRole('heading', { name: 'Treino A' });
+        fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+        fireEvent.change(await screen.findByLabelText('Meta de Supino reto'), { target: { value: '4x10' } });
+        fireEvent.change(screen.getByLabelText('Meta de Corrida'), { target: { value: '6 km' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
+        expect((await screen.findByRole('alert')).textContent).toContain('não foi possível alterar Corrida');
+        expect(chamadas('PUT').filter((chamada) => String(chamada[0]).includes('/exercicios/21'))).toHaveLength(1);
+        expect(chamadas('PUT').filter((chamada) => String(chamada[0]).includes('/exercicios/22'))).toHaveLength(1);
+        expect(screen.getByLabelText('Nome do treino')).toBeTruthy();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
+        await waitFor(() => expect(screen.queryByLabelText('Nome do treino')).toBeNull());
+        expect(chamadas('PUT').filter((chamada) => String(chamada[0]).includes('/exercicios/21'))).toHaveLength(1);
+        expect(chamadas('PUT').filter((chamada) => String(chamada[0]).includes('/exercicios/22'))).toHaveLength(2);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+        fireEvent.click(await screen.findByRole('button', { name: 'Remover Supino reto' }));
+        expect(screen.getByText('Supino reto será removido ao salvar.')).toBeTruthy();
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
+        await waitFor(() => expect(screen.queryByLabelText('Nome do treino')).toBeNull());
+        expect(chamadas('DELETE').map((chamada) => String(chamada[0]))).toEqual(['/api/treinos/7/exercicios/21']);
+    });
+
+    it('copia treino público para a lista e trata conflito sem duplicar o envio', async () => {
+        let conflito = true;
+        mount((url, init) => {
+            if (url.includes('/api/auth/refresh')) return sessao();
+            if (url.includes('/api/catalogo-exercicios')) return Response.json([]);
+            if (url.includes('/exercicios')) return Response.json([]);
+            if (url.includes('/adicionar')) {
+                if (conflito) { conflito = false; return erro(409, 'Este treino já está na sua lista'); }
+                return Response.json(treino({ id: 15, nome: 'Cópia da corrida', meuTreino: true, podeEditar: true }), { status: 201 });
+            }
+            return Response.json([meu, alheio]);
+        });
+        fireEvent.click(await screen.findByRole('button', { name: 'Treinos da Públicos' }));
+        await screen.findByRole('heading', { name: 'Treino público' });
+        const adicionar = screen.getByRole('button', { name: 'Adicionar aos meus treinos' });
+        fireEvent.click(adicionar);
+        fireEvent.click(adicionar);
+        expect((await screen.findByRole('alert')).textContent).toContain('Este treino já está na sua lista');
+        expect(chamadas('POST')).toHaveLength(1);
+        expect(screen.queryByRole('heading', { name: 'Cópia da corrida' })).toBeNull();
+        expect(screen.queryByLabelText('Nome do treino')).toBeNull();
+        expect(String(chamadas('POST')[0][0])).toBe('/api/treinos/8/adicionar');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Adicionar aos meus treinos' }));
+        expect((await screen.findByLabelText('Nome do treino') as HTMLInputElement).value).toBe('Cópia da corrida');
+        const meus = screen.getByRole('heading', { name: 'Meus treinos' }).parentElement!;
+        expect(within(meus).getByRole('heading', { name: 'Cópia da corrida' })).toBeTruthy();
+        expect(screen.queryByRole('heading', { name: 'Treinos públicos de outras pessoas' })).toBeNull();
+        expect(chamadas('POST')).toHaveLength(2);
     });
 
     it('mostra erro recuperável em vez de lista vazia quando a resposta é inválida', async () => {

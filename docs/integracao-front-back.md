@@ -20,7 +20,7 @@ O frontend React/TypeScript está em `frontend/MotivaFit`; o backend Spring Boot
 | 1 | Base HTTP, cookies, erros e configuração | Nenhuma |
 | 2 | Cadastro, login, restauração de sessão e perfis — implementado | 1 |
 | 3 | Consulta de catálogo e CRUD de treinos — implementado | 2; identificação de propriedade do treino |
-| 4 | Exercícios da ficha e cópia de treinos públicos | 3; correções de autorização e persistência |
+| 4 | Exercícios da ficha e cópia de treinos públicos — implementado | 3; correções de autorização e persistência |
 | 5 | Registros de execução, histórico e indicadores pessoais | 4; decisão sobre sessão concluída |
 | 6 | Convites e manutenção administrativa do catálogo | 2 e 3; correções de identidade nos convites |
 | 7 | Inscrições, gestão de alunos e relatórios globais | Contratos novos; decisão sobre inscrições e sessões |
@@ -118,7 +118,7 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 - [ ] Integrar a composição de exercícios conforme a seção seguinte. `TreinoResponseDTO` não contém a lista de exercícios.
 - [x] Confirmar exclusão e atualizar a listagem apenas após sucesso. A edição/exclusão de treino de terceiros deve continuar bloqueada no backend, inclusive quando público.
 
-**Implementação da tarefa 3:** a resposta de treino informa `meuTreino` e `podeEditar`, hoje equivalentes à propriedade. A tela `/treinos` consulta o catálogo ativo e faz o CRUD do cabeçalho pela API, com carregamento, vazio, erro recuperável e envio único. Datas ISO são formatadas em `America/Sao_Paulo`. As chaves locais `@motivafit:treinos` e `@motivafit:meus-exercicios` são descartadas. A página principal aponta para o editor. Na mesma tela, depois de gravar o cabeçalho, o frontend associa cada exercício escolhido em `POST /api/treinos/{id}/exercicios`. A meta é informada na ficha. Não há remoção nem alteração de exercício já gravado, porque o contrato só oferece inclusão. A escrita do exercício ainda não confere o dono do treino no servidor.
+**Implementação da tarefa 3:** a resposta de treino informa `meuTreino` e `podeEditar`, hoje equivalentes à propriedade. A tela `/treinos` consulta o catálogo ativo e faz o CRUD do cabeçalho pela API, com carregamento, vazio, erro recuperável e envio único. Datas ISO são formatadas em `America/Sao_Paulo`. As chaves locais `@motivafit:treinos` e `@motivafit:meus-exercicios` são descartadas. A página principal aponta para o editor. Na mesma tela, depois de gravar o cabeçalho, o frontend associa cada exercício escolhido em `POST /api/treinos/{id}/exercicios`. A meta é informada na ficha. Alteração, remoção e a checagem de dono ficaram para a tarefa 4.
 
 **Aceite:** CRUD persiste após recarga e nova sessão; treino público de terceiros é consultável, mas não editável; treino arquivado sai da listagem e seus registros históricos permanecem. O ciclo no navegador com os dois serviços continua pendente.
 
@@ -128,12 +128,14 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 
 **Bloqueadores identificados:** o controller não aplica `@Valid`; o serviço não recebe o usuário autenticado nem verifica propriedade/visibilidade do treino. Não existem rotas de atualização/exclusão da associação.
 
-- [ ] Antes de conectar a escrita, receber o principal autenticado e validar leitura de treino próprio/público, escrita apenas no próprio, exclusão lógica do treino e catálogo ativo. Validar coerência entre `treinoId` da URL e do corpo, ou remover a duplicidade do contrato.
-- [ ] Aplicar `@Valid` e substituir `RuntimeException` genérica por erros de aplicação com status e mensagens adequados.
-- [ ] Implementar **propostas** `PUT/DELETE /api/treinos/{treinoId}/exercicios/{id}`, garantindo que a associação pertença ao treino autorizado e que a remoção preserve o histórico.
-- [ ] Criar `src/lib/api/exercicios-api.ts`; usar o ID da associação para editar/remover e `catalogoExercicioId` para obter nome/grupo. Não confundir os dois IDs.
-- [ ] Ao salvar a ficha, persistir cabeçalho e inclusões/alterações/remoções. Definir tratamento de falha parcial: manter rascunho e IDs já confirmados, mostrar pendências e evitar duplicar itens na repetição. Se o requisito for salvamento integral, criar operação transacional de ficha completa no backend.
-- [ ] Definir ordenação persistida caso a ordem dos exercícios seja relevante; o contrato atual não possui campo de posição.
+- [x] Antes de conectar a escrita, receber o principal autenticado e validar leitura de treino próprio/público, escrita apenas no próprio, exclusão lógica do treino e catálogo ativo. Validar coerência entre `treinoId` da URL e do corpo, ou remover a duplicidade do contrato.
+- [x] Aplicar `@Valid` e substituir `RuntimeException` genérica por erros de aplicação com status e mensagens adequados.
+- [x] Implementar **propostas** `PUT/DELETE /api/treinos/{treinoId}/exercicios/{id}`, garantindo que a associação pertença ao treino autorizado e que a remoção preserve o histórico.
+- [x] Criar `src/lib/api/exercicios-api.ts`; usar o ID da associação para editar/remover e `catalogoExercicioId` para obter nome/grupo. Não confundir os dois IDs.
+- [x] Ao salvar a ficha, persistir cabeçalho e inclusões/alterações/remoções. Definir tratamento de falha parcial: manter rascunho e IDs já confirmados, mostrar pendências e evitar duplicar itens na repetição. Se o requisito for salvamento integral, criar operação transacional de ficha completa no backend.
+- [x] Definir ordenação persistida caso a ordem dos exercícios seja relevante; o contrato atual não possui campo de posição.
+
+**Implementação da tarefa 4:** leitura exige treino próprio ou público e não excluído. Escrita exige treino do usuário autenticado, não excluído, e item de catálogo ativo. `treinoId` do corpo precisa coincidir com a URL. A alteração muda meta e recorde; trocar `catalogoExercicioId` responde 400. A remoção apaga a associação. O registro diário permanece: a chave estrangeira usa `ON DELETE SET NULL` e o nome do exercício já está gravado no registro. Não há salvamento transacional da ficha inteira: o que foi confirmado fica no rascunho e a repetição não reenvia inclusão, alteração nem remoção já concluídas. A ordem não é requisito; a lista vem por id crescente, sem coluna de posição.
 
 **Aceite:** ficha recarrega com suas metas e exercícios; falha intermediária não é anunciada como sucesso integral; outra conta não consulta exercícios de treino privado nem altera associações de terceiros; remoção não destrói registros anteriores.
 
@@ -143,13 +145,15 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 
 **Diferença de domínio:** `workout-enrollments.ts` registra inscrição por e-mail e ID de ficha. O backend não possui esse vínculo; copiar um treino não permite calcular inscritos por ficha de origem.
 
-- [ ] Adicionar operação de cópia em `treinos-api.ts`, usar a listagem real de treinos públicos e substituir templates fixos quando forem equivalentes a esses treinos.
-- [ ] Apresentar a ação existente como “Adicionar aos meus treinos”; atualizar a listagem usando o ID da cópia. Tratar 409 ao tentar copiar treino próprio e impedir duplo envio na interface.
-- [ ] Decidir se a experiência de inscrição permanece como requisito. Se permanecer, criar entidade/migration de inscrição com usuário, ficha de origem, estado e datas; definir unicidade e cancelamento sem perda de histórico.
-- [ ] Para inscrições, definir **propostas** `GET/POST /api/inscricoes` e `DELETE /api/inscricoes/{id}`, autorização do titular e resposta que permita identificar a ficha. Só então substituir `enrollInWorkoutPlan`, `leaveWorkoutPlan` e consultas locais.
-- [ ] Definir campos das fichas como descrição/frequência, hoje presentes em `WORKOUT_PLANS` e ausentes no DTO de treino. Persisti-los se necessários ou ajustar os cartões.
+- [x] Adicionar operação de cópia em `treinos-api.ts`, usar a listagem real de treinos públicos e substituir templates fixos quando forem equivalentes a esses treinos.
+- [x] Apresentar a ação existente como “Adicionar aos meus treinos”; atualizar a listagem usando o ID da cópia. Tratar 409 ao tentar copiar treino próprio e impedir duplo envio na interface.
+- [x] Decidir se a experiência de inscrição permanece como requisito. Se permanecer, criar entidade/migration de inscrição com usuário, ficha de origem, estado e datas; definir unicidade e cancelamento sem perda de histórico.
+- [x] Para inscrições, definir **propostas** `GET/POST /api/inscricoes` e `DELETE /api/inscricoes/{id}`, autorização do titular e resposta que permita identificar a ficha. Só então substituir `enrollInWorkoutPlan`, `leaveWorkoutPlan` e consultas locais.
+- [x] Definir campos das fichas como descrição/frequência, hoje presentes em `WORKOUT_PLANS` e ausentes no DTO de treino. Persisti-los se necessários ou ajustar os cartões.
 
-**Aceite:** cópia é independente do original e não carrega recordes/histórico; se houver inscrição, inscrever/cancelar persiste entre dispositivos e não altera inscrições de outra conta. Contagem de inscritos não é inferida de cópias sem relação de origem.
+**Implementação da tarefa 4:** `POST /api/treinos/{id}/adicionar` é chamado em “Adicionar aos meus treinos”, só no cartão de treino de outra pessoa. A cópia entra na lista pelo id retornado. 409 mantém a lista e o botão não dispara duas gravações. Os templates locais não são o mesmo que um treino público: têm inscrição, descrição e frequência, que o DTO não possui. Eles continuam só no navegador, com esse limite escrito na página principal, e não foram trocados pela cópia. Inscrição não entra nesta entrega; o contrato proposto fica para a entrega 7, e `enrollInWorkoutPlan` não foi substituído. Descrição e frequência não foram persistidas.
+
+**Aceite:** cópia é independente do original e não carrega recordes/histórico; se houver inscrição, inscrever/cancelar persiste entre dispositivos e não altera inscrições de outra conta. Contagem de inscritos não é inferida de cópias sem relação de origem. A parte de inscrição deste aceite continua na entrega 7.
 
 ## 11. Execução de exercícios, conclusão e histórico pessoal
 

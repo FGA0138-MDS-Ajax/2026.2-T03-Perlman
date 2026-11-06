@@ -12,8 +12,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
-import { adicionarExercicioAoTreino, listarExerciciosDoTreino } from "@/lib/api/exercicios-api";
-import { atualizarTreino, criarTreino, excluirTreino, listarTreinos } from "@/lib/api/treinos-api";
+import { adicionarExercicioAoTreino, atualizarExercicioDoTreino, listarExerciciosDoTreino, removerExercicioDoTreino } from "@/lib/api/exercicios-api";
+import { atualizarTreino, copiarTreinoPublico, criarTreino, excluirTreino, listarTreinos } from "@/lib/api/treinos-api";
 import type { CatalogoExercicioResponseDTO, ExercicioResponseDTO, TipoTreinoBackend, TreinoResponseDTO, VisibilidadeBackend } from "@/lib/api/contracts";
 import {
     ROTULO_TIPO,
@@ -83,12 +83,15 @@ type ExercicioSelecionado = {
     catalogoExercicioId: number;
     meta: string;
     metaRecorde: string;
+    metaOriginal: string;
+    recordeOriginal: string;
     persistidoId: number | null;
+    removido: boolean;
 };
 
 function validarExerciciosSelecionados(itens: ExercicioSelecionado[], nomeDe: (id: number) => string): string | null {
     for (const item of itens) {
-        if (item.persistidoId !== null) continue;
+        if (item.removido) continue;
         const nome = nomeDe(item.catalogoExercicioId);
         const meta = item.meta.trim();
         if (!meta) return `Informe a meta de ${nome}.`;
@@ -96,6 +99,71 @@ function validarExerciciosSelecionados(itens: ExercicioSelecionado[], nomeDe: (i
         if (item.metaRecorde.trim().length > 255) return `O recorde de ${nome} deve ter no máximo 255 caracteres.`;
     }
     return null;
+}
+
+function exercicioAlterado(item: ExercicioSelecionado): boolean {
+    return item.persistidoId !== null
+        && !item.removido
+        && (item.meta.trim() !== item.metaOriginal || item.metaRecorde.trim() !== item.recordeOriginal);
+}
+
+function pedidoDoExercicio(treinoId: number, item: ExercicioSelecionado) {
+    return {
+        meta: item.meta.trim(),
+        metaRecorde: item.metaRecorde.trim() || null,
+        treinoId,
+        catalogoExercicioId: item.catalogoExercicioId,
+    };
+}
+
+function confirmarExercicio(item: ExercicioSelecionado, resposta: ExercicioResponseDTO): ExercicioSelecionado {
+    const recorde = resposta.metaRecorde ?? "";
+    return {
+        ...item,
+        persistidoId: resposta.id,
+        meta: resposta.meta,
+        metaRecorde: recorde,
+        metaOriginal: resposta.meta,
+        recordeOriginal: recorde,
+        removido: false,
+    };
+}
+
+async function sincronizarExercicios(
+    treinoId: number,
+    itens: ExercicioSelecionado[],
+    nomeDe: (id: number) => string,
+): Promise<{ itens: ExercicioSelecionado[]; erro: string | null }> {
+    let atuais = itens.map((item) => ({ ...item }));
+    for (const item of atuais.filter(exercicioAlterado)) {
+        try {
+            const resposta = await atualizarExercicioDoTreino(treinoId, item.persistidoId!, pedidoDoExercicio(treinoId, item));
+            atuais = atuais.map((atual) => atual.chave === item.chave ? confirmarExercicio(atual, resposta) : atual);
+        } catch (error) {
+            return { itens: atuais, erro: `O treino foi salvo, mas não foi possível alterar ${nomeDe(item.catalogoExercicioId)}. ${mensagemAutenticacao(error)}` };
+        }
+    }
+    for (const item of atuais.filter((atual) => atual.removido && atual.persistidoId !== null)) {
+        try {
+            await removerExercicioDoTreino(treinoId, item.persistidoId!);
+            atuais = atuais.filter((atual) => atual.chave !== item.chave);
+        } catch (error) {
+            if (error instanceof ApiError && error.status === 404) {
+                atuais = atuais.filter((atual) => atual.chave !== item.chave);
+                continue;
+            }
+            return { itens: atuais, erro: `O treino foi salvo, mas não foi possível remover ${nomeDe(item.catalogoExercicioId)}. ${mensagemAutenticacao(error)}` };
+        }
+    }
+    for (const item of atuais.filter((atual) => atual.persistidoId === null && !atual.removido)) {
+        try {
+            const resposta = await adicionarExercicioAoTreino(treinoId, pedidoDoExercicio(treinoId, item));
+            atuais = atuais.map((atual) => atual.chave === item.chave ? confirmarExercicio(atual, resposta) : atual);
+        } catch (error) {
+            return { itens: atuais, erro: `O treino foi salvo, mas não foi possível incluir ${nomeDe(item.catalogoExercicioId)}. ${mensagemAutenticacao(error)}` };
+        }
+    }
+    return { itens: atuais, erro: null };
 }
 
 export default function PaginaTreinos() {
@@ -116,12 +184,18 @@ export default function PaginaTreinos() {
     const [erroExclusao, setErroExclusao] = useState("");
     const [excluindo, setExcluindo] = useState(false);
     const [selecionados, setSelecionados] = useState<ExercicioSelecionado[]>([]);
+    const [copiandoId, setCopiandoId] = useState<number | null>(null);
+    const [erroCopia, setErroCopia] = useState("");
     const [textoCatalogo, setTextoCatalogo] = useState("");
     const [grupoCatalogo, setGrupoCatalogo] = useState("TODOS");
     const [modalidadeCatalogo, setModalidadeCatalogo] = useState<FiltroModalidade>("TODAS");
     const montado = useRef(true);
     const salvando = useRef(false);
     const exclusaoEmAndamento = useRef(false);
+    const copiaEmAndamento = useRef(false);
+    const formularioRef = useRef<HTMLDivElement>(null);
+    const levarAoTreino = useRef(false);
+    const [aba, setAba] = useState<"conta" | "publicos">("conta");
 
     useEffect(() => {
         montado.current = true;
@@ -130,6 +204,12 @@ export default function PaginaTreinos() {
             montado.current = false;
         };
     }, []);
+
+    useEffect(() => {
+        if (!levarAoTreino.current || aba !== "conta" || !formularioAberto) return;
+        levarAoTreino.current = false;
+        formularioRef.current?.scrollIntoView?.({ block: "start" });
+    }, [aba, formularioAberto, editando]);
 
     useEffect(() => {
         if (treinos.status !== "sucesso") return;
@@ -181,7 +261,10 @@ export default function PaginaTreinos() {
                     catalogoExercicioId: item.catalogoExercicioId,
                     meta: item.meta,
                     metaRecorde: item.metaRecorde ?? "",
+                    metaOriginal: item.meta,
+                    recordeOriginal: item.metaRecorde ?? "",
                     persistidoId: item.id,
+                    removido: false,
                 })));
             },
             (error: unknown) => {
@@ -197,7 +280,10 @@ export default function PaginaTreinos() {
             catalogoExercicioId: item.id,
             meta: "",
             metaRecorde: "",
+            metaOriginal: "",
+            recordeOriginal: "",
             persistidoId: null,
+            removido: false,
         }]);
     }
 
@@ -224,7 +310,6 @@ export default function PaginaTreinos() {
         setEnviando(true);
         setErroForm("");
         const pedido = { nome: nome.trim(), tipo, visibilidade };
-        const pendentes = selecionados.filter((item) => item.persistidoId === null);
         try {
             const salvo = editando
                 ? await atualizarTreino(editando.id, pedido)
@@ -232,25 +317,13 @@ export default function PaginaTreinos() {
             if (!montado.current) return;
             publicar(salvo);
             setEditando(salvo);
-            const gravados = [...selecionados];
-            for (const item of pendentes) {
-                try {
-                    const resposta = await adicionarExercicioAoTreino(salvo.id, {
-                        meta: item.meta.trim(),
-                        metaRecorde: item.metaRecorde.trim() || null,
-                        treinoId: salvo.id,
-                        catalogoExercicioId: item.catalogoExercicioId,
-                    });
-                    const indice = gravados.findIndex((atual) => atual.chave === item.chave);
-                    if (indice >= 0) gravados[indice] = { ...item, persistidoId: resposta.id };
-                } catch (error) {
-                    if (!montado.current || ignorarConsulta(error)) return;
-                    setSelecionados(gravados);
-                    setErroForm(`O treino foi salvo, mas não foi possível incluir ${nomeDoCatalogo(item.catalogoExercicioId)}. ${mensagemAutenticacao(error)}`);
-                    return;
-                }
-            }
+            const ficha = await sincronizarExercicios(salvo.id, selecionados, nomeDoCatalogo);
             if (!montado.current) return;
+            setSelecionados(ficha.itens);
+            if (ficha.erro) {
+                setErroForm(ficha.erro);
+                return;
+            }
             setFormularioAberto(false);
         } catch (error) {
             if (!montado.current || ignorarConsulta(error)) return;
@@ -280,6 +353,27 @@ export default function PaginaTreinos() {
         } finally {
             exclusaoEmAndamento.current = false;
             if (montado.current) setExcluindo(false);
+        }
+    }
+
+    async function copiarTreino(treino: TreinoResponseDTO) {
+        if (copiaEmAndamento.current) return;
+        copiaEmAndamento.current = true;
+        setCopiandoId(treino.id);
+        setErroCopia("");
+        try {
+            const copia = await copiarTreinoPublico(treino.id);
+            if (!montado.current) return;
+            publicar(copia);
+            levarAoTreino.current = true;
+            setAba("conta");
+            abrirEdicao(copia);
+        } catch (error) {
+            if (!montado.current || ignorarConsulta(error)) return;
+            setErroCopia(mensagemAutenticacao(error));
+        } finally {
+            copiaEmAndamento.current = false;
+            if (montado.current) setCopiandoId(null);
         }
     }
 
@@ -360,6 +454,26 @@ export default function PaginaTreinos() {
                     </div>
                 </header>
 
+                <div className="flex items-center justify-center  bg-background/60 px-6 py-3">
+                    <Button
+                        type="button"
+                        className="rounded-r-none cursor-pointer"
+                        variant={aba == "conta" ? "default" : "outline"}
+                        onClick={() => setAba("conta")}
+                    >
+                        Treinos da Conta
+                    </Button>
+
+                    <Button
+                        type="button"
+                        className="rounded-l-none cursor-pointer"
+                        variant={aba == "publicos" ? "default" : "outline"}
+                        onClick={() => setAba("publicos")}
+                    >
+                        Treinos da Públicos
+                    </Button>
+                </div>
+
                 <main className="flex-1 space-y-8 p-6">
                     <section className="mx-auto max-w-5xl space-y-4">
                         <div className="flex items-center justify-between gap-4">
@@ -369,8 +483,8 @@ export default function PaginaTreinos() {
                             </Button>
                         </div>
 
-                        {formularioAberto && (
-                            <Card>
+                        {formularioAberto && aba == "conta" && (
+                            <Card ref={formularioRef}>
                                 <CardHeader>
                                     <CardTitle>{editando ? "Editar treino" : "Novo treino"}</CardTitle>
                                     <CardDescription>
@@ -428,7 +542,12 @@ export default function PaginaTreinos() {
                                                 nomeDe={nomeDoCatalogo}
                                                 onMeta={(chave, meta) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, meta } : item))}
                                                 onRecorde={(chave, metaRecorde) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, metaRecorde } : item))}
-                                                onRemover={(chave) => setSelecionados((atual) => atual.filter((item) => item.chave !== chave))}
+                                                onRemover={(chave) => setSelecionados((atual) => atual.flatMap((item) => {
+                                                    if (item.chave !== chave) return [item];
+                                                    if (item.persistidoId === null) return [];
+                                                    return [{ ...item, removido: true }];
+                                                }))}
+                                                onDesfazer={(chave) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, removido: false } : item))}
                                             />
                                         </CardContent>
                                         <div className="flex items-center justify-between border-t p-4">
@@ -449,8 +568,10 @@ export default function PaginaTreinos() {
                                 </Button>
                             </div>
                         )}
-                        {treinos.status === "sucesso" && (
-                            <div className="space-y-6">
+                        <div className="space-y-6">
+                            {erroCopia && <p role="alert" className="text-sm text-destructive">{erroCopia}</p>}
+                            {treinos.status === "sucesso" && aba == "conta" && (
+
                                 <ListaTreinos
                                     titulo="Meus treinos"
                                     vazio="Nenhum treino criado."
@@ -460,6 +581,9 @@ export default function PaginaTreinos() {
                                     onEditar={abrirEdicao}
                                     onExcluir={(treino) => { setErroExclusao(""); setExclusao(treino); }}
                                 />
+                            )}
+
+                            {treinos.status === "sucesso" && aba == "publicos" && (
                                 <ListaTreinos
                                     titulo="Treinos públicos de outras pessoas"
                                     vazio="Nenhum treino público de outras pessoas."
@@ -468,9 +592,11 @@ export default function PaginaTreinos() {
                                     nomeDe={nomeDoCatalogo}
                                     onEditar={abrirEdicao}
                                     onExcluir={(treino) => { setErroExclusao(""); setExclusao(treino); }}
+                                    onCopiar={(treino) => { void copiarTreino(treino); }}
+                                    copiandoId={copiandoId}
                                 />
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </section>
 
                     <PainelCatalogo
@@ -536,12 +662,14 @@ function ExerciciosSelecionados({
     onMeta,
     onRecorde,
     onRemover,
+    onDesfazer,
 }: {
     itens: ExercicioSelecionado[];
     nomeDe: (id: number) => string;
     onMeta: (chave: string, meta: string) => void;
     onRecorde: (chave: string, recorde: string) => void;
     onRemover: (chave: string) => void;
+    onDesfazer: (chave: string) => void;
 }) {
     return (
         <div className="space-y-3">
@@ -556,8 +684,11 @@ function ExerciciosSelecionados({
                         return (
                             <li key={item.chave} className="space-y-2 rounded-lg border p-3">
                                 <p className="text-sm font-medium">{nome}</p>
-                                {item.persistidoId !== null ? (
-                                    <p className="text-sm text-muted-foreground">Meta: {item.meta}{item.metaRecorde ? `. Recorde: ${item.metaRecorde}` : ""}</p>
+                                {item.removido ? (
+                                    <>
+                                        <p className="text-sm text-muted-foreground">{nome} será removido ao salvar.</p>
+                                        <Button type="button" variant="outline" size="sm" onClick={() => onDesfazer(item.chave)}>Desfazer remoção de {nome}</Button>
+                                    </>
                                 ) : (
                                     <>
                                         <div className="space-y-1.5">
@@ -588,6 +719,8 @@ function ListaTreinos({
     nomeDe,
     onEditar,
     onExcluir,
+    onCopiar,
+    copiandoId = null,
 }: {
     titulo: string;
     vazio: string;
@@ -596,6 +729,8 @@ function ListaTreinos({
     nomeDe: (id: number) => string;
     onEditar: (treino: TreinoResponseDTO) => void;
     onExcluir: (treino: TreinoResponseDTO) => void;
+    onCopiar?: (treino: TreinoResponseDTO) => void;
+    copiandoId?: number | null;
 }) {
     return (
         <div className="space-y-3">
@@ -631,7 +766,19 @@ function ListaTreinos({
                                         </Button>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-muted-foreground">Você pode consultar este treino, mas não alterá-lo.</p>
+                                    <div className="space-y-2 w-full">
+                                        <p className="text-sm text-muted-foreground">Você pode consultar este treino, mas não alterá-lo.</p>
+                                        {onCopiar && (
+                                            <Button
+                                                type="button"
+                                                className="h-auto whitespace-normal w-full sm:w-auto"
+                                                disabled={copiandoId !== null}
+                                                onClick={() => onCopiar(treino)}
+                                            >
+                                                {copiandoId === treino.id ? "Adicionando…" : "Adicionar aos meus treinos"}
+                                            </Button>
+                                        )}
+                                    </div>
                                 )}
                             </CardContent>
                         </Card>

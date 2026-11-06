@@ -24,3 +24,19 @@ export async function adicionarExercicioAoTreino(treinoId: number, request: Exer
     });
     return exigirValor(dados, exercicioValido);
 }
+
+export async function atualizarExercicioDoTreino(
+    treinoId: number,
+    exercicioId: number,
+    request: ExercicioRequestDTO,
+): Promise<ExercicioResponseDTO> {
+    const dados = await apiRequest<unknown>(`/api/treinos/${treinoId}/exercicios/${exercicioId}`, {
+        method: "PUT",
+        body: request,
+    });
+    return exigirValor(dados, exercicioValido);
+}
+
+export async function removerExercicioDoTreino(treinoId: number, exercicioId: number): Promise<void> {
+    await apiRequest<void>(`/api/treinos/${treinoId}/exercicios/${exercicioId}`, { method: "DELETE" });
+}

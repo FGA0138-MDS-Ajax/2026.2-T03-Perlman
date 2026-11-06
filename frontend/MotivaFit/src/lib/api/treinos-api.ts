@@ -49,3 +49,8 @@ export async function atualizarTreino(
 export function excluirTreino(id: number): Promise<void> {
     return apiRequest<void>(`/api/treinos/${id}`, { method: "DELETE" });
 }
+
+export async function copiarTreinoPublico(id: number): Promise<TreinoResponseDTO> {
+    const dados = await apiRequest<unknown>(`/api/treinos/${id}/adicionar`, { method: "POST" });
+    return exigirValor(dados, treinoValido);
+}
