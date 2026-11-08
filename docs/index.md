@@ -9,10 +9,17 @@ O MotivaFit é um aplicativo web voltado para praticantes de exercícios físico
 Este projeto é desenvolvido pelo Grupo Perlman — T03, na disciplina de Métodos de Desenvolvimento de Software (MDS), da Universidade de Brasília.
 
 <div class="mf-team">
+  <div class="mf-member mf-member--leader">
+    <img class="mf-avatar" src="https://github.com/teuszindls.png?size=160" alt="Foto de Mateus Fernandes Dantas" loading="lazy">
+    <strong>Mateus Fernandes Dantas</strong>
+    <span>Front-end (líder)</span>
+    <a href="https://github.com/teuszindls">@teuszindls</a>
+  </div>
   <div class="mf-member">
-    <span class="mf-avatar mf-avatar--initials" aria-hidden="true">BS</span>
+    <img class="mf-avatar" src="assets/img/equipe/bernardo.png" alt="Foto de Bernardo Campos Caxito Silveira" loading="lazy">
     <strong>Bernardo Campos Caxito Silveira</strong>
     <span>GQM / Analista de Qualidade</span>
+    <a href="https://github.com/bernardoccs1">@bernardoccs1</a>
   </div>
   <div class="mf-member">
     <img class="mf-avatar" src="https://github.com/brunocruvinell.png?size=160" alt="Foto de Bruno Cruvinel Barros da Silva" loading="lazy">
@@ -31,12 +38,6 @@ Este projeto é desenvolvido pelo Grupo Perlman — T03, na disciplina de Métod
     <strong>Luís Felipe Pontes Vieira Andrade</strong>
     <span>Back-end</span>
     <a href="https://github.com/andradluis">@andradluis</a>
-  </div>
-  <div class="mf-member">
-    <img class="mf-avatar" src="https://github.com/teuszindls.png?size=160" alt="Foto de Mateus Fernandes Dantas" loading="lazy">
-    <strong>Mateus Fernandes Dantas</strong>
-    <span>Front-end (líder)</span>
-    <a href="https://github.com/teuszindls">@teuszindls</a>
   </div>
   <div class="mf-member">
     <img class="mf-avatar" src="https://github.com/TheuxZn16.png?size=160" alt="Foto de Matheus Estevam Ferreira" loading="lazy">

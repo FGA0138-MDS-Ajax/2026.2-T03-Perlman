@@ -222,6 +222,44 @@
   background: var(--mf-table-head);
 }
 
+/* Destaque do líder: moldura dourada com brilho */
+.md-typeset .mf-member--leader {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #d4af37;
+  background: color-mix(in srgb, #d4af37 12%, var(--mf-card-bg));
+  animation: mf-gold-glow 2.4s ease-in-out infinite;
+}
+.md-typeset .mf-member--leader::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255, 236, 170, .55), transparent);
+  pointer-events: none;
+  animation: mf-gold-shine 3.6s ease-in-out infinite;
+}
+.md-typeset .mf-member--leader .mf-avatar {
+  border: 3px solid #d4af37;
+  box-shadow: 0 0 10px rgba(212, 175, 55, .7);
+}
+@keyframes mf-gold-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(212, 175, 55, .45); }
+  50%      { box-shadow: 0 0 20px rgba(212, 175, 55, .95); }
+}
+@keyframes mf-gold-shine {
+  0%        { left: -75%; }
+  60%, 100% { left: 125%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset .mf-member--leader,
+  .md-typeset .mf-member--leader::after { animation: none; }
+  .md-typeset .mf-member--leader { box-shadow: 0 0 14px rgba(212, 175, 55, .8); }
+  .md-typeset .mf-member--leader::after { display: none; }
+}
+
 /* ---------- Rodapé ---------- */
 .md-footer { background: var(--md-primary-fg-color--dark); }
 .md-footer-meta { background: #101714; }
