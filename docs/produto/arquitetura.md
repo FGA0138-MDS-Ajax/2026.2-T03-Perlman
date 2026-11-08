@@ -77,7 +77,7 @@ Não fazem parte do escopo desta arquitetura: aplicativos móveis nativos (o pro
 
 ### 1.4 Documentos de referência
 
-Esta versão toma como base o [Documento de Visão](documento-de-visao.md) 1.0.0 e acompanha uma cópia revisada 1.0.1 com as mesmas prioridades, decisões sobre recordes, Hexad e cobertura. Os originais são preservados. As alterações constituem a proposta documental desta revisão e não evidenciam implementação ou homologação pelo Dono do Produto. Mudanças futuras de escopo e cronograma devem atualizar ambos os históricos e matrizes de rastreabilidade.
+Esta versão toma como base o [Documento de Visão](sobre-documento.md) 1.0.0 e acompanha uma cópia revisada 1.0.1 com as mesmas prioridades, decisões sobre recordes, Hexad e cobertura. Os originais são preservados. As alterações constituem a proposta documental desta revisão e não evidenciam implementação ou homologação pelo Dono do Produto. Mudanças futuras de escopo e cronograma devem atualizar ambos os históricos e matrizes de rastreabilidade.
 
 ### 1.5 Organização do documento
 

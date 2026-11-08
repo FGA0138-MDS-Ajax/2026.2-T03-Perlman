@@ -81,14 +81,34 @@ extra_css:
 
 nav:
   - Início: index.md
-  - Produto:
-      - Documento de Visão: produto/visao.md
+  - Gestão e Metodologia:
+      - Equipe: gestao/equipe.md
+      - Ciclo de Vida: gestao/ciclo-de-vida.md
+      - Organização: gestao/organizacao.md
+      - Planejamento das Sprints: gestao/sprints.md
+      - Comunicação: gestao/comunicacao.md
+      - Riscos e Replanejamento: gestao/riscos.md
+      - Processo de Desenvolvimento: gestao/processo.md
+      - Atas de Reunião:
+          - Ata 1: atas-reuniao/ata-reuniao-1.md
+          - Ata 2: atas-reuniao/ata-reuniao-2.md
+          - Ata 3: atas-reuniao/ata-reuniao-3.md
+          - Ata 4: atas-reuniao/ata-reuniao-4.md
+          - Ata 5: atas-reuniao/ata-reuniao-5.md
+          - Ata 6: atas-reuniao/ata-reuniao-6.md
+          - Ata 7: atas-reuniao/ata-reuniao-7.md
+  - Arquitetura:
       - Documento de Arquitetura: produto/arquitetura.md
-  - Atas de Reunião:
-      - Ata 1: atas-reuniao/ata-reuniao-1.md
-      - Ata 2: atas-reuniao/ata-reuniao-2.md
-      - Ata 3: atas-reuniao/ata-reuniao-3.md
-      - Ata 4: atas-reuniao/ata-reuniao-4.md
-      - Ata 5: atas-reuniao/ata-reuniao-5.md
-      - Ata 6: atas-reuniao/ata-reuniao-6.md
-      - Ata 7: atas-reuniao/ata-reuniao-7.md
+      - Guia da API: produto/guia-api.md
+  - Produto:
+      - Sobre o Documento: produto/sobre-documento.md
+      - Visão Geral: produto/visao-geral.md
+      - Escopo: produto/escopo.md
+      - Perfis e Cenários: produto/perfis-cenarios.md
+      - Backlog do Produto: produto/backlog.md
+      - Rastreabilidade: produto/rastreabilidade.md
+  - Métricas: metricas/gqm.md
+  - Testes:
+      - Estratégia de Testes: testes/estrategia.md
+      - Roteiro de Teste: testes/roteiro.md
+  - Referências: referencias.md

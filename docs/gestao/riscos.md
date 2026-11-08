@@ -1,0 +1,21 @@
+# 2.5 Gerenciamento de riscos
+
+**Tabela 9 – Riscos**
+
+| Risco                                                                | Fase do projeto                    |  Grau  | Mitigação (prevenção)                                                                                                                                                                           | Contingência (reação)                                                                                                                                                                                                       |
+| :------------------------------------------------------------------- | :--------------------------------- | :----: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Atraso nas entregas devido ao ciclo curto de 1 semana                | Todas as Sprints                   |  Alto  | Realizar reuniões de Sprint Planning rigorosas.                                                                                                                                                    | Não negociar o aumento da duração da Sprint. As tarefas não concluídas devem ser interrompidas, retornar para o backlog e ser replanejadas para entrega na Sprint imediatamente seguinte.                                 |
+| Abandono/saída de membro da equipe                                  | Todas as Sprints                   | Baixo | Fomentar a prática de Pair Programming para evitar que apenas uma pessoa saiba mexer numa parte do código e manter a documentação sempre atualizada.                                            | Redistribuir imediatamente as tarefas críticas pelos restantes membros da equipe e reportar ao P.O. (Monitor Daniel) para reduzir a carga de trabalho (story points) planejada para as Sprints seguintes.                     |
+| Falha na integração com serviços externos (autenticação Google) | Sprints 9 e 10 (RF-24, Could have) | Médio | Iniciar os testes de requisição isoladamente via Postman antes de integrar o código ao front-end e ao back-end.                                                                                  | Manter o cadastro e login com e-mail e senha já disponíveis no MVP (CF-01 e CF-02). Replanejar a integração opcional com o Google (CF-09) sem bloquear as funcionalidades obrigatórias ou comprometer a entrega final.    |
+| Desalinhamento com as expectativas do cliente                        | Sprints de ponto de controle       | Baixo | Envolver o cliente nas Sprint Reviews, reforçando a cada reunião o cronograma de entregas e deixando claro que o software é entregue em incrementos e ainda se encontra em fase de construção. | Agendar uma reunião extraordinária de alinhamento para relembrar os prazos estritos das Sprints, esclarecendo que qualquer nova exigência não negociada irá para o Backlog para não comprometer o prazo da Sprint atual. |
+
+*Fonte: elaborado pelos autores (2026).*
+
+## 2.6 Critérios de replanejamento
+
+Os critérios de replanejamento definem os cenários críticos que inviabilizam o cronograma atual. Para o projeto MotivaFit, utilizando a metodologia Scrum, qualquer replanejamento causará o versionamento deste documento. Os critérios adotados são:
+
+- **Abandono da equipe** por parte de algum membro, exigindo a readequação dos pontos de esforço da Sprint.
+- **Alterações de escopo:** se o cliente ou o Dono do Produto solicitarem mudanças estruturais nos cenários funcionais que ultrapassem a capacidade de entrega semanal da equipe.
+- **Atraso crítico em requisitos MUST:** caso a equipe atrase e não consiga entregar funcionalidades obrigatórias.
+- **Acumulação de dívida técnica (débito técnico):** quando a métrica de débito técnico (falta de refatoração, código não documentado ou ausência de testes) atingir um nível crítico que torne a base de código insustentável, impedindo a equipe de desenvolver e integrar novas funcionalidades com segurança.
