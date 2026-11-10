@@ -115,4 +115,5 @@ nav:
   - Testes:
       - Estratégia de Testes: testes/estrategia.md
       - Roteiro de Teste: testes/roteiro.md
+      - Relatório de Testes da API: testes/relatorio-testes-api.md
   - Referências: referencias.md

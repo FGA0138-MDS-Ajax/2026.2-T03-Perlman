@@ -8,7 +8,7 @@ Métricas de acompanhamento do processo da equipe, calculadas a partir das atas 
 
 | Métrica | Resultado |
 | :-- | :-- |
-| Taxa de conclusão dos encaminhamentos | **63%** (17 de 27 com prazo vencido ou já concluídos) |
+| Taxa de conclusão dos encaminhamentos | **67%** (18 de 27 com prazo vencido ou já concluídos) |
 | Pontualidade dos encaminhamentos | **50%** concluídos no prazo; atraso médio de **8,8 dias** |
 | Confiabilidade dos status registrados | **57%** das conclusões declaradas tinham evidência na data |
 | Encaminhamentos com prazo definido | **59%** (19 de 32) |
@@ -28,10 +28,10 @@ Métricas de acompanhamento do processo da equipe, calculadas a partir das atas 
 | 4 | 1 | 1 | 0 | 0 | 0 |
 | 5 | 5 | 4 | 0 | 1 | 0 |
 | 6 | 4 | 3 | 1 | 0 | 0 |
-| 7 | 10 | 2 | 2 | 1 | 5 |
-| **Total** | **32** | **17** | **4** | **6** | **5** |
+| 7 | 10 | 3 | 1 | 1 | 5 |
+| **Total** | **32** | **18** | **3** | **6** | **5** |
 
-**Resultado:** 17 ÷ 27 = **63%**. Considerando todos os 32, a taxa é de 53%.
+**Resultado:** 18 ÷ 27 = **67%**. Considerando todos os 32, a taxa é de 56%.
 
 ## P2 — Pontualidade
 

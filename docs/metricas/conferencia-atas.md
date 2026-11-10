@@ -45,7 +45,7 @@ Ações combinadas fora do repositório (apresentações, mensagens, contato com
 | 3.1 | Criar a estrutura base do front-end | 04/10 | Concluída (ata nº 4) / Em andamento (ata nº 5) | Concluída com atraso (21 dias) | Primeiro commit do front-end em 25/10 (`Feat:Base estrutural do frontend`). |
 | 3.2 | Configurar o acompanhamento das métricas M1 a M4 | 05/10 | Concluída (ata nº 4) | Pendente vencida | O repositório não tem issues, labels, workflow de CI nem análise estática. Só o limite de 70% de cobertura do JaCoCo foi configurado, em 24/10. |
 | 3.3 | Detalhar os casos de teste de RF-13 a RF-19, RF-21 e RF-23 | Antes de cada sprint | Concluída (ata nº 4) | Em andamento | O roteiro cita RF-13, RF-19, RF-21 e RF-23, mas não tem casos para RF-14 a RF-18. |
-| 3.4 | Atualizar o registro de execução dos testes | Contínuo | Concluída (ata nº 4) / Pendente (ata nº 6) | Pendente vencida | Os 22 casos do roteiro continuam como "Não executado". |
+| 3.4 | Atualizar o registro de execução dos testes | Contínuo | Concluída (ata nº 4) / Pendente (ata nº 6) | Pendente vencida | Os 22 casos do roteiro continuam como "Não executado"; a rodada de testes da API de 08/11 não foi registrada neles. |
 
 ### Ata nº 4 — 04/10/2026
 
@@ -68,7 +68,7 @@ Ações combinadas fora do repositório (apresentações, mensagens, contato com
 | Item | Ação | Prazo | Status na ata seguinte | Status verificado | Evidência |
 | :-: | :-- | :-: | :-- | :-- | :-- |
 | 6.1 | Iniciar o site de documentação (MkDocs) | — | Concluída | Concluída (sem prazo) | Reestruturação do site em 27/10 (branch `docs`). |
-| 6.2 | Iniciar a elaboração dos testes | — | Em andamento | Concluída (sem prazo) | Testes de fumaça da API publicados em 08/11 (branch `test/smoke-api`). |
+| 6.2 | Iniciar a elaboração dos testes | — | Em andamento | Concluída (sem prazo) | Testes de fumaça da API publicados em 08/11 (branch `test/smoke-api`) e rodada de testes da API executada no mesmo dia. |
 | 6.3 | Desenvolver o front-end seguindo o Figma | — | Em andamento | Em andamento | Telas do MVP concluídas até 06/11; gamificação ainda não iniciada. |
 | 6.4 | Definir a data da próxima reunião | — | Concluída | Concluída (sem prazo) | Reunião realizada em 04/11. |
 
@@ -76,10 +76,10 @@ Ações combinadas fora do repositório (apresentações, mensagens, contato com
 
 | Item | Ação | Prazo | Status na ata | Status verificado | Evidência |
 | :-: | :-- | :-: | :-- | :-- | :-- |
-| 7.1 | Integrar o back-end com o front-end | 07/11 | Pendente | Concluída no prazo | Cinco commits de integração no front-end entre 05/11 e 06/11, reunidos na branch `integracao` em 06/11. |
+| 7.1 | Integrar o back-end com o front-end | 07/11 | Pendente | Concluída no prazo | Cinco commits de integração no front-end entre 05/11 e 06/11, reunidos na branch `integracao` em 06/11. O relatório de testes de 08/11 ainda não verificou o fluxo pela interface do front-end. |
 | 7.2 | Reunião de integração | 05/11 | Pendente | Concluída no prazo | Evidência indireta: PRs #12 e #13 e commits de integração de três integrantes em 05/11. Não há ata dessa reunião. |
-| 7.3 | Rotina de testes após a integração | Após a integração | Pendente | Em andamento | Script de testes de fumaça criado em 08/11, com o campo de resultado ainda em branco. |
-| 7.4 | Subir os documentos de testes | — | Pendente | Em andamento | Registro dos testes de fumaça publicado em 08/11 na branch `test/smoke-api`, ainda não mesclada. |
+| 7.3 | Rotina de testes após a integração | Após a integração | Pendente | Em andamento | Rodada de testes da API executada em 08/11 pelo Bernardo, com 8 verificações aprovadas (ver [Relatório de Testes da API](../testes/relatorio-testes-api.md)). A rotina de um teste por dia e os testes em desktop e celular ainda não estão comprovados. |
+| 7.4 | Subir os documentos de testes | — | Pendente | Concluída (sem prazo) | Registro dos testes de fumaça publicado em 08/11 na branch `test/smoke-api` (ainda não mesclada) e relatório da rodada de testes entregue para a documentação em 09/11. O campo de resultado do registro de fumaça segue em branco. |
 | 7.5 | Confirmar alterações nas APIs | — | Pendente | Pendente no prazo | O código mostra que houve alterações (ver [divergências](#divergencias-encontradas)). |
 | 7.6 | Verificar a viabilidade do recorde pessoal e do feed | 09/11 | Pendente | Pendente no prazo | Sem registro até a data da conferência. |
 | 7.7 | Contatar o líder do grupo Torvalds | Antes de 16/11 | Pendente | Pendente no prazo | Ação fora do repositório. |
@@ -104,6 +104,7 @@ Estas entregas estão no repositório, mas nenhuma ata as menciona. Elas foram c
 | 05/11 | Dados demonstrativos para apresentação | PR #13 |
 | 05/11 a 06/11 | Front-end integrado: autenticação, catálogo, CRUD de treinos, exercícios da ficha, cópia de treinos públicos, registros de execução, histórico e indicadores pessoais | Branch `frontend/treinos`, reunida em `integracao` |
 | 08/11 | Testes de fumaça da API | Branch `test/smoke-api` |
+| 08/11 | Rodada de testes da API por `curl` (8 verificações aprovadas) | [Relatório de Testes da API](../testes/relatorio-testes-api.md) |
 
 ## Divergências encontradas
 

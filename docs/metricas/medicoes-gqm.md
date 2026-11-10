@@ -9,7 +9,7 @@ Valores medidos das métricas M1 a M4 definidas no [Quadro GQM](gqm.md), compara
 | Métrica | Meta | Medido | Situação |
 | :-- | :-- | :-- | :-- |
 | M1 — Throughput por sprint | 4 a 6 por sprint | 0, 0, 5, 6 e 2 PRs nas Sprints 3 a 7 | Atingida em 2 das 5 sprints de desenvolvimento |
-| M2 — Densidade de defeitos | ≤ 0,2 bug/issue | — | Não mensurável |
+| M2 — Densidade de defeitos | ≤ 0,2 bug/issue | 1 defeito identificado e corrigido em 8 verificações; sem issues para a fórmula | Não mensurável pela fórmula |
 | M3 — Cobertura de testes | ≥ 70% das linhas | 82,0% no back-end | Atingida no back-end; front-end sem medição |
 | M4 — Dívida técnica | Nota A, zero críticos | — | Não mensurável |
 
@@ -34,7 +34,15 @@ Valores medidos das métricas M1 a M4 definidas no [Quadro GQM](gqm.md), compara
 
 ## M2 — Densidade de defeitos
 
-**Não mensurável.** Não há issues com a label `bug`, e os 22 casos do [Roteiro de Teste](../testes/roteiro.md) continuam como "Não executado". O único commit de correção (`fix: corrigir configuração dos testes`) ajusta a configuração dos testes, não um defeito do produto.
+**Não mensurável pela fórmula da ficha**, porque não há issues concluídas nem issues com a label `bug`.
+
+Há, porém, uma rodada de testes executada em 08/11 pelo Bernardo (ver [Relatório de Testes da API](../testes/relatorio-testes-api.md)):
+
+- 8 verificações executadas e 8 aprovadas;
+- 1 defeito identificado: marcadores de conflito do Git em `pagina-principal.tsx`, presentes na branch `developer` e removidos na `integracao` pelo commit `150abe5` (05/11);
+- indicador provisório, fora da fórmula da ficha: 1 defeito para 8 verificações.
+
+Os 22 casos do [Roteiro de Teste](../testes/roteiro.md) continuam como "Não executado", porque a rodada ainda não foi registrada neles. O único commit de correção do código (`fix: corrigir configuração dos testes`) ajusta a configuração dos testes, não um defeito do produto.
 
 **Para medir:** registrar cada defeito como issue com a label `bug` durante a rotina de testes definida na ata nº 7.
 
@@ -80,7 +88,7 @@ Comparação dos resultados medidos com os objetivos definidos no [Quadro GQM](g
 | Objetivo | Meta definida | Resultado | Situação |
 | :-- | :-- | :-- | :-- |
 | **G1** Cadência de entrega | 4 a 6 entregas por sprint | Sprints 3 e 4 com 0, Sprint 5 com 5, Sprint 6 com 6 e Sprint 7 com 2 | **Parcial:** atingida em 2 das 5 sprints de desenvolvimento |
-| **G2** Estabilidade do software | ≤ 0,2 bug por issue | Sem dados | **Não avaliável** |
+| **G2** Estabilidade do software | ≤ 0,2 bug por issue | Rodada de 08/11: 8 verificações aprovadas e 1 defeito corrigido; sem issues para a fórmula | **Não avaliável pela fórmula** |
 | **G3** Proteção contra regressões | ≥ 70% de cobertura, com bloqueio automático no CI | 82,0% no back-end, sem CI e sem medição no front-end | **Parcial:** a meta numérica foi atingida, mas o mecanismo previsto não existe |
 | **G4** Manutenibilidade | Nota A e zero falhas críticas | Sem ferramenta de análise | **Não avaliável** |
 
@@ -89,6 +97,7 @@ Comparação dos resultados medidos com os objetivos definidos no [Quadro GQM](g
 - **As regras de ação não foram aplicadas.** A ficha da M1 determina renegociar o escopo com o cliente depois de duas sprints abaixo da meta. Essa condição já valia ao fim da Sprint 4, com zero entregas nas Sprints 3 e 4. Nenhuma ata registra a renegociação, e o cronograma seguiu acumulando atraso (média de 2,6 sprints, ver [Medições do Processo](medicoes-processo.md)).
 - **A M1 foi medida de forma adaptada.** O quadro GQM define a contagem por issues concluídas no GitHub Projects. Como o repositório não tem issues, foram contados Pull Requests mesclados, uma aproximação razoável que não é a métrica exatamente como definida.
 - **A G3 foi atingida só em parte.** O objetivo fala em proteção "no contexto da integração contínua", mas os 82,0% vêm de uma execução manual. Sem workflow de CI, nada impede que um Pull Request reduza a cobertura. A cobertura de ramos, de 56,9%, indica caminhos alternativos das regras de negócio sem teste.
+- **Os testes ainda não cobrem a interface.** A rodada de 08/11 validou a API e o banco por `curl`; o fluxo pelas telas do front-end ainda não foi testado, e o cadastro duplicado (409) e a persistência após a criação de treino seguem pendentes.
 - **G2 e G4 dependem de configurações ainda não feitas.** A ata nº 4 registra a configuração das métricas M1 a M4 como concluída, mas issues, label `bug`, CI e análise estática não existem no repositório (ver [Conferência das Atas](conferencia-atas.md), item 3.2).
 
 ### Plano de ação
