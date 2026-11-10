@@ -14,7 +14,7 @@ export default function PaginaInterfaceInicial() {
     return (
         <div className="flex min-h-screen flex-col bg-background selection:bg-primary/20 selection:text-primary">
             {/* Header */}
-            <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md px-6 py-4">
+            <header className="sticky top-0 z-40 border-b bg-background/80 px-3 py-3 backdrop-blur-md sm:px-6 sm:py-4">
                 <div className="mx-auto flex max-w-6xl items-center justify-between">
                     <div className="flex items-center gap-2.5">
                         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-sm">
@@ -25,12 +25,12 @@ export default function PaginaInterfaceInicial() {
                         </h1>
                     </div>
 
-                    <nav className="flex items-center gap-2">
+                    <nav className="flex shrink-0 items-center gap-1 sm:gap-2">
                         <ThemeToggle variant="outline" className="h-9 w-9" />
-                        <Button variant="ghost" asChild>
+                        <Button variant="ghost" className="px-2 sm:px-4" asChild>
                             <Link to="/login">Entrar</Link>
                         </Button>
-                        <Button asChild>
+                        <Button className="px-2 text-sm sm:px-4" asChild>
                             <Link to="/cadastro">Criar Conta</Link>
                         </Button>
                     </nav>
@@ -45,7 +45,7 @@ export default function PaginaInterfaceInicial() {
                         Plataforma Inteligente de Treinos
                     </Badge>
 
-                    <h2 className="text-4xl font-heading font-extrabold tracking-tight sm:text-6xl text-balance">
+                    <h2 className="text-3xl font-heading font-extrabold tracking-tight text-balance sm:text-6xl">
                         Transforme sua rotina e conquiste sua <span className="text-primary decoration-wavy decoration-2">melhor versão</span>
                     </h2>
 
@@ -107,7 +107,7 @@ export default function PaginaInterfaceInicial() {
             </main>
 
             {/* Footer */}
-            <footer className="border-t px-6 py-6 text-center text-sm text-muted-foreground bg-muted/20">
+            <footer className="border-t bg-muted/20 px-4 py-6 text-center text-sm text-muted-foreground sm:px-6">
                 <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
                     <span>© 2026 MotivaFit — Grupo Perlman & UnB. Todos os direitos reservados.</span>
                     <div className="flex items-center gap-4 text-xs">

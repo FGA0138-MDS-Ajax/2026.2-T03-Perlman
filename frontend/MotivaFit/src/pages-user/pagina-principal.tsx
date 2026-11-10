@@ -7,20 +7,14 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate, Link } from "react-router-dom";
 import {
-    Home,
     Dumbbell,
-    LogOut,
     Flame,
     Calendar,
-    Play,
-    Shield
 } from "lucide-react";
-import { ThemeToggle, ThemeSelector } from "@/components/theme-toggle";
 import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import type { RegistroDiarioResponseDTO } from "@/lib/api/contracts";
@@ -34,7 +28,6 @@ import {
     WORKOUT_ENROLLMENTS_UPDATED_EVENT,
 } from "@/lib/workout-enrollments";
 import { WORKOUT_PLANS } from "@/lib/workout-plans";
-import HeaderMenu from "@/components/menu";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
 
@@ -76,7 +69,7 @@ export default function PaginaPrincipal() {
     const fichasDoUsuario = WORKOUT_PLANS.filter((ficha) => fichasInscritas.includes(ficha.id));
     const execucoesNaSemana = indicadores.status === "sucesso" ? indicadores.execucoesNaSemana : null;
     const sequenciaAtiva = indicadores.status === "sucesso" ? indicadores.sequenciaDias : null;
-    const [menuAberto, setMenuAberto] = useState(true);
+    const [menuAberto, setMenuAberto] = useState(false);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -159,19 +152,13 @@ export default function PaginaPrincipal() {
         setFichasInscritas(getUserWorkoutPlanIds(user.email));
     }
 
-    const asideClass = (menuAberto: boolean) => {
-        return menuAberto
-            ? "w-full fixed md:static md:!flex md:flex-col bottom-0 md:bottom-auto md:h-full md:w-64  border-r bg-muted p-6 md:flex"
-            : "!hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex";
-    };
-
     return (
         <div className="flex min-h-screen w-full bg-background">
             {/* Sidebar */}
-            <Aside menuAberto={menuAberto} setMenuAberto={setMenuAberto} email={user?.email || ""} isAdmin={isAdmin} logout={logout} saindo={enviando} />
+            <Aside menuAberto={menuAberto} setMenuAberto={setMenuAberto} isAdmin={isAdmin} logout={logout} saindo={enviando} />
 
             {/* Main Content */}
-            <div className="flex flex-1 flex-col overflow-x-hidden">
+            <div className="flex min-w-0 flex-1 flex-col">
                 {/* Top Bar */}
                 <Header
                     email={user?.email || ""}
@@ -182,7 +169,7 @@ export default function PaginaPrincipal() {
                 />
 
                 {/* Dashboard Content */}
-                <main className="flex-1 space-y-6 p-6">
+                <main className="min-w-0 flex-1 space-y-6 p-4 sm:p-6">
                     {/* Summary Cards */}
                     <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         <Card className="shadow-sm">

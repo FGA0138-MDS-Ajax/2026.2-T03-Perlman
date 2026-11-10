@@ -77,10 +77,10 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
                 </Button>
             </aside>
 
-            <div className="flex flex-1 flex-col overflow-x-hidden">
-                <header className="flex items-center justify-between border-b bg-card/60 px-6 py-4 backdrop-blur">
-                    <div>
-                        <h1 className="text-xl font-bold tracking-tight">{title}</h1>
+            <div className="flex min-w-0 flex-1 flex-col">
+                <header className="flex items-center justify-between gap-3 border-b bg-card/60 px-4 py-3 backdrop-blur sm:px-6 sm:py-4">
+                    <div className="min-w-0">
+                        <h1 className="truncate text-lg font-bold tracking-tight sm:text-xl">{title}</h1>
                         <p className="text-xs text-muted-foreground">MotivaFit</p>
                     </div>
 
@@ -97,7 +97,34 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
                     </div>
                 </header>
 
-                <main className="flex-1 space-y-6 p-6">{children}</main>
+                <nav aria-label="Navegação administrativa" className="flex gap-1 overflow-x-auto border-b px-3 py-2 md:hidden">
+                    {navigationItems.filter((item) => item.to !== "/admin/superusuario" || isSuperusuario).map(({ label, to, icon: Icon }) => (
+                        <Button key={to} variant="ghost" size="sm" className="shrink-0 gap-2" asChild>
+                            <Link to={to}>
+                                <Icon className="h-4 w-4" />
+                                {label}
+                            </Link>
+                        </Button>
+                    ))}
+                    <Button variant="outline" size="sm" className="shrink-0 gap-2" asChild>
+                        <Link to="/principal">
+                            <ExternalLink className="h-4 w-4" />
+                            App do Aluno
+                        </Link>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="shrink-0 gap-2 text-destructive hover:bg-destructive/10"
+                        onClick={handleLogout}
+                        disabled={enviando}
+                    >
+                        <LogOut className="h-4 w-4" />
+                        Sair
+                    </Button>
+                </nav>
+
+                <main className="min-w-0 flex-1 space-y-6 p-4 sm:p-6">{children}</main>
             </div>
         </div>
     );

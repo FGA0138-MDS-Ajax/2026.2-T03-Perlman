@@ -166,7 +166,7 @@ export default function PaginaRealizarTreino() {
                     <Button variant="secondary" className="justify-start gap-2.5" asChild><Link to="/treinos" state={{ realizar: true }}><Play className="h-4 w-4" />Realizar treino</Link></Button>
                 </nav>
             </aside>
-            <main className="flex-1 space-y-6 p-6">
+            <main className="min-w-0 flex-1 space-y-6 p-4 sm:p-6">
                 <p><Link to="/treinos" className="text-sm text-primary underline-offset-4 hover:underline">Voltar aos treinos</Link></p>
                 {!idValido && <p role="alert">Treino inválido.</p>}
                 {idValido && consulta.status === "carregando" && <p role="status">Carregando treino…</p>}

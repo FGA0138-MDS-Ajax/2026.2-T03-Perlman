@@ -135,3 +135,9 @@
     @apply font-sans;
   }
 }
+
+@media (max-width: 639px) {
+  .terms-content section {
+    padding: 1rem;
+  }
+}

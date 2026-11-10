@@ -25,7 +25,7 @@ export default function PaginaTermosDeUso() {
     return (
         <div className="flex min-h-screen flex-col bg-background text-foreground">
             {/* Header */}
-            <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md px-6 py-4">
+            <header className="sticky top-0 z-40 border-b bg-background/80 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-4">
                 <div className="mx-auto flex max-w-4xl items-center justify-between">
                     <Link
                         to="/"
@@ -40,7 +40,7 @@ export default function PaginaTermosDeUso() {
 
             {/* Conteúdo principal */}
             <main className="flex-1 px-4 py-10 sm:px-6">
-                <article className="mx-auto max-w-4xl space-y-10">
+                <article className="terms-content mx-auto max-w-4xl space-y-10">
                     {/* Cabeçalho */}
                     <div className="text-center space-y-4">
                         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
@@ -535,16 +535,16 @@ export default function PaginaTermosDeUso() {
                         <p className="text-sm text-muted-foreground">
                             Ao criar sua conta no MotivaFit, você confirma estar ciente e de acordo com as disposições destes Termos de Uso e da Política de Privacidade.
                         </p>
-                        <div className="flex justify-center gap-3">
+                        <div className="flex flex-col justify-center gap-3 sm:flex-row">
                             <Link
                                 to="/cadastro"
-                                className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+                                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
                             >
                                 Criar minha conta
                             </Link>
                             <Link
                                 to="/"
-                                className="inline-flex items-center gap-2 rounded-md border px-6 py-2.5 text-sm font-medium hover:bg-muted transition-colors"
+                                className="inline-flex items-center justify-center gap-2 rounded-md border px-6 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                             >
                                 Voltar ao início
                             </Link>
@@ -554,7 +554,7 @@ export default function PaginaTermosDeUso() {
             </main>
 
             {/* Footer */}
-            <footer className="border-t px-6 py-6 text-center text-sm text-muted-foreground bg-muted/20">
+            <footer className="border-t bg-muted/20 px-4 py-6 text-center text-sm text-muted-foreground sm:px-6">
                 <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
                     <span>© 2026 MotivaFit — Grupo Perlman & UnB. Todos os direitos reservados.</span>
                     <div className="flex items-center gap-4 text-xs">

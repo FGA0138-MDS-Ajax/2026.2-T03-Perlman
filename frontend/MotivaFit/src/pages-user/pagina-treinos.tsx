@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Dumbbell, Home, LogOut, Play, Plus, Shield, Trash2, Edit3, Menu } from "lucide-react";
+import { Plus, Trash2, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
@@ -25,7 +22,6 @@ import {
     validarNomeTreino,
     type FiltroModalidade,
 } from "@/lib/treinos-apresentacao";
-import HeaderMenu from "@/components/menu";
 import Header from "@/components/header";
 import Aside from "@/components/aside";
 
@@ -182,7 +178,7 @@ export default function PaginaTreinos() {
     const [selecionados, setSelecionados] = useState<ExercicioSelecionado[]>([]);
     const [copiandoId, setCopiandoId] = useState<number | null>(null);
     const [erroCopia, setErroCopia] = useState("");
-    const [menuAberto, setMenuAberto] = useState(true);
+    const [menuAberto, setMenuAberto] = useState(false);
     const [treinoDetalhado, setTreinoDetalhado] = useState<TreinoResponseDTO | null>(null);
     const origemDetalhesRef = useRef<HTMLElement | null>(null);
     const [textoCatalogo, setTextoCatalogo] = useState("");
@@ -409,23 +405,16 @@ export default function PaginaTreinos() {
 
     const email = user?.email ?? "";
 
-    const asideClass = (menuAberto: boolean) => {
-        return menuAberto
-            ? "w-full fixed md:static md:!flex md:flex-col bottom-0 md:bottom-auto md:h-full md:w-64  border-r bg-muted p-6 md:flex"
-            : "!hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex";
-    };
-
     return (
-        <div className="flex min-h-screen bg-background h-screen">
+        <div className="flex min-h-screen bg-background">
             <Aside
                 menuAberto={menuAberto}
                 setMenuAberto={setMenuAberto}
-                email={email}
                 isAdmin={isAdmin}
                 logout={logout}
                 saindo={saindo} />
 
-            <div className="flex flex-1 flex-col overflow-x-hidden">
+            <div className="flex min-w-0 flex-1 flex-col">
                 <Header
                     email={email}
                     menuAberto={menuAberto}
@@ -434,7 +423,7 @@ export default function PaginaTreinos() {
                     subtitle="Gerencie seus treinos e exercícios."
                 />
 
-                <div className="flex items-center justify-center  bg-background/60 px-6 py-3">
+                <div className="flex flex-wrap items-center justify-center bg-background/60 px-4 py-3 sm:px-6">
                     <Button
                         type="button"
                         className="rounded-r-none cursor-pointer"
@@ -454,9 +443,9 @@ export default function PaginaTreinos() {
                     </Button>
                 </div>
 
-                <main className="flex-1 space-y-8 p-6">
+                <main className="min-w-0 flex-1 space-y-8 p-4 sm:p-6">
                     <section className="mx-auto max-w-5xl space-y-4">
-                        <div className="flex items-center justify-between gap-4">
+                        <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
                             <h2 className="font-heading text-lg font-bold">Treinos da conta</h2>
                             <Button onClick={abrirCriacao} disabled={enviando} className="gap-2">
                                 <Plus className="h-4 w-4" />Criar treino
@@ -464,7 +453,7 @@ export default function PaginaTreinos() {
                         </div>
 
                         <Dialog open={formularioAberto} onOpenChange={(aberto) => { if (!salvando.current) setFormularioAberto(aberto); }}>
-                            <DialogContent className="max-h-[90dvh] md:max-w-[50dvw] md:p-10 overflow-y-auto sm:max-w-4xl" showCloseButton={!enviando} finalFocus={origemFormularioRef}>
+                            <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-4xl md:max-w-[50dvw] md:p-10" showCloseButton={!enviando} finalFocus={origemFormularioRef}>
                                 <DialogHeader className="pr-8">
                                     <DialogTitle>{editando ? "Editar treino" : "Novo treino"}</DialogTitle>
                                     <DialogDescription className="sr-only">
@@ -714,8 +703,8 @@ function ExerciciosSelecionados({
                         const pace = paceDosCampos(item.campos);
                         const metaAnterior = item.metaOriginal && !lerMeta(item.modalidade, item.metaOriginal) ? item.metaOriginal : "";
                         return (
-                            <li key={item.chave} className="flex items-end gap-3 overflow-x-auto rounded-lg border p-3">
-                                <p className="min-w-28 flex-1 self-center text-sm font-medium">{nome}</p>
+                            <li key={item.chave} className="flex min-w-0 flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:flex-wrap sm:items-end">
+                                <p className="min-w-0 break-words text-sm font-medium sm:flex-1">{nome}</p>
                                 {item.removido ? (
                                     <>
                                         <p className="text-sm text-muted-foreground">{nome} será removido ao salvar.</p>
@@ -751,7 +740,7 @@ function ExerciciosSelecionados({
 
 function CampoMeta({ id, rotulo, valor, onChange }: { id: string; rotulo: string; valor: string; onChange: (valor: string) => void }) {
     return (
-        <div className="flex w-24 shrink-0 flex-col gap-2">
+        <div className="flex min-w-0 flex-col gap-2 sm:w-24 sm:shrink-0">
             <Label htmlFor={id}>{rotulo.replace(/ de .*?(?= \(|$)/, "")}</Label>
             <Input aria-label={rotulo} id={id} inputMode="decimal" value={valor} onChange={(event) => onChange(event.target.value)} />
         </div>
