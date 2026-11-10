@@ -1,15 +1,29 @@
 import type {
     CatalogoExercicioRequestDTO,
     CatalogoExercicioResponseDTO,
+    ModalidadeBackend,
 } from "@/lib/api/contracts";
-import { apiRequest } from "@/lib/api/http-client";
+import { apiRequest, exigirLista, exigirValor } from "@/lib/api/http-client";
 
-export function listarCatalogoExercicios(): Promise<CatalogoExercicioResponseDTO[]> {
-    return apiRequest<CatalogoExercicioResponseDTO[]>("/api/catalogo-exercicios");
+const MODALIDADES: readonly ModalidadeBackend[] = ["MUSCULACAO", "AEROBICO"];
+
+function exercicioValido(item: unknown): item is CatalogoExercicioResponseDTO {
+    if (typeof item !== "object" || item === null) return false;
+    const exercicio = item as CatalogoExercicioResponseDTO;
+    return typeof exercicio.id === "number"
+        && typeof exercicio.nome === "string"
+        && MODALIDADES.includes(exercicio.modalidade)
+        && typeof exercicio.grupoMuscular === "string";
 }
 
-export function buscarExercicioCatalogo(id: number): Promise<CatalogoExercicioResponseDTO> {
-    return apiRequest<CatalogoExercicioResponseDTO>(`/api/catalogo-exercicios/${id}`);
+export async function listarCatalogoExercicios(signal?: AbortSignal): Promise<CatalogoExercicioResponseDTO[]> {
+    const dados = await apiRequest<unknown>("/api/catalogo-exercicios", { signal });
+    return exigirLista(dados, exercicioValido);
+}
+
+export async function buscarExercicioCatalogo(id: number, signal?: AbortSignal): Promise<CatalogoExercicioResponseDTO> {
+    const dados = await apiRequest<unknown>(`/api/catalogo-exercicios/${id}`, { signal });
+    return exigirValor(dados, exercicioValido);
 }
 
 export function criarExercicioCatalogo(

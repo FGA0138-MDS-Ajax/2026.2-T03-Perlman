@@ -111,6 +111,7 @@ export default function PaginaInterfaceInicial() {
                 <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
                     <span>© 2026 MotivaFit — Grupo Perlman & UnB. Todos os direitos reservados.</span>
                     <div className="flex items-center gap-4 text-xs">
+                        <Link to="/termos-de-uso" className="hover:text-foreground">Termos de Uso</Link>
                         <Link to="/login" className="hover:text-foreground">Login</Link>
                         <Link to="/cadastro" className="hover:text-foreground">Cadastro</Link>
                     </div>

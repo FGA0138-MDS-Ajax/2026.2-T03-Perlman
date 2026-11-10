@@ -10,14 +10,17 @@ public final class TreinoMapper {
     private TreinoMapper() {
     }
 
-    public static TreinoResponseDTO toDto(Treino treino) {
+    public static TreinoResponseDTO toDto(Treino treino, Long usuarioAutenticadoId) {
+        boolean meuTreino = usuarioAutenticadoId != null && usuarioAutenticadoId.equals(treino.getUsuarioId());
         return new TreinoResponseDTO(
                 treino.getId(),
                 treino.getNome(),
                 treino.getTipo(),
                 treino.getVisibilidade(),
                 treino.getCreatedAt(),
-                treino.getUpdatedAt()
+                treino.getUpdatedAt(),
+                meuTreino,
+                meuTreino
         );
     }
 

@@ -17,6 +17,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 security:
+  cookies:
+    secure: ${COOKIE_SECURE:true}
   jwt:
     secret-key: ${JWT_SECRET}
     issuer: ${JWT_ISSUER}

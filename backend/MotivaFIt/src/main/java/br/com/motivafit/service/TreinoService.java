@@ -30,27 +30,27 @@ public class TreinoService {
     @Transactional
     public TreinoResponseDTO create(Long usuarioId, TreinoRequestDTO request) {
         Treino entity = TreinoMapper.toEntity(request, usuarioId);
-        return TreinoMapper.toDto(treinoRepository.saveAndFlush(entity));
+        return TreinoMapper.toDto(treinoRepository.saveAndFlush(entity), usuarioId);
     }
 
     @Transactional(readOnly = true)
     public List<TreinoResponseDTO> findAll(Long usuarioId) {
         return treinoRepository.findAllByUsuarioIdAndExcluidoEmIsNullOrVisibilidadeAndExcluidoEmIsNull(usuarioId, Visibilidade.PUBLICO)
                 .stream()
-                .map(TreinoMapper::toDto)
+                .map(treino -> TreinoMapper.toDto(treino, usuarioId))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public TreinoResponseDTO findById(Long usuarioId, Long id) {
-        return TreinoMapper.toDto(buscarTreinoVisivel(usuarioId, id));
+        return TreinoMapper.toDto(buscarTreinoVisivel(usuarioId, id), usuarioId);
     }
 
     @Transactional
     public TreinoResponseDTO update(Long usuarioId, Long id, TreinoRequestDTO request) {
         Treino entity = buscarTreinoDoUsuario(usuarioId, id);
         TreinoMapper.updateEntity(entity, request);
-        return TreinoMapper.toDto(treinoRepository.saveAndFlush(entity));
+        return TreinoMapper.toDto(treinoRepository.saveAndFlush(entity), usuarioId);
     }
 
     @Transactional
@@ -73,7 +73,7 @@ public class TreinoService {
         if (!exerciciosCopiados.isEmpty()) {
             exercicioRepository.saveAll(exerciciosCopiados);
         }
-        return TreinoMapper.toDto(copia);
+        return TreinoMapper.toDto(copia, usuarioId);
     }
 
     private Treino copiarTreino(Treino origem, Long usuarioId) {

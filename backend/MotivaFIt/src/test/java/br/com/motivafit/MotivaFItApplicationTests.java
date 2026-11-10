@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.TestPropertySource;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,6 +52,29 @@ class MotivaFItApplicationTests {
                 .andExpect(jsonPath("$.email").value("cadastro-test@motivafit.com"))
                 .andExpect(jsonPath("$.perfil").value("USUARIO"))
                 .andExpect(jsonPath("$.ativo").value(true));
+    }
+
+    @Test
+    void apiProtegidaRejeitaRequisicaoSemSessao() throws Exception {
+        mockMvc.perform(get("/api/treinos")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void usuarioNaoPodeManterCatalogoDiretamente() throws Exception {
+        mockMvc.perform(post("/api/admin/catalogo-exercicios")
+                        .with(user("aluno@test.com").roles("USUARIO"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Supino\",\"modalidade\":\"MUSCULACAO\",\"grupoMuscular\":\"Peitoral\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void administradorNaoPodeEmitirConviteDeSuperusuario() throws Exception {
+        mockMvc.perform(post("/api/admin/convites")
+                        .with(user("admin@test.com").roles("ADMINISTRADOR"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"convidadorId\":1,\"email\":\"convidado@test.com\"}"))
+                .andExpect(status().isForbidden());
     }
 
 }

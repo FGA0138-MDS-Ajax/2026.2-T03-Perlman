@@ -5,7 +5,7 @@ import type {
     UsuarioRequestDTO,
     UsuarioResponseDTO,
 } from "@/lib/api/contracts";
-import { apiRequest, readCsrfCookie, setAccessToken } from "@/lib/api/http-client";
+import { ApiError, apiRequest, finishPendingRefresh, readCsrfCookie, setAccessToken } from "@/lib/api/http-client";
 
 function decodeBase64Url(value: string): string {
     const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
@@ -60,26 +60,29 @@ export async function registerAccount(request: UsuarioRequestDTO): Promise<Usuar
 }
 
 export async function login(request: LoginRequestDTO): Promise<LoginResponseDTO> {
+    setAccessToken(null);
+    await finishPendingRefresh();
     const response = await apiRequest<LoginResponseDTO>("/api/auth/login", {
         method: "POST",
         authenticated: false,
         body: request,
     });
+    try {
+        const claims = readJwtUsuarioClaims(response.token);
+        if (!claims.ativo || claims.exp * 1000 <= Date.now()) throw new Error("Sessão inválida");
+    } catch (cause) {
+        throw new ApiError(0, { codigo: "SESSAO_INVALIDA", mensagem: "A sessão retornada é inválida. Entre novamente.",
+            dataHora: new Date().toISOString() }, cause);
+    }
     setAccessToken(response.token);
     return response;
 }
 
-export async function refreshSession(): Promise<LoginResponseDTO> {
-    const response = await apiRequest<LoginResponseDTO>("/api/auth/refresh", {
-        method: "POST",
-        authenticated: false,
-        headers: { "X-CSRF-TOKEN": readCsrfCookie() },
-    });
-    setAccessToken(response.token);
-    return response;
-}
+export { refreshSession } from "@/lib/api/http-client";
 
 export async function logout(): Promise<void> {
+    setAccessToken(null);
+    await finishPendingRefresh();
     try {
         await apiRequest<void>("/api/auth/logout", {
             method: "POST",

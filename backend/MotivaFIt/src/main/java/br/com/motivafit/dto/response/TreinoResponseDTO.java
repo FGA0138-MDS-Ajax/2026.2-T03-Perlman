@@ -19,6 +19,10 @@ public record TreinoResponseDTO(
         @Schema(description = "Data e hora de criação", type = "string", format = "date-time")
         OffsetDateTime createdAt,
         @Schema(description = "Data e hora da última alteração", type = "string", format = "date-time")
-        OffsetDateTime updatedAt
+        OffsetDateTime updatedAt,
+        @Schema(description = "Verdadeiro quando o treino pertence ao usuário autenticado")
+        boolean meuTreino,
+        @Schema(description = "Verdadeiro quando o usuário autenticado pode alterar ou excluir o treino. Treino público de outra pessoa permanece apenas consultável.")
+        boolean podeEditar
 ) {
 }

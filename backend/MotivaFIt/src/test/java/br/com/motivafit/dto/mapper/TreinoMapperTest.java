@@ -52,7 +52,7 @@ class TreinoMapperTest {
         entity.setTipo(TipoTreino.AEROBICO);
         entity.setVisibilidade(Visibilidade.PRIVADO);
 
-        TreinoResponseDTO dto = TreinoMapper.toDto(entity);
+        TreinoResponseDTO dto = TreinoMapper.toDto(entity, 7L);
 
         assertEquals(10L, dto.id());
         assertEquals("Treino C", dto.nome());
@@ -60,6 +60,19 @@ class TreinoMapperTest {
         assertEquals(Visibilidade.PRIVADO, dto.visibilidade());
         assertSame(criado, dto.createdAt());
         assertSame(alterado, dto.updatedAt());
+        assertTrue(dto.meuTreino());
+        assertTrue(dto.podeEditar());
+    }
+
+    @Test
+    void treinoDeOutroUsuarioNaoPodeSerEditado() {
+        Treino entity = new Treino();
+        entity.setUsuarioId(7L);
+
+        TreinoResponseDTO dto = TreinoMapper.toDto(entity, 8L);
+
+        assertFalse(dto.meuTreino());
+        assertFalse(dto.podeEditar());
     }
 
     @Test

@@ -1,1335 +1,938 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Dumbbell, Home, LogOut, Play, Plus, Shield, Trash2, Edit3, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useNavigate, Link } from "react-router-dom";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
+import { ApiError } from "@/lib/api/http-client";
+import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
+import { adicionarExercicioAoTreino, atualizarExercicioDoTreino, listarExerciciosDoTreino, removerExercicioDoTreino } from "@/lib/api/exercicios-api";
+import { atualizarTreino, copiarTreinoPublico, criarTreino, excluirTreino, listarTreinos } from "@/lib/api/treinos-api";
+import type { CatalogoExercicioResponseDTO, ExercicioResponseDTO, ModalidadeBackend, TipoTreinoBackend, TreinoResponseDTO, VisibilidadeBackend } from "@/lib/api/contracts";
+import { camposVazios, formatarMetaVisivel, lerMeta, paceDosCampos, serializarMeta, validarMeta, type CamposMeta } from "@/lib/meta-exercicio";
 import {
-    Home,
-    Dumbbell,
-    LineChart,
-    Settings,
-    LogOut,
-    Shield,
-    Plus,
-    Search,
-    Trash2,
-    Edit3,
-    Check,
-    Sparkles,
-    ArrowLeft,
-    ArrowRight,
-    Layers,
-    Play,
-    Copy,
-    ChevronDown,
-    ChevronUp,
-    AlertCircle,
-    X,
-    Trophy
-} from "lucide-react";
+    ROTULO_TIPO,
+    ROTULO_VISIBILIDADE,
+    filtrarCatalogo,
+    gruposDoCatalogo,
+    validarNomeTreino,
+    type FiltroModalidade,
+} from "@/lib/treinos-apresentacao";
+import HeaderMenu from "@/components/menu";
+import Header from "@/components/header";
+import Aside from "@/components/aside";
 
-// Tipos alinhados ao diagrama de classes (TREINO, EXERCICIO, CATALOGO_EXERCICIO)
-export type ModalidadeTreino = "musculação" | "aeróbico";
+type Consulta<T> =
+    | { status: "carregando" }
+    | { status: "sucesso"; dados: T }
+    | { status: "erro"; mensagem: string };
 
-export interface CatalogoExercicioItem {
-    id: string;
-    nome: string;
-    grupoMuscular: string;
-    metaPadrao: string;
-    metaRecordePadrao: string;
-    origem: "MOTIVAFIT" | "USUARIO";
+function ignorarConsulta(error: unknown): boolean {
+    if (error instanceof ApiError && error.code === "SESSAO_ALTERADA") return true;
+    return error instanceof Error && error.name === "AbortError";
 }
 
-export interface ExercicioTreino {
-    id: string; // id único da instância no treino
-    catalogoExercicioId: string;
-    nome: string;
-    grupoMuscular: string;
-    meta: string; // meta (texto)
-    metaRecorde: string; // metaRecorde (texto)
-}
-
-export interface TemplateTreino {
-    id: string;
-    nome: string;
-    tipo: ModalidadeTreino;
-    exercicios: ExercicioTreino[];
-}
-
-export interface Treino {
-    id: string;
-    nome: string;
-    tipo: ModalidadeTreino;
-    dataCriacao: string;
-    exercicios: ExercicioTreino[];
-}
-
-// Catálogo Base do MotivaFit (CATALOGO_EXERCICIO)
-const CATALOGO_MOTIVAFIT: CatalogoExercicioItem[] = [
-    { id: "mf-1", nome: "Supino Reto com Barra", grupoMuscular: "Peitoral", metaPadrao: "4 séries de 10-12 reps", metaRecordePadrao: "30 kg cada lado", origem: "MOTIVAFIT" },
-    { id: "mf-2", nome: "Supino Inclinado com Halteres", grupoMuscular: "Peitoral", metaPadrao: "3 séries de 12 reps", metaRecordePadrao: "18 kg haltere", origem: "MOTIVAFIT" },
-    { id: "mf-3", nome: "Crucifixo com Halteres", grupoMuscular: "Peitoral", metaPadrao: "3 séries de 12-15 reps", metaRecordePadrao: "14 kg haltere", origem: "MOTIVAFIT" },
-    { id: "mf-4", nome: "Puxada Alta Aberta", grupoMuscular: "Costas", metaPadrao: "4 séries de 10-12 reps", metaRecordePadrao: "50 kg placa", origem: "MOTIVAFIT" },
-    { id: "mf-5", nome: "Remada Curvada com Barra", grupoMuscular: "Costas", metaPadrao: "4 séries de 10 reps", metaRecordePadrao: "25 kg cada lado", origem: "MOTIVAFIT" },
-    { id: "mf-6", nome: "Remada Baixa no Triângulo", grupoMuscular: "Costas", metaPadrao: "3 séries de 12 reps", metaRecordePadrao: "45 kg placa", origem: "MOTIVAFIT" },
-    { id: "mf-7", nome: "Agachamento Livre com Barra", grupoMuscular: "Pernas", metaPadrao: "4 séries de 8-10 reps", metaRecordePadrao: "35 kg cada lado", origem: "MOTIVAFIT" },
-    { id: "mf-8", nome: "Leg Press 45°", grupoMuscular: "Pernas", metaPadrao: "4 séries de 12 reps", metaRecordePadrao: "160 kg total", origem: "MOTIVAFIT" },
-    { id: "mf-9", nome: "Cadeira Extensora", grupoMuscular: "Pernas", metaPadrao: "3 séries de 15 reps", metaRecordePadrao: "40 kg placa", origem: "MOTIVAFIT" },
-    { id: "mf-10", nome: "Mesa Flexora", grupoMuscular: "Pernas", metaPadrao: "3 séries de 12 reps", metaRecordePadrao: "35 kg placa", origem: "MOTIVAFIT" },
-    { id: "mf-11", nome: "Desenvolvimento Militar", grupoMuscular: "Ombros", metaPadrao: "4 séries de 10 reps", metaRecordePadrao: "15 kg cada lado", origem: "MOTIVAFIT" },
-    { id: "mf-12", nome: "Elevação Lateral com Halteres", grupoMuscular: "Ombros", metaPadrao: "4 séries de 12-15 reps", metaRecordePadrao: "10 kg haltere", origem: "MOTIVAFIT" },
-    { id: "mf-13", nome: "Rosca Direta com Barra W", grupoMuscular: "Bíceps", metaPadrao: "3 séries de 10-12 reps", metaRecordePadrao: "12 kg cada lado", origem: "MOTIVAFIT" },
-    { id: "mf-14", nome: "Rosca Martelo com Halteres", grupoMuscular: "Bíceps", metaPadrao: "3 séries de 12 reps", metaRecordePadrao: "14 kg haltere", origem: "MOTIVAFIT" },
-    { id: "mf-15", nome: "Tríceps Corda na Polia", grupoMuscular: "Tríceps", metaPadrao: "3 séries de 15 reps", metaRecordePadrao: "25 kg placa", origem: "MOTIVAFIT" },
-    { id: "mf-16", nome: "Tríceps Francês Unilateral", grupoMuscular: "Tríceps", metaPadrao: "3 séries de 12 reps", metaRecordePadrao: "12 kg haltere", origem: "MOTIVAFIT" },
-    { id: "mf-17", nome: "Abdominal Supra no Solo", grupoMuscular: "Abdômen", metaPadrao: "4 séries de 20 reps", metaRecordePadrao: "Peso corporal", origem: "MOTIVAFIT" },
-    { id: "mf-18", nome: "Prancha Isométrica", grupoMuscular: "Abdômen", metaPadrao: "3 séries de 60s", metaRecordePadrao: "60 segundos", origem: "MOTIVAFIT" },
-    { id: "mf-19", nome: "Corrida Esteira HIIT", grupoMuscular: "Cardio", metaPadrao: "20 minutos contínuos", metaRecordePadrao: "Velocidade 11 km/h", origem: "MOTIVAFIT" },
-    { id: "mf-20", nome: "Bicicleta Ergométrica", grupoMuscular: "Cardio", metaPadrao: "30 minutos moderados", metaRecordePadrao: "Nível 7", origem: "MOTIVAFIT" },
-];
-
-// Templates Prontos do MotivaFit
-const TEMPLATES_MOTIVAFIT: TemplateTreino[] = [
-    {
-        id: "tpl-1",
-        nome: "Treino A - Peito, Ombros e Tríceps",
-        tipo: "musculação",
-        exercicios: [
-            { id: "t1-1", catalogoExercicioId: "mf-1", nome: "Supino Reto com Barra", grupoMuscular: "Peitoral", meta: "4 séries de 10-12 reps", metaRecorde: "30 kg cada lado" },
-            { id: "t1-2", catalogoExercicioId: "mf-2", nome: "Supino Inclinado com Halteres", grupoMuscular: "Peitoral", meta: "3 séries de 12 reps", metaRecorde: "18 kg haltere" },
-            { id: "t1-3", catalogoExercicioId: "mf-11", nome: "Desenvolvimento Militar", grupoMuscular: "Ombros", meta: "4 séries de 10 reps", metaRecorde: "15 kg cada lado" },
-            { id: "t1-4", catalogoExercicioId: "mf-12", nome: "Elevação Lateral com Halteres", grupoMuscular: "Ombros", meta: "4 séries de 12-15 reps", metaRecorde: "10 kg haltere" },
-            { id: "t1-5", catalogoExercicioId: "mf-15", nome: "Tríceps Corda na Polia", grupoMuscular: "Tríceps", meta: "3 séries de 15 reps", metaRecorde: "25 kg placa" },
-        ]
-    },
-    {
-        id: "tpl-2",
-        nome: "Treino B - Costas e Bíceps",
-        tipo: "musculação",
-        exercicios: [
-            { id: "t2-1", catalogoExercicioId: "mf-4", nome: "Puxada Alta Aberta", grupoMuscular: "Costas", meta: "4 séries de 10-12 reps", metaRecorde: "50 kg placa" },
-            { id: "t2-2", catalogoExercicioId: "mf-5", nome: "Remada Curvada com Barra", grupoMuscular: "Costas", meta: "4 séries de 10 reps", metaRecorde: "25 kg cada lado" },
-            { id: "t2-3", catalogoExercicioId: "mf-6", nome: "Remada Baixa no Triângulo", grupoMuscular: "Costas", meta: "3 séries de 12 reps", metaRecorde: "45 kg placa" },
-            { id: "t2-4", catalogoExercicioId: "mf-13", nome: "Rosca Direta com Barra W", grupoMuscular: "Bíceps", meta: "3 séries de 10-12 reps", metaRecorde: "12 kg cada lado" },
-            { id: "t2-5", catalogoExercicioId: "mf-14", nome: "Rosca Martelo com Halteres", grupoMuscular: "Bíceps", meta: "3 séries de 12 reps", metaRecorde: "14 kg haltere" },
-        ]
-    },
-    {
-        id: "tpl-3",
-        nome: "Treino C - Membros Inferiores",
-        tipo: "musculação",
-        exercicios: [
-            { id: "t3-1", catalogoExercicioId: "mf-7", nome: "Agachamento Livre com Barra", grupoMuscular: "Pernas", meta: "4 séries de 8-10 reps", metaRecorde: "35 kg cada lado" },
-            { id: "t3-2", catalogoExercicioId: "mf-8", nome: "Leg Press 45°", grupoMuscular: "Pernas", meta: "4 séries de 12 reps", metaRecorde: "160 kg total" },
-            { id: "t3-3", catalogoExercicioId: "mf-9", nome: "Cadeira Extensora", grupoMuscular: "Pernas", meta: "3 séries de 15 reps", metaRecorde: "40 kg placa" },
-            { id: "t3-4", catalogoExercicioId: "mf-10", nome: "Mesa Flexora", grupoMuscular: "Pernas", meta: "3 séries de 12 reps", metaRecorde: "35 kg placa" },
-        ]
-    },
-    {
-        id: "tpl-4",
-        nome: "Treino Funcional & Cardio",
-        tipo: "aeróbico",
-        exercicios: [
-            { id: "t4-1", catalogoExercicioId: "mf-19", nome: "Corrida Esteira HIIT", grupoMuscular: "Cardio", meta: "25 minutos alternando ritmo", metaRecorde: "Velocidade 11 km/h" },
-            { id: "t4-2", catalogoExercicioId: "mf-17", nome: "Abdominal Supra no Solo", grupoMuscular: "Abdômen", meta: "4 séries de 20 reps", metaRecorde: "Peso corporal" },
-            { id: "t4-3", catalogoExercicioId: "mf-18", nome: "Prancha Isométrica", grupoMuscular: "Abdômen", meta: "3 séries de 60s", metaRecorde: "60 segundos" },
-        ]
+function descartarTreinosLocais(): void {
+    try {
+        localStorage.removeItem("@motivafit:treinos");
+        localStorage.removeItem("@motivafit:meus-exercicios");
+    } catch {
+        // Armazenamento bloqueado não reintroduz a lista local.
     }
-];
+}
 
-// Exercícios personalizados do usuário
-const MEUS_EXERCICIOS_INICIAL: CatalogoExercicioItem[] = [
-    { id: "usr-1", nome: "Afundo Búlgaro com Halteres", grupoMuscular: "Pernas", metaPadrao: "3 séries de 12 reps cada perna", metaRecordePadrao: "14 kg halteres", origem: "USUARIO" },
-    { id: "usr-2", nome: "Elevação Pélvica com Barra", grupoMuscular: "Pernas", metaPadrao: "4 séries de 10-12 reps", metaRecordePadrao: "50 kg barra", origem: "USUARIO" },
-    { id: "usr-3", nome: "Crucifixo Invertido no Peck Deck", grupoMuscular: "Costas", metaPadrao: "4 séries de 15 reps", metaRecordePadrao: "30 kg placa", origem: "USUARIO" },
-    { id: "usr-4", nome: "Remada Cavalinho com Anilha", grupoMuscular: "Costas", metaPadrao: "4 séries de 10 reps", metaRecordePadrao: "40 kg anilhas", origem: "USUARIO" },
-];
-
-// Treinos cadastrados iniciais
-const TREINOS_INICIAIS: Treino[] = [
-    {
-        id: "tr-1",
-        nome: "Treino A - Peito, Ombros e Tríceps",
-        tipo: "musculação",
-        dataCriacao: "20/10/2026",
-        exercicios: [
-            { id: "e-1", catalogoExercicioId: "mf-1", nome: "Supino Reto com Barra", grupoMuscular: "Peitoral", meta: "4 séries de 10-12 reps", metaRecorde: "30 kg cada lado" },
-            { id: "e-2", catalogoExercicioId: "mf-2", nome: "Supino Inclinado com Halteres", grupoMuscular: "Peitoral", meta: "3 séries de 12 reps", metaRecorde: "18 kg haltere" },
-            { id: "e-3", catalogoExercicioId: "mf-11", nome: "Desenvolvimento Militar", grupoMuscular: "Ombros", meta: "4 séries de 10 reps", metaRecorde: "15 kg cada lado" },
-            { id: "e-4", catalogoExercicioId: "mf-15", nome: "Tríceps Corda na Polia", grupoMuscular: "Tríceps", meta: "3 séries de 15 reps", metaRecorde: "25 kg placa" },
-        ]
-    },
-    {
-        id: "tr-2",
-        nome: "Treino B - Dorsal e Bíceps",
-        tipo: "musculação",
-        dataCriacao: "22/10/2026",
-        exercicios: [
-            { id: "e-5", catalogoExercicioId: "mf-4", nome: "Puxada Alta Aberta", grupoMuscular: "Costas", meta: "4 séries de 10-12 reps", metaRecorde: "50 kg placa" },
-            { id: "e-6", catalogoExercicioId: "mf-5", nome: "Remada Curvada com Barra", grupoMuscular: "Costas", meta: "4 séries de 10 reps", metaRecorde: "25 kg cada lado" },
-            { id: "e-7", catalogoExercicioId: "mf-13", nome: "Rosca Direta com Barra W", grupoMuscular: "Bíceps", meta: "3 séries de 10-12 reps", metaRecorde: "12 kg cada lado" },
-        ]
+function useConsulta<T>(buscar: (signal: AbortSignal) => Promise<T>, versao: number) {
+    const [estado, setEstado] = useState<Consulta<T>>({ status: "carregando" });
+    const [versaoCarregada, setVersaoCarregada] = useState(versao);
+    if (versaoCarregada !== versao) {
+        setVersaoCarregada(versao);
+        setEstado({ status: "carregando" });
     }
-];
+
+    useEffect(() => {
+        const controller = new AbortController();
+        let ativo = true;
+        buscar(controller.signal).then(
+            (dados) => {
+                if (ativo) setEstado({ status: "sucesso", dados });
+            },
+            (error: unknown) => {
+                if (!ativo || ignorarConsulta(error)) return;
+                setEstado({ status: "erro", mensagem: mensagemAutenticacao(error) });
+            },
+        );
+        return () => {
+            ativo = false;
+            controller.abort();
+        };
+    }, [buscar, versao]);
+
+    return [estado, setEstado] as const;
+}
+
+type ExercicioSelecionado = {
+    chave: string;
+    catalogoExercicioId: number;
+    modalidade: ModalidadeBackend;
+    campos: CamposMeta;
+    metaOriginal: string;
+    metaRecorde: string;
+    persistidoId: number | null;
+    removido: boolean;
+};
+
+function metaDoItem(item: ExercicioSelecionado): string {
+    return serializarMeta(item.campos) ?? "";
+}
+
+function validarExerciciosSelecionados(itens: ExercicioSelecionado[], nomeDe: (id: number) => string): string | null {
+    for (const item of itens) {
+        if (item.removido) continue;
+        const erro = validarMeta(item.campos, nomeDe(item.catalogoExercicioId));
+        if (erro) return erro;
+    }
+    return null;
+}
+
+function exercicioAlterado(item: ExercicioSelecionado): boolean {
+    return item.persistidoId !== null && !item.removido && metaDoItem(item) !== item.metaOriginal;
+}
+
+function pedidoDoExercicio(treinoId: number, item: ExercicioSelecionado) {
+    return {
+        meta: metaDoItem(item),
+        metaRecorde: item.metaRecorde.trim() || null,
+        treinoId,
+        catalogoExercicioId: item.catalogoExercicioId,
+    };
+}
+
+function confirmarExercicio(item: ExercicioSelecionado, resposta: ExercicioResponseDTO): ExercicioSelecionado {
+    return {
+        ...item,
+        persistidoId: resposta.id,
+        campos: lerMeta(item.modalidade, resposta.meta) ?? item.campos,
+        metaOriginal: resposta.meta,
+        metaRecorde: resposta.metaRecorde ?? "",
+        removido: false,
+    };
+}
+
+async function sincronizarExercicios(
+    treinoId: number,
+    itens: ExercicioSelecionado[],
+    nomeDe: (id: number) => string,
+): Promise<{ itens: ExercicioSelecionado[]; erro: string | null }> {
+    let atuais = itens.map((item) => ({ ...item }));
+    for (const item of atuais.filter(exercicioAlterado)) {
+        try {
+            const resposta = await atualizarExercicioDoTreino(treinoId, item.persistidoId!, pedidoDoExercicio(treinoId, item));
+            atuais = atuais.map((atual) => atual.chave === item.chave ? confirmarExercicio(atual, resposta) : atual);
+        } catch (error) {
+            return { itens: atuais, erro: `O treino foi salvo, mas não foi possível alterar ${nomeDe(item.catalogoExercicioId)}. ${mensagemAutenticacao(error)}` };
+        }
+    }
+    for (const item of atuais.filter((atual) => atual.removido && atual.persistidoId !== null)) {
+        try {
+            await removerExercicioDoTreino(treinoId, item.persistidoId!);
+            atuais = atuais.filter((atual) => atual.chave !== item.chave);
+        } catch (error) {
+            if (error instanceof ApiError && error.status === 404) {
+                atuais = atuais.filter((atual) => atual.chave !== item.chave);
+                continue;
+            }
+            return { itens: atuais, erro: `O treino foi salvo, mas não foi possível remover ${nomeDe(item.catalogoExercicioId)}. ${mensagemAutenticacao(error)}` };
+        }
+    }
+    for (const item of atuais.filter((atual) => atual.persistidoId === null && !atual.removido)) {
+        try {
+            const resposta = await adicionarExercicioAoTreino(treinoId, pedidoDoExercicio(treinoId, item));
+            atuais = atuais.map((atual) => atual.chave === item.chave ? confirmarExercicio(atual, resposta) : atual);
+        } catch (error) {
+            return { itens: atuais, erro: `O treino foi salvo, mas não foi possível incluir ${nomeDe(item.catalogoExercicioId)}. ${mensagemAutenticacao(error)}` };
+        }
+    }
+    return { itens: atuais, erro: null };
+}
 
 export default function PaginaTreinos() {
-    const navigate = useNavigate();
-
-    // Estados dos treinos e dos exercícios do usuário
-    const [treinos, setTreinos] = useState<Treino[]>(() => {
-        const salvos = localStorage.getItem("@motivafit:treinos");
-        return salvos ? JSON.parse(salvos) : TREINOS_INICIAIS;
-    });
-
-    const [meusExercicios, setMeusExercicios] = useState<CatalogoExercicioItem[]>(() => {
-        const salvos = localStorage.getItem("@motivafit:meus-exercicios");
-        return salvos ? JSON.parse(salvos) : MEUS_EXERCICIOS_INICIAL;
-    });
+    const { user, logout, isAdmin, enviando: saindo } = useAuth();
+    const [versaoTreinos, setVersaoTreinos] = useState(0);
+    const [versaoCatalogo, setVersaoCatalogo] = useState(0);
+    const [treinos, setTreinos] = useConsulta(listarTreinos, versaoTreinos);
+    const [catalogo] = useConsulta(listarCatalogoExercicios, versaoCatalogo);
+    const [fichas, setFichas] = useState<Record<number, Consulta<ExercicioResponseDTO[]>>>({});
+    const [formularioAberto, setFormularioAberto] = useState(false);
+    const [editando, setEditando] = useState<TreinoResponseDTO | null>(null);
+    const [nome, setNome] = useState("");
+    const [tipo, setTipo] = useState<TipoTreinoBackend>("MUSCULACAO");
+    const [visibilidade, setVisibilidade] = useState<VisibilidadeBackend>("PRIVADO");
+    const [erroForm, setErroForm] = useState("");
+    const [enviando, setEnviando] = useState(false);
+    const [exclusao, setExclusao] = useState<TreinoResponseDTO | null>(null);
+    const [erroExclusao, setErroExclusao] = useState("");
+    const [excluindo, setExcluindo] = useState(false);
+    const [selecionados, setSelecionados] = useState<ExercicioSelecionado[]>([]);
+    const [copiandoId, setCopiandoId] = useState<number | null>(null);
+    const [erroCopia, setErroCopia] = useState("");
+    const [menuAberto, setMenuAberto] = useState(true);
+    const [treinoDetalhado, setTreinoDetalhado] = useState<TreinoResponseDTO | null>(null);
+    const origemDetalhesRef = useRef<HTMLElement | null>(null);
+    const [textoCatalogo, setTextoCatalogo] = useState("");
+    const [grupoCatalogo, setGrupoCatalogo] = useState("TODOS");
+    const [modalidadeCatalogo, setModalidadeCatalogo] = useState<FiltroModalidade>("TODAS");
+    const origemFormularioRef = useRef<HTMLElement | null>(null);
+    const montado = useRef(true);
+    const salvando = useRef(false);
+    const exclusaoEmAndamento = useRef(false);
+    const copiaEmAndamento = useRef(false);
+    const location = useLocation();
+    const meusTreinosRef = useRef<HTMLDivElement>(null);
+    const [aba, setAba] = useState<"conta" | "publicos">("conta");
+    const [pedidoRealizar, setPedidoRealizar] = useState<string | null>(null);
+    const realizarPedido = Boolean((location.state as { realizar?: boolean } | null)?.realizar);
+    if (realizarPedido && pedidoRealizar !== location.key) {
+        setPedidoRealizar(location.key);
+        setAba("conta");
+    }
 
     useEffect(() => {
-        localStorage.setItem("@motivafit:treinos", JSON.stringify(treinos));
+        montado.current = true;
+        descartarTreinosLocais();
+        return () => {
+            montado.current = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!realizarPedido || aba !== "conta" || treinos.status !== "sucesso") return;
+        meusTreinosRef.current?.scrollIntoView?.({ block: "start" });
+    }, [realizarPedido, location.key, aba, treinos.status]);
+
+    useEffect(() => {
+        if (treinos.status !== "sucesso") return;
+        const controller = new AbortController();
+        let ativo = true;
+        void Promise.all(treinos.dados.map(async (treino) => {
+            try {
+                const dados = await listarExerciciosDoTreino(treino.id, controller.signal);
+                return [treino.id, { status: "sucesso", dados }] as const;
+            } catch (error) {
+                if (!ativo || ignorarConsulta(error)) return null;
+                return [treino.id, { status: "erro", mensagem: mensagemAutenticacao(error) }] as const;
+            }
+        })).then((resultados) => {
+            if (!ativo) return;
+            const proximas: Record<number, Consulta<ExercicioResponseDTO[]>> = {};
+            for (const item of resultados) if (item) proximas[item[0]] = item[1];
+            setFichas(proximas);
+        });
+        return () => {
+            ativo = false;
+            controller.abort();
+        };
     }, [treinos]);
 
-    useEffect(() => {
-        localStorage.setItem("@motivafit:meus-exercicios", JSON.stringify(meusExercicios));
-    }, [meusExercicios]);
-
-    // Controle de modo e passos (Passo 1: Dados do Treino, Passo 2: Exercícios do Treino)
-    const [modo, setModo] = useState<"LISTAGEM" | "CRIAR" | "EDITAR">("LISTAGEM");
-    const [passoAtual, setPassoAtual] = useState<1 | 2>(1);
-    const [treinoAbertoId, setTreinoAbertoId] = useState<string | null>(null);
-
-    // Controle da seleção de exercícios no Passo 2
-    const [abaExercicios, setAbaExercicios] = useState<"MOTIVAFIT" | "MEUS_EXERCICIOS">("MOTIVAFIT");
-    const [pesquisaExercicio, setPesquisaExercicio] = useState("");
-    const [filtroGrupo, setFiltroGrupo] = useState<string>("TODOS");
-
-    // Estado do Treino em Criação / Edição (Nome do Treino, Modalidade e Exercícios)
-    const [treinoForm, setTreinoForm] = useState<{
-        id: string;
-        nome: string;
-        tipo: ModalidadeTreino;
-        exercicios: ExercicioTreino[];
-    }>({
-        id: "",
-        nome: "",
-        tipo: "musculação",
-        exercicios: []
-    });
-
-    // Modal de Criar Novo Exercício (para a lista do usuário)
-    const [modalNovoExercicioAberto, setModalNovoExercicioAberto] = useState(false);
-    const [novoExercicioForm, setNovoExercicioForm] = useState<{
-        nome: string;
-        grupoMuscular: string;
-        metaPadrao: string;
-        metaRecordePadrao: string;
-        adicionarAoTreinoAtual: boolean;
-    }>({
-        nome: "",
-        grupoMuscular: "Peitoral",
-        metaPadrao: "4 séries de 10-12 reps",
-        metaRecordePadrao: "20 kg",
-        adicionarAoTreinoAtual: true
-    });
-
-    // Toast de notificação
-    const [notificacao, setNotificacao] = useState<string | null>(null);
-
-    function mostrarNotificacao(texto: string) {
-        setNotificacao(texto);
-        setTimeout(() => setNotificacao(null), 3000);
+    function abrirCriacao() {
+        setTextoCatalogo("");
+        setGrupoCatalogo("TODOS");
+        setModalidadeCatalogo("TODAS");
+        origemFormularioRef.current = document.activeElement as HTMLElement;
+        setEditando(null);
+        setNome("");
+        setTipo("MUSCULACAO");
+        setVisibilidade("PRIVADO");
+        setSelecionados([]);
+        setErroForm("");
+        setFormularioAberto(true);
     }
 
-    // Abertura da tela de criação (inicia no Passo 1: Dados do Treino)
-    function handleAbrirCriarTreino() {
-        setTreinoForm({
-            id: `tr-${Date.now()}`,
-            nome: "",
-            tipo: "musculação",
-            exercicios: []
-        });
-        setPassoAtual(1);
-        setAbaExercicios("MOTIVAFIT");
-        setPesquisaExercicio("");
-        setFiltroGrupo("TODOS");
-        setModo("CRIAR");
-    }
-
-    // Abertura da tela de edição (inicia no Passo 1: Dados do Treino)
-    function handleAbrirEditarTreino(treino: Treino) {
-        setTreinoForm({
-            id: treino.id,
-            nome: treino.nome,
-            tipo: treino.tipo,
-            exercicios: [...treino.exercicios]
-        });
-        setPassoAtual(1);
-        setAbaExercicios("MOTIVAFIT");
-        setPesquisaExercicio("");
-        setFiltroGrupo("TODOS");
-        setModo("EDITAR");
-    }
-
-    // Avançar do Passo 1 para o Passo 2
-    function handleAvancarParaPasso2(e: React.FormEvent) {
-        e.preventDefault();
-        if (!treinoForm.nome.trim()) {
-            alert("Por favor, preencha o Nome do treino.");
-            return;
-        }
-        setPassoAtual(2);
-    }
-
-    // Exclusão de treino
-    function handleExcluirTreino(id: string) {
-        if (confirm("Deseja realmente excluir este treino?")) {
-            setTreinos(treinos.filter(t => t.id !== id));
-            mostrarNotificacao("Treino excluído!");
-        }
-    }
-
-    // Aplicar template ao treino em edição
-    function handleAplicarTemplate(template: TemplateTreino) {
-        const novos = template.exercicios.map(ex => ({
-            ...ex,
-            id: `ex-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`
-        }));
-
-        setTreinoForm(prev => ({
-            ...prev,
-            tipo: template.tipo,
-            exercicios: [...prev.exercicios, ...novos]
-        }));
-
-        mostrarNotificacao(`Template "${template.nome}" adicionado!`);
-    }
-
-    // Adicionar exercício individual ao treino
-    function handleAdicionarExercicioAoTreino(item: CatalogoExercicioItem) {
-        const novoItem: ExercicioTreino = {
-            id: `ex-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-            catalogoExercicioId: item.id,
-            nome: item.nome,
-            grupoMuscular: item.grupoMuscular,
-            meta: item.metaPadrao,
-            metaRecorde: item.metaRecordePadrao
-        };
-
-        setTreinoForm(prev => ({
-            ...prev,
-            exercicios: [...prev.exercicios, novoItem]
-        }));
-
-        mostrarNotificacao(`"${item.nome}" adicionado.`);
-    }
-
-    // Atualizar meta ou metaRecorde de um exercício no treino
-    function handleAtualizarExercicioNoTreino(idConfig: string, campo: "meta" | "metaRecorde", valor: string) {
-        setTreinoForm(prev => ({
-            ...prev,
-            exercicios: prev.exercicios.map(ex => {
-                if (ex.id === idConfig) {
-                    return { ...ex, [campo]: valor };
-                }
-                return ex;
-            })
-        }));
-    }
-
-    // Remover exercício do treino
-    function handleRemoverExercicioDoTreino(idConfig: string) {
-        setTreinoForm(prev => ({
-            ...prev,
-            exercicios: prev.exercicios.filter(ex => ex.id !== idConfig)
-        }));
-    }
-
-    // Salvar formulário final de treino (Passo 2)
-    function handleSalvarTreinoFinal() {
-        if (!treinoForm.nome.trim()) {
-            alert("Por favor, preencha o Nome do treino.");
-            setPassoAtual(1);
-            return;
-        }
-
-        if (treinoForm.exercicios.length === 0) {
-            alert("Adicione pelo menos um exercício aos Exercícios do Treino.");
-            return;
-        }
-
-        if (modo === "CRIAR") {
-            const novoTreino: Treino = {
-                id: treinoForm.id || `tr-${Date.now()}`,
-                nome: treinoForm.nome.trim(),
-                tipo: treinoForm.tipo,
-                dataCriacao: new Date().toLocaleDateString("pt-BR"),
-                exercicios: treinoForm.exercicios
-            };
-            setTreinos([novoTreino, ...treinos]);
-            mostrarNotificacao(`Treino "${novoTreino.nome}" criado com sucesso!`);
-        } else {
-            setTreinos(treinos.map(t => {
-                if (t.id === treinoForm.id) {
+    function abrirEdicao(treino: TreinoResponseDTO) {
+        setTextoCatalogo("");
+        setGrupoCatalogo("TODOS");
+        setModalidadeCatalogo("TODAS");
+        origemFormularioRef.current = document.activeElement as HTMLElement;
+        setEditando(treino);
+        setNome(treino.nome);
+        setTipo(treino.tipo);
+        setVisibilidade(treino.visibilidade);
+        setSelecionados([]);
+        setErroForm("");
+        setFormularioAberto(true);
+        void listarExerciciosDoTreino(treino.id).then(
+            (lista) => {
+                if (!montado.current) return;
+                setSelecionados(lista.map((item) => {
+                    const modalidade = itensCatalogo.find((catalogo) => catalogo.id === item.catalogoExercicioId)?.modalidade ?? treino.tipo;
                     return {
-                        ...t,
-                        nome: treinoForm.nome.trim(),
-                        tipo: treinoForm.tipo,
-                        exercicios: treinoForm.exercicios
+                        chave: `salvo-${item.id}`,
+                        catalogoExercicioId: item.catalogoExercicioId,
+                        modalidade,
+                        campos: lerMeta(modalidade, item.meta) ?? camposVazios(modalidade),
+                        metaOriginal: item.meta,
+                        metaRecorde: item.metaRecorde ?? "",
+                        persistidoId: item.id,
+                        removido: false,
                     };
-                }
-                return t;
-            }));
-            mostrarNotificacao(`Treino "${treinoForm.nome}" atualizado!`);
-        }
-
-        setModo("LISTAGEM");
+                }));
+            },
+            (error: unknown) => {
+                if (!montado.current || ignorarConsulta(error)) return;
+                setErroForm(mensagemAutenticacao(error));
+            },
+        );
     }
 
-    // Cadastrar novo exercício na lista do usuário
-    function handleSalvarNovoExercicio(e: React.FormEvent) {
-        e.preventDefault();
-        if (!novoExercicioForm.nome.trim()) {
-            alert("Informe o nome do exercício.");
+    function adicionarDoCatalogo(item: CatalogoExercicioResponseDTO) {
+        setSelecionados((atual) => [...atual, {
+            chave: `novo-${item.id}-${atual.length}-${Date.now()}`,
+            catalogoExercicioId: item.id,
+            modalidade: item.modalidade,
+            campos: camposVazios(item.modalidade),
+            metaOriginal: "",
+            metaRecorde: "",
+            persistidoId: null,
+            removido: false,
+        }]);
+    }
+
+    function publicar(treino: TreinoResponseDTO) {
+        if (treinos.status !== "sucesso") {
+            setVersaoTreinos((versao) => versao + 1);
             return;
         }
-
-        const novo: CatalogoExercicioItem = {
-            id: `usr-${Date.now()}`,
-            nome: novoExercicioForm.nome.trim(),
-            grupoMuscular: novoExercicioForm.grupoMuscular,
-            metaPadrao: novoExercicioForm.metaPadrao.trim() || "4 séries de 10-12 reps",
-            metaRecordePadrao: novoExercicioForm.metaRecordePadrao.trim() || "20 kg",
-            origem: "USUARIO"
-        };
-
-        setMeusExercicios([novo, ...meusExercicios]);
-
-        if (novoExercicioForm.adicionarAoTreinoAtual) {
-            handleAdicionarExercicioAoTreino(novo);
-        }
-
-        mostrarNotificacao(`Exercício "${novo.nome}" cadastrado!`);
-        setModalNovoExercicioAberto(false);
-        setNovoExercicioForm({
-            nome: "",
-            grupoMuscular: "Peitoral",
-            metaPadrao: "4 séries de 10-12 reps",
-            metaRecordePadrao: "20 kg",
-            adicionarAoTreinoAtual: true
+        setTreinos({
+            status: "sucesso",
+            dados: [treino, ...treinos.dados.filter((item) => item.id !== treino.id)],
         });
     }
 
-    // Filtros
-    const gruposMusculares = ["TODOS", "Peitoral", "Costas", "Pernas", "Ombros", "Bíceps", "Tríceps", "Abdômen", "Cardio"];
+    async function salvarTreino(event: FormEvent) {
+        event.preventDefault();
+        if (salvando.current) return;
+        const validacao = validarNomeTreino(nome) ?? validarExerciciosSelecionados(selecionados, nomeDoCatalogo);
+        if (validacao) {
+            setErroForm(validacao);
+            return;
+        }
+        salvando.current = true;
+        setEnviando(true);
+        setErroForm("");
+        const pedido = { nome: nome.trim(), tipo, visibilidade };
+        try {
+            const salvo = editando
+                ? await atualizarTreino(editando.id, pedido)
+                : await criarTreino(pedido);
+            if (!montado.current) return;
+            publicar(salvo);
+            setEditando(salvo);
+            const ficha = await sincronizarExercicios(salvo.id, selecionados, nomeDoCatalogo);
+            if (!montado.current) return;
+            setSelecionados(ficha.itens);
+            if (ficha.erro) {
+                setErroForm(ficha.erro);
+                return;
+            }
+            setFormularioAberto(false);
+        } catch (error) {
+            if (!montado.current || ignorarConsulta(error)) return;
+            setErroForm(mensagemAutenticacao(error));
+        } finally {
+            salvando.current = false;
+            if (montado.current) setEnviando(false);
+        }
+    }
 
-    const catalogoMotivaFitFiltrado = CATALOGO_MOTIVAFIT.filter(item => {
-        const matchTexto = item.nome.toLowerCase().includes(pesquisaExercicio.toLowerCase()) ||
-                           item.grupoMuscular.toLowerCase().includes(pesquisaExercicio.toLowerCase());
-        const matchGrupo = filtroGrupo === "TODOS" || item.grupoMuscular.toLowerCase() === filtroGrupo.toLowerCase();
-        return matchTexto && matchGrupo;
-    });
+    async function confirmarExclusao() {
+        if (!exclusao || exclusaoEmAndamento.current) return;
+        exclusaoEmAndamento.current = true;
+        setExcluindo(true);
+        setErroExclusao("");
+        try {
+            await excluirTreino(exclusao.id);
+            if (!montado.current) return;
+            setTreinos((atual) => atual.status !== "sucesso" ? atual : {
+                status: "sucesso",
+                dados: atual.dados.filter((item) => item.id !== exclusao.id),
+            });
+            setExclusao(null);
+        } catch (error) {
+            if (!montado.current || ignorarConsulta(error)) return;
+            setErroExclusao(mensagemAutenticacao(error));
+        } finally {
+            exclusaoEmAndamento.current = false;
+            if (montado.current) setExcluindo(false);
+        }
+    }
 
-    const templatesMotivaFitFiltrados = TEMPLATES_MOTIVAFIT.filter(tpl => {
-        return tpl.nome.toLowerCase().includes(pesquisaExercicio.toLowerCase()) ||
-               tpl.tipo.toLowerCase().includes(pesquisaExercicio.toLowerCase());
-    });
+    async function copiarTreino(treino: TreinoResponseDTO) {
+        if (copiaEmAndamento.current) return;
+        copiaEmAndamento.current = true;
+        setCopiandoId(treino.id);
+        setErroCopia("");
+        try {
+            const copia = await copiarTreinoPublico(treino.id);
+            if (!montado.current) return;
+            publicar(copia);
+            setTreinoDetalhado(null);
+            setAba("conta");
+            abrirEdicao(copia);
+        } catch (error) {
+            if (!montado.current || ignorarConsulta(error)) return;
+            setErroCopia(mensagemAutenticacao(error));
+        } finally {
+            copiaEmAndamento.current = false;
+            if (montado.current) setCopiandoId(null);
+        }
+    }
 
-    const meusExerciciosFiltrados = meusExercicios.filter(item => {
-        const matchTexto = item.nome.toLowerCase().includes(pesquisaExercicio.toLowerCase()) ||
-                           item.grupoMuscular.toLowerCase().includes(pesquisaExercicio.toLowerCase());
-        const matchGrupo = filtroGrupo === "TODOS" || item.grupoMuscular.toLowerCase() === filtroGrupo.toLowerCase();
-        return matchTexto && matchGrupo;
+    const meusTreinos = treinos.status === "sucesso" ? treinos.dados.filter((item) => item.meuTreino) : [];
+    const treinosPublicos = treinos.status === "sucesso" ? treinos.dados.filter((item) => !item.meuTreino) : [];
+    const itensCatalogo = catalogo.status === "sucesso" ? catalogo.dados : [];
+    const grupos = gruposDoCatalogo(itensCatalogo);
+    const grupoVisivel = grupoCatalogo !== "TODOS" && !grupos.includes(grupoCatalogo) ? "TODOS" : grupoCatalogo;
+    const catalogoFiltrado = filtrarCatalogo(itensCatalogo, {
+        texto: textoCatalogo,
+        grupo: grupoVisivel,
+        modalidade: modalidadeCatalogo,
     });
+    function nomeDoCatalogo(id: number): string {
+        return itensCatalogo.find((item) => item.id === id)?.nome ?? `Exercício ${id}`;
+    }
+
+    const email = user?.email ?? "";
+
+    const asideClass = (menuAberto: boolean) => {
+        return menuAberto
+            ? "w-full fixed md:static md:!flex md:flex-col bottom-0 md:bottom-auto md:h-full md:w-64  border-r bg-muted p-6 md:flex"
+            : "!hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex";
+    };
 
     return (
-        <div className="flex min-h-screen bg-background">
-            {/* Toast de feedback */}
-            {notificacao && (
-                <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-lg bg-foreground px-4 py-3 text-background shadow-xl animate-in slide-in-from-bottom-5 duration-300">
-                    <Check className="h-4 w-4 text-emerald-400" />
-                    <span className="text-sm font-medium">{notificacao}</span>
-                </div>
-            )}
+        <div className="flex min-h-screen bg-background h-screen">
+            <Aside
+                menuAberto={menuAberto}
+                setMenuAberto={setMenuAberto}
+                email={email}
+                isAdmin={isAdmin}
+                logout={logout}
+                saindo={saindo} />
 
-            {/* Sidebar */}
-            <aside className="hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex">
-                <div className="flex items-center gap-2 mb-6">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-                        <Dumbbell className="h-5 w-5" />
-                    </div>
-                    <span className="text-lg font-heading font-bold text-foreground">MotivaFit</span>
-                </div>
-
-                <nav className="flex flex-1 flex-col gap-1.5">
-                    <Button variant="ghost" className="justify-start gap-2.5" asChild>
-                        <Link to="/principal">
-                            <Home className="h-4 w-4" />
-                            Início
-                        </Link>
-                    </Button>
-                    <Button variant="secondary" className="justify-start gap-2.5">
-                        <Dumbbell className="h-4 w-4 text-primary" />
-                        Meus Treinos
-                    </Button>
-                    <Button variant="ghost" className="justify-start gap-2.5">
-                        <LineChart className="h-4 w-4" />
-                        Progresso
-                    </Button>
-                    <Button variant="ghost" className="justify-start gap-2.5">
-                        <Settings className="h-4 w-4" />
-                        Configurações
-                    </Button>
-
-                    <Separator className="my-3" />
-
-                    <Button variant="outline" size="sm" className="justify-start gap-2 text-xs" asChild>
-                        <Link to="/admin">
-                            <Shield className="h-3.5 w-3.5" />
-                            Painel Administrativo
-                        </Link>
-                    </Button>
-                </nav>
-
-                <Separator className="my-4" />
-                <Button
-                    variant="ghost"
-                    className="justify-start gap-2 text-destructive hover:bg-destructive/10"
-                    onClick={() => navigate("/")}
-                >
-                    <LogOut className="h-4 w-4" />
-                    Sair
-                </Button>
-            </aside>
-
-            {/* Conteúdo Central */}
             <div className="flex flex-1 flex-col overflow-x-hidden">
-                {/* Header */}
-                <header className="flex items-center justify-between border-b px-6 py-4 bg-background/60 backdrop-blur">
-                    <div className="flex items-center gap-3">
-                        {modo !== "LISTAGEM" && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                    if (passoAtual === 2) {
-                                        setPassoAtual(1);
-                                    } else {
-                                        setModo("LISTAGEM");
-                                    }
-                                }}
-                                className="gap-1.5 text-muted-foreground hover:text-foreground"
-                            >
-                                <ArrowLeft className="h-4 w-4" />
-                                {passoAtual === 2 ? "Voltar ao Passo 1" : "Voltar aos Treinos"}
+                <Header
+                    email={email}
+                    menuAberto={menuAberto}
+                    setMenuAberto={setMenuAberto}
+                    title="Treinos"
+                    subtitle="Gerencie seus treinos e exercícios."
+                />
+
+                <div className="flex items-center justify-center  bg-background/60 px-6 py-3">
+                    <Button
+                        type="button"
+                        className="rounded-r-none cursor-pointer"
+                        variant={aba == "conta" ? "default" : "outline"}
+                        onClick={() => setAba("conta")}
+                    >
+                        Treinos da Conta
+                    </Button>
+
+                    <Button
+                        type="button"
+                        className="rounded-l-none cursor-pointer"
+                        variant={aba == "publicos" ? "default" : "outline"}
+                        onClick={() => setAba("publicos")}
+                    >
+                        Treinos da Públicos
+                    </Button>
+                </div>
+
+                <main className="flex-1 space-y-8 p-6">
+                    <section className="mx-auto max-w-5xl space-y-4">
+                        <div className="flex items-center justify-between gap-4">
+                            <h2 className="font-heading text-lg font-bold">Treinos da conta</h2>
+                            <Button onClick={abrirCriacao} disabled={enviando} className="gap-2">
+                                <Plus className="h-4 w-4" />Criar treino
                             </Button>
-                        )}
-                        <div>
-                            <h1 className="text-xl font-heading font-bold">
-                                {modo === "LISTAGEM" && "Meus Treinos"}
-                                {modo !== "LISTAGEM" && (modo === "CRIAR" ? "Novo Treino" : `Editar: ${treinoForm.nome}`)}
-                            </h1>
-                            <p className="text-xs text-muted-foreground">
-                                {modo === "LISTAGEM" && "Gerenciamento e montagem de treinos"}
-                                {modo !== "LISTAGEM" && (passoAtual === 1 ? "Passo 1: Dados do Treino" : "Passo 2: Exercícios do Treino")}
-                            </p>
                         </div>
-                    </div>
 
-                    <div className="flex items-center gap-3">
-                        <div className="text-right hidden sm:block">
-                            <span className="block text-sm font-medium">Carlos Eduardo</span>
-                            <span className="block text-xs text-muted-foreground">Plano Pro</span>
-                        </div>
-                        <Avatar className="h-9 w-9 border border-primary/20">
-                            <AvatarImage src="" alt="Avatar" />
-                            <AvatarFallback className="bg-primary/10 text-primary font-bold">CE</AvatarFallback>
-                        </Avatar>
-                    </div>
-                </header>
-
-                <main className="flex-1 p-6">
-                    {/* ========================================================= */}
-                    {/* 1. LISTAGEM DE TREINOS                                    */}
-                    {/* ========================================================= */}
-                    {modo === "LISTAGEM" && (
-                        <div className="space-y-6 max-w-5xl mx-auto">
-                            <div className="flex items-center justify-between gap-4">
-                                <div className="flex items-center gap-2">
-                                    <h2 className="text-lg font-heading font-bold">Treinos do Usuário</h2>
-                                    <Badge variant="secondary" className="font-normal text-xs">
-                                        {treinos.length}
-                                    </Badge>
-                                </div>
-
-                                <Button
-                                    onClick={handleAbrirCriarTreino}
-                                    className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                    Criar Treino
-                                </Button>
-                            </div>
-
-                            {treinos.length === 0 ? (
-                                <Card className="p-12 text-center border-dashed">
-                                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3">
-                                        <Dumbbell className="h-6 w-6" />
-                                    </div>
-                                    <h3 className="text-base font-bold">Nenhum treino criado</h3>
-                                    <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1 mb-4">
-                                        Crie seu primeiro treino selecionando templates ou seus exercícios.
-                                    </p>
-                                    <Button onClick={handleAbrirCriarTreino} size="sm" className="gap-2">
-                                        <Plus className="h-4 w-4" />
-                                        Criar Treino
-                                    </Button>
-                                </Card>
-                            ) : (
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    {treinos.map((treino) => {
-                                        const aberto = treinoAbertoId === treino.id;
-                                        return (
-                                            <Card key={treino.id} className="border-border/80 flex flex-col hover:shadow-xs transition-shadow">
-                                                <CardHeader className="pb-3">
-                                                    <div className="flex items-start justify-between gap-3">
-                                                        <div>
-                                                            <Badge variant="outline" className="text-[11px] font-semibold uppercase text-primary border-primary/30 bg-primary/5">
-                                                                {treino.tipo}
-                                                            </Badge>
-                                                            <CardTitle className="text-lg font-heading font-bold mt-1.5">
-                                                                {treino.nome}
-                                                            </CardTitle>
-                                                        </div>
-
-                                                        <div className="flex items-center gap-1">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                                                                title="Editar treino"
-                                                                onClick={() => handleAbrirEditarTreino(treino)}
-                                                            >
-                                                                <Edit3 className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                                                title="Excluir treino"
-                                                                onClick={() => handleExcluirTreino(treino.id)}
-                                                            >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </CardHeader>
-
-                                                <CardContent className="flex-1 pb-4">
-                                                    <div className="rounded-lg bg-muted/40 p-3 space-y-2 border border-border/50">
-                                                        <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
-                                                            <span>Exercícios ({treino.exercicios.length})</span>
-                                                            <button
-                                                                onClick={() => setTreinoAbertoId(aberto ? null : treino.id)}
-                                                                className="text-primary hover:underline flex items-center gap-1"
-                                                            >
-                                                                {aberto ? "Recolher" : "Ver todos"}
-                                                                {aberto ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                                                            </button>
-                                                        </div>
-
-                                                        <div className="space-y-1.5 pt-1">
-                                                            {(aberto ? treino.exercicios : treino.exercicios.slice(0, 3)).map((ex, idx) => (
-                                                                <div key={ex.id || idx} className="text-xs py-1 border-b border-border/40 last:border-0 flex items-start justify-between gap-2">
-                                                                    <div className="flex items-center gap-2 truncate">
-                                                                        <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-background text-[10px] font-bold text-muted-foreground">
-                                                                            {idx + 1}
-                                                                        </span>
-                                                                        <span className="font-medium text-foreground truncate">{ex.nome}</span>
-                                                                    </div>
-                                                                    <div className="text-right text-[11px] text-muted-foreground shrink-0">
-                                                                        <span>{ex.meta}</span>
-                                                                        {ex.metaRecorde && (
-                                                                            <span className="block font-medium text-foreground/80">{ex.metaRecorde}</span>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-
-                                                            {!aberto && treino.exercicios.length > 3 && (
-                                                                <p className="text-[11px] text-muted-foreground text-center pt-1 italic">
-                                                                    + {treino.exercicios.length - 3} outros exercícios
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </CardContent>
-
-                                                <div className="px-6 pb-4 pt-0 mt-auto flex items-center justify-end">
-                                                    <Button
-                                                        size="sm"
-                                                        className="gap-1.5 bg-primary hover:bg-primary/90 font-medium"
-                                                        onClick={() => mostrarNotificacao(`Treino "${treino.nome}" iniciado!`)}
-                                                    >
-                                                        <Play className="h-3.5 w-3.5 fill-current" />
-                                                        Iniciar Treino
-                                                    </Button>
-                                                </div>
-                                            </Card>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {/* ========================================================= */}
-                    {/* FLUXO EM TELAS SEPARADAS (PASSO 1 E PASSO 2)              */}
-                    {/* ========================================================= */}
-                    {modo !== "LISTAGEM" && (
-                        <div className="max-w-5xl mx-auto space-y-6">
-                            {/* Indicador de Passos */}
-                            <div className="flex items-center justify-center">
-                                <div className="flex items-center gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setPassoAtual(1)}
-                                        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                                            passoAtual === 1
-                                                ? "bg-primary text-primary-foreground shadow-xs"
-                                                : "bg-muted text-foreground hover:bg-muted/80"
-                                        }`}
-                                    >
-                                        <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                                            passoAtual === 1 ? "bg-primary-foreground text-primary" : "bg-foreground/10 text-foreground"
-                                        }`}>
-                                            1
-                                        </span>
-                                        Dados do Treino
-                                    </button>
-
-                                    <div className="w-8 h-0.5 bg-border" />
-
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            if (treinoForm.nome.trim()) {
-                                                setPassoAtual(2);
-                                            } else {
-                                                alert("Preencha o Nome do treino antes de avançar.");
-                                            }
-                                        }}
-                                        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                                            passoAtual === 2
-                                                ? "bg-primary text-primary-foreground shadow-xs"
-                                                : "bg-muted text-muted-foreground hover:text-foreground"
-                                        }`}
-                                    >
-                                        <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                                            passoAtual === 2 ? "bg-primary-foreground text-primary" : "bg-foreground/10 text-muted-foreground"
-                                        }`}>
-                                            2
-                                        </span>
-                                        Exercícios do Treino
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* -------------------------------------------------- */}
-                            {/* PASSO 1: DADOS DO TREINO                           */}
-                            {/* -------------------------------------------------- */}
-                            {passoAtual === 1 && (
-                                <Card className="max-w-lg mx-auto border-border/80 shadow-sm animate-in fade-in-50">
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="text-xl font-heading font-bold text-foreground">
-                                            Dados do Treino
-                                        </CardTitle>
-                                        <CardDescription>
-                                            Informe os dados gerais de identificação e modalidade do seu treino.
-                                        </CardDescription>
-                                    </CardHeader>
-
-                                    <form onSubmit={handleAvancarParaPasso2}>
-                                        <CardContent className="space-y-5">
-                                            <div className="space-y-1.5">
-                                                <Label htmlFor="nomeTreino" className="text-xs font-semibold">
-                                                    Nome do Treino *
-                                                </Label>
+                        <Dialog open={formularioAberto} onOpenChange={(aberto) => { if (!salvando.current) setFormularioAberto(aberto); }}>
+                            <DialogContent className="max-h-[90dvh] md:max-w-[50dvw] md:p-10 overflow-y-auto sm:max-w-4xl" showCloseButton={!enviando} finalFocus={origemFormularioRef}>
+                                <DialogHeader className="pr-8">
+                                    <DialogTitle>{editando ? "Editar treino" : "Novo treino"}</DialogTitle>
+                                    <DialogDescription className="sr-only">
+                                        Defina o treino, escolha os exercícios do catálogo e preencha suas metas.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={(event) => { void salvarTreino(event); }}>
+                                    <fieldset disabled={enviando} className="space-y-4">
+                                        <div className="space-y-4">
+                                            {erroForm && <p role="alert" className="text-sm text-destructive">{erroForm}</p>}
+                                            <div className="flex flex-col gap-2">
+                                                <Label htmlFor="nomeTreino">Nome do treino</Label>
                                                 <Input
                                                     id="nomeTreino"
-                                                    placeholder="Ex: Treino A - Superior"
-                                                    value={treinoForm.nome}
-                                                    onChange={(e) => setTreinoForm({ ...treinoForm, nome: e.target.value })}
-                                                    required
+                                                    value={nome}
+                                                    maxLength={150}
+                                                    onChange={(event) => setNome(event.target.value)}
                                                     autoFocus
                                                 />
                                             </div>
-
-                                            <div className="space-y-1.5">
-                                                <Label className="text-xs font-semibold">Modalidade</Label>
-                                                <div className="grid grid-cols-2 gap-2.5">
-                                                    <Button
-                                                        type="button"
-                                                        variant={treinoForm.tipo === "musculação" ? "default" : "outline"}
-                                                        className="text-xs h-10 font-medium"
-                                                        onClick={() => setTreinoForm({ ...treinoForm, tipo: "musculação" })}
-                                                    >
-                                                        Musculação
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant={treinoForm.tipo === "aeróbico" ? "default" : "outline"}
-                                                        className="text-xs h-10 font-medium"
-                                                        onClick={() => setTreinoForm({ ...treinoForm, tipo: "aeróbico" })}
-                                                    >
-                                                        Aeróbico
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-
-                                        <div className="border-t p-4 flex items-center justify-between bg-muted/20">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setModo("LISTAGEM")}
-                                            >
-                                                Cancelar
-                                            </Button>
-
-                                            <Button
-                                                type="submit"
-                                                size="sm"
-                                                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-1.5"
-                                            >
-                                                Próximo: Exercícios do Treino
-                                                <ArrowRight className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </form>
-                                </Card>
-                            )}
-
-                            {/* -------------------------------------------------- */}
-                            {/* PASSO 2: EXERCÍCIOS DO TREINO                     */}
-                            {/* -------------------------------------------------- */}
-                            {passoAtual === 2 && (
-                                <div className="space-y-6 animate-in fade-in-50">
-                                    {/* Sessão principal: Exercícios do Treino */}
-                                    <div className="rounded-xl border bg-card p-5 shadow-xs space-y-6">
-                                        {/* Cabeçalho da Sessão */}
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
-                                            <div>
-                                                <h2 className="text-xl font-heading font-bold text-foreground flex items-center gap-2">
-                                                    <Dumbbell className="h-5 w-5 text-primary" />
-                                                    Exercícios do Treino
-                                                </h2>
-                                                <p className="text-xs text-muted-foreground mt-0.5">
-                                                    Treino: <strong className="text-foreground">{treinoForm.nome}</strong> • Modalidade: <span className="capitalize">{treinoForm.tipo}</span>
-                                                </p>
-                                            </div>
-
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setPassoAtual(1)}
-                                                className="text-xs gap-1.5 text-muted-foreground hover:text-foreground self-start sm:self-auto"
-                                            >
-                                                <Edit3 className="h-3.5 w-3.5" />
-                                                Alterar Dados do Treino
-                                            </Button>
-                                        </div>
-
-                                        {/* CAIXA MOTIVAFIT / MEUS EXERCÍCIOS DENTRO DA SESSÃO EXERCÍCIOS DO TREINO */}
-                                        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-4">
-                                            {/* Abas Superiores da Caixa: MotivaFit e Meus Exercícios */}
-                                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                                                <div className="grid grid-cols-2 p-1 bg-background rounded-lg border shadow-xs max-w-md w-full sm:w-auto">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setAbaExercicios("MOTIVAFIT")}
-                                                        className={`flex items-center justify-center gap-1.5 py-1.5 px-4 text-xs font-bold rounded-md transition-all ${
-                                                            abaExercicios === "MOTIVAFIT"
-                                                                ? "bg-primary text-primary-foreground shadow-xs"
-                                                                : "text-muted-foreground hover:text-foreground"
-                                                        }`}
-                                                    >
-                                                        <Sparkles className="h-3.5 w-3.5" />
-                                                        MotivaFit
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setAbaExercicios("MEUS_EXERCICIOS")}
-                                                        className={`flex items-center justify-center gap-1.5 py-1.5 px-4 text-xs font-bold rounded-md transition-all ${
-                                                            abaExercicios === "MEUS_EXERCICIOS"
-                                                                ? "bg-primary text-primary-foreground shadow-xs"
-                                                                : "text-muted-foreground hover:text-foreground"
-                                                        }`}
-                                                    >
-                                                        <Dumbbell className="h-3.5 w-3.5" />
-                                                        Meus Exercícios
-                                                        <Badge variant="outline" className={`ml-1 text-[9px] py-0 px-1 border-current ${
-                                                            abaExercicios === "MEUS_EXERCICIOS" ? "bg-primary-foreground/20 text-primary-foreground" : "text-muted-foreground"
-                                                        }`}>
-                                                            {meusExercicios.length}
-                                                        </Badge>
-                                                    </button>
-                                                </div>
-
-                                                {/* Botão de Adicionar Novo Exercício por aqui (quando na aba Meus Exercícios) */}
-                                                {abaExercicios === "MEUS_EXERCICIOS" && (
-                                                    <Button
-                                                        type="button"
-                                                        size="sm"
-                                                        onClick={() => setModalNovoExercicioAberto(true)}
-                                                        className="gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold h-8"
-                                                    >
-                                                        <Plus className="h-3.5 w-3.5" />
-                                                        Novo Exercício
-                                                    </Button>
-                                                )}
-                                            </div>
-
-                                            {/* Barra de Pesquisa Compartilhada em ambas as abas */}
-                                            <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
-                                                <div className="relative flex-1">
-                                                    <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-                                                    <Input
-                                                        placeholder="Buscar por nome do exercício ou grupo muscular..."
-                                                        className="pl-8 text-xs h-8 bg-background"
-                                                        value={pesquisaExercicio}
-                                                        onChange={(e) => setPesquisaExercicio(e.target.value)}
-                                                    />
-                                                    {pesquisaExercicio && (
-                                                        <button
+                                            <div className="flex flex-col gap-2">
+                                                <Label id="rotulo-tipo">Modalidade</Label>
+                                                <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="rotulo-tipo">
+                                                    {(["MUSCULACAO", "AEROBICO"] as const).map((opcao) => (
+                                                        <Button
+                                                            key={opcao}
                                                             type="button"
-                                                            onClick={() => setPesquisaExercicio("")}
-                                                            className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
+                                                            variant={tipo === opcao ? "default" : "outline"}
+                                                            aria-pressed={tipo === opcao}
+                                                            onClick={() => setTipo(opcao)}
                                                         >
-                                                            <X className="h-3.5 w-3.5" />
-                                                        </button>
-                                                    )}
+                                                            {ROTULO_TIPO[opcao]}
+                                                        </Button>
+                                                    ))}
                                                 </div>
-
-                                                {/* Filtro Rápido por Grupo Muscular */}
-                                                <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px]">
-                                                    {gruposMusculares.map(grupo => (
-                                                        <button
-                                                            key={grupo}
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <Label id="rotulo-visibilidade">Visibilidade</Label>
+                                                <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="rotulo-visibilidade">
+                                                    {(["PRIVADO", "PUBLICO"] as const).map((opcao) => (
+                                                        <Button
+                                                            key={opcao}
                                                             type="button"
-                                                            onClick={() => setFiltroGrupo(grupo)}
-                                                            className={`shrink-0 px-2 py-1 rounded transition-colors ${
-                                                                filtroGrupo === grupo
-                                                                    ? "bg-primary text-primary-foreground font-semibold"
-                                                                    : "bg-background text-muted-foreground hover:bg-muted border"
-                                                            }`}
+                                                            variant={visibilidade === opcao ? "default" : "outline"}
+                                                            aria-pressed={visibilidade === opcao}
+                                                            onClick={() => setVisibilidade(opcao)}
                                                         >
-                                                            {grupo}
-                                                        </button>
+                                                            {ROTULO_VISIBILIDADE[opcao]}
+                                                        </Button>
                                                     ))}
                                                 </div>
                                             </div>
 
-                                            {/* CONTEÚDO DA ABA MOTIVAFIT */}
-                                            {abaExercicios === "MOTIVAFIT" && (
-                                                <div className="space-y-3 pt-1">
-                                                    {/* Templates Prontos */}
-                                                    {templatesMotivaFitFiltrados.length > 0 && filtroGrupo === "TODOS" && (
-                                                        <div className="space-y-2">
-                                                            <div className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                                                                <Layers className="h-3.5 w-3.5 text-primary" />
-                                                                Templates Prontos da Plataforma
-                                                            </div>
-
-                                                            <div className="grid gap-2 sm:grid-cols-2">
-                                                                {templatesMotivaFitFiltrados.map((tpl) => (
-                                                                    <div
-                                                                        key={tpl.id}
-                                                                        className="rounded-lg border bg-background p-2.5 flex items-center justify-between gap-2 shadow-xs hover:border-primary/40 transition-colors"
-                                                                    >
-                                                                        <div className="truncate pr-1">
-                                                                            <h4 className="text-xs font-bold text-foreground truncate">{tpl.nome}</h4>
-                                                                            <span className="text-[10px] text-muted-foreground">
-                                                                                {tpl.exercicios.length} exercícios incluídos
-                                                                            </span>
-                                                                        </div>
-
-                                                                        <Button
-                                                                            type="button"
-                                                                            size="sm"
-                                                                            variant="outline"
-                                                                            className="h-7 text-[11px] gap-1 shrink-0 hover:bg-primary hover:text-primary-foreground hover:border-primary font-medium"
-                                                                            onClick={() => handleAplicarTemplate(tpl)}
-                                                                        >
-                                                                            <Copy className="h-3 w-3" />
-                                                                            Usar Template
-                                                                        </Button>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-
-                                                            <Separator className="my-2" />
-                                                        </div>
-                                                    )}
-
-                                                    {/* Catálogo Individual de Exercícios */}
-                                                    <div className="space-y-1.5">
-                                                        <div className="text-xs font-bold text-foreground">
-                                                            Exercícios do Catálogo ({catalogoMotivaFitFiltrado.length})
-                                                        </div>
-
-                                                        {catalogoMotivaFitFiltrado.length === 0 ? (
-                                                            <p className="text-xs text-muted-foreground text-center py-4 bg-background rounded-lg border">
-                                                                Nenhum exercício encontrado na busca.
-                                                            </p>
-                                                        ) : (
-                                                            <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 max-h-56 overflow-y-auto pr-1">
-                                                                {catalogoMotivaFitFiltrado.map((item) => (
-                                                                    <div
-                                                                        key={item.id}
-                                                                        className="flex items-center justify-between rounded-lg border p-2 text-xs bg-background hover:border-primary/40 transition-colors"
-                                                                    >
-                                                                        <div className="truncate pr-2">
-                                                                            <div className="font-semibold text-foreground truncate">{item.nome}</div>
-                                                                            <div className="text-[10px] text-muted-foreground">
-                                                                                {item.grupoMuscular} • {item.metaPadrao}
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <Button
-                                                                            type="button"
-                                                                            size="sm"
-                                                                            variant="outline"
-                                                                            className="h-6 text-xs gap-1 shrink-0 hover:bg-primary hover:text-primary-foreground hover:border-primary"
-                                                                            onClick={() => handleAdicionarExercicioAoTreino(item)}
-                                                                        >
-                                                                            <Plus className="h-3 w-3" />
-                                                                            Adicionar
-                                                                        </Button>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* CONTEÚDO DA ABA MEUS EXERCÍCIOS */}
-                                            {abaExercicios === "MEUS_EXERCICIOS" && (
-                                                <div className="space-y-2 pt-1">
-                                                    {meusExerciciosFiltrados.length === 0 ? (
-                                                        <div className="rounded-lg border border-dashed p-6 text-center bg-background">
-                                                            <p className="text-xs font-semibold text-foreground">
-                                                                Nenhum exercício cadastrado por você ainda
-                                                            </p>
-                                                            <p className="text-[11px] text-muted-foreground mt-0.5 mb-3">
-                                                                Clique em "Novo Exercício" para criar e salvar seus exercícios personalizados.
-                                                            </p>
-                                                            <Button
-                                                                type="button"
-                                                                size="sm"
-                                                                onClick={() => setModalNovoExercicioAberto(true)}
-                                                                className="gap-1.5 text-xs"
-                                                            >
-                                                                <Plus className="h-3.5 w-3.5" />
-                                                                Cadastrar Meu Primeiro Exercício
-                                                            </Button>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 max-h-56 overflow-y-auto pr-1">
-                                                            {meusExerciciosFiltrados.map((item) => (
-                                                                <div
-                                                                    key={item.id}
-                                                                    className="flex items-center justify-between rounded-lg border p-2 text-xs bg-background hover:border-primary/40 transition-colors"
-                                                                >
-                                                                    <div className="truncate pr-2">
-                                                                        <div className="font-semibold text-foreground truncate flex items-center gap-1">
-                                                                            {item.nome}
-                                                                            <Badge variant="secondary" className="text-[8px] py-0 px-1 font-normal">
-                                                                                Meu
-                                                                            </Badge>
-                                                                        </div>
-                                                                        <div className="text-[10px] text-muted-foreground">
-                                                                            {item.grupoMuscular} • {item.metaPadrao}
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <Button
-                                                                        type="button"
-                                                                        size="sm"
-                                                                        variant="outline"
-                                                                        className="h-6 text-xs gap-1 shrink-0 hover:bg-primary hover:text-primary-foreground hover:border-primary"
-                                                                        onClick={() => handleAdicionarExercicioAoTreino(item)}
-                                                                    >
-                                                                        <Plus className="h-3 w-3" />
-                                                                        Adicionar
-                                                                    </Button>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
                                         </div>
-
-                                        {/* LISTA DE EXERCÍCIOS ADICIONADOS AO TREINO */}
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between">
-                                                <h3 className="text-sm font-heading font-bold text-foreground flex items-center gap-2">
-                                                    Lista de Exercícios do Treino
-                                                    <Badge variant="secondary" className="font-normal text-xs">
-                                                        {treinoForm.exercicios.length} {treinoForm.exercicios.length === 1 ? "exercício" : "exercícios"}
-                                                    </Badge>
-                                                </h3>
-
-                                                {treinoForm.exercicios.length > 0 && (
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-xs text-destructive hover:bg-destructive/10 h-7"
-                                                        onClick={() => setTreinoForm({ ...treinoForm, exercicios: [] })}
-                                                    >
-                                                        Remover todos
-                                                    </Button>
-                                                )}
-                                            </div>
-
-                                            {treinoForm.exercicios.length === 0 ? (
-                                                <div className="rounded-xl border border-dashed p-8 text-center bg-muted/20">
-                                                    <AlertCircle className="mx-auto h-8 w-8 text-muted-foreground/60 mb-2" />
-                                                    <p className="text-xs font-semibold text-foreground">
-                                                        Nenhum exercício selecionado para o treino
-                                                    </p>
-                                                    <p className="text-[11px] text-muted-foreground max-w-sm mx-auto mt-0.5">
-                                                        Utilize a caixa acima (MotivaFit ou Meus Exercícios) para adicionar exercícios ao seu treino.
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                <div className="grid gap-3 sm:grid-cols-2">
-                                                    {treinoForm.exercicios.map((ex, index) => (
-                                                        <div
-                                                            key={ex.id}
-                                                            className="flex flex-col gap-2 rounded-lg border bg-card p-3 shadow-xs hover:border-primary/40 transition-colors"
-                                                        >
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
-                                                                        {index + 1}
-                                                                    </span>
-                                                                    <span className="font-semibold text-xs text-foreground truncate max-w-[200px]">
-                                                                        {ex.nome}
-                                                                    </span>
-                                                                    <Badge variant="outline" className="text-[9px] px-1 py-0 border-muted-foreground/30">
-                                                                        {ex.grupoMuscular}
-                                                                    </Badge>
-                                                                </div>
-
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                                                                    onClick={() => handleRemoverExercicioDoTreino(ex.id)}
-                                                                >
-                                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                                </Button>
-                                                            </div>
-
-                                                            <div className="grid grid-cols-2 gap-2 pt-1">
-                                                                <div className="space-y-1">
-                                                                    <Label className="text-[10px] text-muted-foreground font-semibold">Meta (texto)</Label>
-                                                                    <Input
-                                                                        className="h-7 text-xs font-medium"
-                                                                        placeholder="Ex: 4 séries de 10-12 reps"
-                                                                        value={ex.meta}
-                                                                        onChange={(e) => handleAtualizarExercicioNoTreino(ex.id, "meta", e.target.value)}
-                                                                    />
-                                                                </div>
-
-                                                                <div className="space-y-1">
-                                                                    <Label className="text-[10px] text-muted-foreground font-semibold flex items-center gap-1">
-                                                                        <Trophy className="h-3 w-3 text-amber-500" />
-                                                                        Meta Recorde (texto)
-                                                                    </Label>
-                                                                    <Input
-                                                                        className="h-7 text-xs font-medium"
-                                                                        placeholder="Ex: 30 kg cada lado"
-                                                                        value={ex.metaRecorde}
-                                                                        onChange={(e) => handleAtualizarExercicioNoTreino(ex.id, "metaRecorde", e.target.value)}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
+                                        <PainelCatalogo
+                                            estado={catalogo}
+                                            itens={catalogoFiltrado}
+                                            total={itensCatalogo.length}
+                                            texto={textoCatalogo}
+                                            grupo={grupoVisivel}
+                                            modalidade={modalidadeCatalogo}
+                                            grupos={grupos}
+                                            onTexto={setTextoCatalogo}
+                                            onGrupo={setGrupoCatalogo}
+                                            onModalidade={setModalidadeCatalogo}
+                                            onTentarNovamente={() => setVersaoCatalogo((versao) => versao + 1)}
+                                            onAdicionar={adicionarDoCatalogo}
+                                        >
+                                            <ExerciciosSelecionados
+                                                itens={selecionados}
+                                                nomeDe={nomeDoCatalogo}
+                                                onCampo={(chave, campo, valor) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, campos: { ...item.campos, [campo]: valor } } : item))}
+                                                onRemover={(chave) => setSelecionados((atual) => atual.flatMap((item) => {
+                                                    if (item.chave !== chave) return [item];
+                                                    if (item.persistidoId === null) return [];
+                                                    return [{ ...item, removido: true }];
+                                                }))}
+                                                onDesfazer={(chave) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, removido: false } : item))}
+                                            />
+                                        </PainelCatalogo>
+                                        <div className="flex items-center justify-between border-t pt-4">
+                                            <Button type="button" variant="outline" onClick={() => setFormularioAberto(false)}>Cancelar</Button>
+                                            <Button type="submit">{enviando ? "Salvando…" : "Salvar treino"}</Button>
                                         </div>
+                                    </fieldset>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
 
-                                        {/* Barra de Ações Final */}
-                                        <div className="border-t pt-4 flex items-center justify-between">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setPassoAtual(1)}
-                                                className="gap-1.5"
-                                            >
-                                                <ArrowLeft className="h-4 w-4" />
-                                                Voltar aos Dados do Treino
-                                            </Button>
-
-                                            <Button
-                                                type="button"
-                                                size="sm"
-                                                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-1.5 px-5"
-                                                onClick={handleSalvarTreinoFinal}
-                                            >
-                                                <Check className="h-4 w-4" />
-                                                Salvar Treino
-                                            </Button>
-                                        </div>
-                                    </div>
+                        {treinos.status === "carregando" && <p role="status">Carregando treinos…</p>}
+                        {treinos.status === "erro" && (
+                            <div role="alert" className="space-y-3 rounded-lg border border-destructive/40 p-4">
+                                <p className="text-sm">{treinos.mensagem}</p>
+                                <Button type="button" variant="outline" onClick={() => setVersaoTreinos((versao) => versao + 1)} disabled={enviando}>
+                                    Tentar carregar treinos novamente
+                                </Button>
+                            </div>
+                        )}
+                        <div className="space-y-6">
+                            {erroCopia && <p role="alert" className="text-sm text-destructive">{erroCopia}</p>}
+                            {treinos.status === "sucesso" && aba == "conta" && (
+                                <div ref={meusTreinosRef} id="meus-treinos">
+                                    <ListaTreinos
+                                        titulo="Meus treinos"
+                                        vazio="Nenhum treino criado."
+                                        treinos={meusTreinos}
+                                        fichas={fichas}
+                                        nomeDe={nomeDoCatalogo}
+                                        onEditar={abrirEdicao}
+                                        onExcluir={(treino) => { setErroExclusao(""); setExclusao(treino); }}
+                                    />
                                 </div>
                             )}
+
+                            {treinos.status === "sucesso" && aba == "publicos" && (
+                                <ListaTreinos
+                                    titulo="Treinos públicos de outras pessoas"
+                                    vazio="Nenhum treino público de outras pessoas."
+                                    treinos={treinosPublicos}
+                                    fichas={fichas}
+                                    nomeDe={nomeDoCatalogo}
+                                    onEditar={abrirEdicao}
+                                    onExcluir={(treino) => { setErroExclusao(""); setExclusao(treino); }}
+                                    onCopiar={(treino) => { void copiarTreino(treino); }}
+                                    copiandoId={copiandoId}
+                                    onDetalhes={(treino) => {
+                                        origemDetalhesRef.current = document.activeElement as HTMLElement;
+                                        setErroCopia("");
+                                        setTreinoDetalhado(treino);
+                                    }}
+                                />
+                            )}
                         </div>
-                    )}
+                    </section>
+
                 </main>
             </div>
 
-            {/* ========================================================= */}
-            {/* MODAL CADASTRAR NOVO EXERCÍCIO (na lista do usuário)      */}
-            {/* ========================================================= */}
-            {modalNovoExercicioAberto && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
-                    <div className="w-full max-w-sm rounded-xl bg-card p-5 shadow-2xl border border-border space-y-3.5">
-                        <div className="flex items-center justify-between border-b pb-2.5">
-                            <h3 className="text-sm font-heading font-bold text-foreground flex items-center gap-1.5">
-                                <Plus className="h-4 w-4 text-primary" />
-                                Novo Exercício
-                            </h3>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                                onClick={() => setModalNovoExercicioAberto(false)}
-                            >
-                                <X className="h-4 w-4" />
+            <Dialog open={treinoDetalhado !== null} onOpenChange={(aberto) => { if (!aberto && !copiaEmAndamento.current) setTreinoDetalhado(null); }}>
+                <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl" showCloseButton={copiandoId === null} finalFocus={origemDetalhesRef}>
+                    {treinoDetalhado && (
+                        <>
+                            <DialogHeader className="pr-8">
+                                <DialogTitle>{treinoDetalhado.nome}</DialogTitle>
+                                <DialogDescription>{ROTULO_TIPO[treinoDetalhado.tipo]} · Exercícios e metas</DialogDescription>
+                            </DialogHeader>
+                            <ExerciciosVisiveis ficha={fichas[treinoDetalhado.id]} nomeDe={nomeDoCatalogo} apresentacao="cards" />
+                            {erroCopia && <p role="alert" className="text-sm text-destructive">{erroCopia}</p>}
+                            <Button type="button" className="w-full cursor-pointer" disabled={copiandoId !== null} onClick={() => { void copiarTreino(treinoDetalhado); }}>
+                                {copiandoId === treinoDetalhado.id ? "Adicionando…" : "Adicionar aos meus treinos"}
+                            </Button>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {exclusao && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="presentation">
+                    <div role="dialog" aria-modal="true" aria-labelledby="titulo-exclusao" className="w-full max-w-md space-y-4 rounded-xl border bg-card p-5">
+                        <h2 id="titulo-exclusao" className="font-heading text-lg font-bold">Excluir treino</h2>
+                        <p className="text-sm text-muted-foreground">
+                            Excluir “{exclusao.nome}”? Ele sai da listagem. Os registros históricos permanecem no servidor.
+                        </p>
+                        {erroExclusao && <p role="alert" className="text-sm text-destructive">{erroExclusao}</p>}
+                        <div className="flex justify-end gap-2">
+                            <Button type="button" variant="outline" onClick={() => setExclusao(null)} disabled={excluindo}>Cancelar</Button>
+                            <Button type="button" variant="destructive" onClick={() => { void confirmarExclusao(); }} disabled={excluindo}>
+                                {excluindo ? "Excluindo…" : "Confirmar exclusão"}
                             </Button>
                         </div>
-
-                        <form onSubmit={handleSalvarNovoExercicio} className="space-y-3">
-                            <div className="space-y-1">
-                                <Label htmlFor="modalNomeExercicio" className="text-xs font-semibold">
-                                    Nome *
-                                </Label>
-                                <Input
-                                    id="modalNomeExercicio"
-                                    placeholder="Ex: Afundo Búlgaro"
-                                    className="h-8 text-xs"
-                                    value={novoExercicioForm.nome}
-                                    onChange={(e) => setNovoExercicioForm({ ...novoExercicioForm, nome: e.target.value })}
-                                    required
-                                    autoFocus
-                                />
-                            </div>
-
-                            <div className="space-y-1">
-                                <Label htmlFor="modalGrupoMuscular" className="text-xs font-semibold">
-                                    Grupo Muscular
-                                </Label>
-                                <select
-                                    id="modalGrupoMuscular"
-                                    className="w-full h-8 rounded-md border border-input bg-transparent px-2.5 text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                    value={novoExercicioForm.grupoMuscular}
-                                    onChange={(e) => setNovoExercicioForm({ ...novoExercicioForm, grupoMuscular: e.target.value })}
-                                >
-                                    <option value="Peitoral">Peitoral</option>
-                                    <option value="Costas">Costas</option>
-                                    <option value="Pernas">Pernas</option>
-                                    <option value="Ombros">Ombros</option>
-                                    <option value="Bíceps">Bíceps</option>
-                                    <option value="Tríceps">Tríceps</option>
-                                    <option value="Abdômen">Abdômen</option>
-                                    <option value="Cardio">Cardio</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-1">
-                                <Label htmlFor="modalMeta" className="text-xs font-semibold">
-                                    Meta (texto)
-                                </Label>
-                                <Input
-                                    id="modalMeta"
-                                    placeholder="Ex: 4 séries de 10-12 reps"
-                                    className="h-8 text-xs"
-                                    value={novoExercicioForm.metaPadrao}
-                                    onChange={(e) => setNovoExercicioForm({ ...novoExercicioForm, metaPadrao: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="space-y-1">
-                                <Label htmlFor="modalMetaRecorde" className="text-xs font-semibold flex items-center gap-1">
-                                    <Trophy className="h-3 w-3 text-amber-500" />
-                                    Meta Recorde (texto)
-                                </Label>
-                                <Input
-                                    id="modalMetaRecorde"
-                                    placeholder="Ex: 20 kg cada halter"
-                                    className="h-8 text-xs"
-                                    value={novoExercicioForm.metaRecordePadrao}
-                                    onChange={(e) => setNovoExercicioForm({ ...novoExercicioForm, metaRecordePadrao: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-2 pt-1">
-                                <input
-                                    type="checkbox"
-                                    id="addAoTreinoCheck"
-                                    checked={novoExercicioForm.adicionarAoTreinoAtual}
-                                    onChange={(e) => setNovoExercicioForm({ ...novoExercicioForm, adicionarAoTreinoAtual: e.target.checked })}
-                                    className="h-3.5 w-3.5 rounded border-gray-300 text-primary focus:ring-primary"
-                                />
-                                <Label htmlFor="addAoTreinoCheck" className="text-xs cursor-pointer">
-                                    Adicionar ao treino atual
-                                </Label>
-                            </div>
-
-                            <div className="flex items-center justify-end gap-2 pt-2 border-t">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 text-xs"
-                                    onClick={() => setModalNovoExercicioAberto(false)}
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    size="sm"
-                                    className="h-8 text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-                                >
-                                    Salvar
-                                </Button>
-                            </div>
-                        </form>
                     </div>
                 </div>
             )}
         </div>
+    );
+}
+
+function ExerciciosVisiveis({
+    ficha,
+    nomeDe,
+    apresentacao = "lista",
+}: {
+    ficha?: Consulta<ExercicioResponseDTO[]>;
+    nomeDe: (id: number) => string;
+    apresentacao?: "lista" | "tags" | "cards";
+}) {
+    if (!ficha || ficha.status === "carregando") return <p role="status">Carregando exercícios…</p>;
+    if (ficha.status === "erro") return <p className="text-sm text-muted-foreground">{ficha.mensagem}</p>;
+    if (ficha.dados.length === 0) return <p className="text-sm text-muted-foreground">Nenhum exercício neste treino.</p>;
+    if (apresentacao === "tags") {
+        return (
+            <div className="flex flex-wrap gap-2">
+                {ficha.dados.map((item) => (
+                    <Badge key={item.id} variant="secondary" className="inline-block rounded-md break-words">
+                        {nomeDe(item.catalogoExercicioId)}
+                    </Badge>
+                ))}
+            </div>
+        );
+    }
+    if (apresentacao === "cards") {
+        return (
+            <div className="space-y-3">
+                {ficha.dados.map((item) => (
+                    <Card key={item.id}>
+                        <CardHeader className="p-4 pb-2">
+                            <CardTitle className="text-base">{nomeDe(item.catalogoExercicioId)}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="px-4 pb-4 text-sm text-muted-foreground">
+                            {formatarMetaVisivel(item.meta)}
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        );
+    }
+    return (
+        <ul className="space-y-1 text-sm">
+            {ficha.dados.map((item) => (
+                <li key={item.id}>{nomeDe(item.catalogoExercicioId)} — {formatarMetaVisivel(item.meta)}</li>
+            ))}
+        </ul>
+    );
+}
+
+function ExerciciosSelecionados({
+    itens,
+    nomeDe,
+    onCampo,
+    onRemover,
+    onDesfazer,
+}: {
+    itens: ExercicioSelecionado[];
+    nomeDe: (id: number) => string;
+    onCampo: (chave: string, campo: string, valor: string) => void;
+    onRemover: (chave: string) => void;
+    onDesfazer: (chave: string) => void;
+}) {
+    return (
+        <div className="space-y-3">
+            {itens.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nenhum exercício adicionado.</p>
+            ) : (
+                <ul className="space-y-3">
+                    {itens.map((item) => {
+                        const nome = nomeDe(item.catalogoExercicioId);
+                        const pace = paceDosCampos(item.campos);
+                        const metaAnterior = item.metaOriginal && !lerMeta(item.modalidade, item.metaOriginal) ? item.metaOriginal : "";
+                        return (
+                            <li key={item.chave} className="flex items-end gap-3 overflow-x-auto rounded-lg border p-3">
+                                <p className="min-w-28 flex-1 self-center text-sm font-medium">{nome}</p>
+                                {item.removido ? (
+                                    <>
+                                        <p className="text-sm text-muted-foreground">{nome} será removido ao salvar.</p>
+                                        <Button type="button" variant="outline" size="sm" onClick={() => onDesfazer(item.chave)}>Desfazer remoção de {nome}</Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        {metaAnterior && <p className="text-xs text-muted-foreground">Meta anterior, em texto: {metaAnterior}</p>}
+                                        {item.campos.modalidade === "MUSCULACAO" ? (
+                                            <>
+                                                <CampoMeta id={`series-${item.chave}`} rotulo={`Séries de ${nome}`} valor={item.campos.series} onChange={(valor) => onCampo(item.chave, "series", valor)} />
+                                                <CampoMeta id={`repeticoes-${item.chave}`} rotulo={`Repetições de ${nome}`} valor={item.campos.repeticoes} onChange={(valor) => onCampo(item.chave, "repeticoes", valor)} />
+                                                <CampoMeta id={`carga-${item.chave}`} rotulo={`Carga de ${nome} (kg)`} valor={item.campos.cargaKg} onChange={(valor) => onCampo(item.chave, "cargaKg", valor)} />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <CampoMeta id={`tempo-${item.chave}`} rotulo={`Tempo de ${nome} (s)`} valor={item.campos.tempoS} onChange={(valor) => onCampo(item.chave, "tempoS", valor)} />
+                                                <CampoMeta id={`distancia-${item.chave}`} rotulo={`Distância de ${nome} (m)`} valor={item.campos.distanciaM} onChange={(valor) => onCampo(item.chave, "distanciaM", valor)} />
+                                                <p className="text-sm text-muted-foreground">{pace !== null && `Pace: ${pace} s/km`}</p>
+                                            </>
+                                        )}
+                                        <Button type="button" variant="outline" size="sm" aria-label={`Remover ${nome}`} onClick={() => onRemover(item.chave)}>Remover</Button>
+                                    </>
+                                )}
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </div>
+    );
+}
+
+function CampoMeta({ id, rotulo, valor, onChange }: { id: string; rotulo: string; valor: string; onChange: (valor: string) => void }) {
+    return (
+        <div className="flex w-24 shrink-0 flex-col gap-2">
+            <Label htmlFor={id}>{rotulo.replace(/ de .*?(?= \(|$)/, "")}</Label>
+            <Input aria-label={rotulo} id={id} inputMode="decimal" value={valor} onChange={(event) => onChange(event.target.value)} />
+        </div>
+    );
+}
+
+function ListaTreinos({
+    titulo,
+    vazio,
+    treinos,
+    fichas,
+    nomeDe,
+    onEditar,
+    onExcluir,
+    onCopiar,
+    onDetalhes,
+    copiandoId = null,
+}: {
+    titulo: string;
+    vazio: string;
+    treinos: TreinoResponseDTO[];
+    fichas: Record<number, Consulta<ExercicioResponseDTO[]>>;
+    nomeDe: (id: number) => string;
+    onEditar: (treino: TreinoResponseDTO) => void;
+    onExcluir: (treino: TreinoResponseDTO) => void;
+    onCopiar?: (treino: TreinoResponseDTO) => void;
+    copiandoId?: number | null;
+    onDetalhes?: (treino: TreinoResponseDTO) => void;
+}) {
+    return (
+        <div className="space-y-3">
+            <h3 className="font-heading text-base font-bold">{titulo}</h3>
+            {treinos.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{vazio}</p>
+            ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                    {treinos.map((treino) => (
+                        <Card key={treino.id} className="flex h-full min-w-0 flex-col">
+                            <CardHeader className="space-y-2">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="flex flex-wrap gap-2">
+                                        <Badge variant="outline">{ROTULO_TIPO[treino.tipo]}</Badge>
+                                        <Badge variant="secondary">{ROTULO_VISIBILIDADE[treino.visibilidade]}</Badge>
+                                    </div>
+                                    {onDetalhes && (
+                                        <Button type="button" variant="ghost" size="sm" className="h-auto shrink-0 cursor-pointer px-2 py-1" onClick={() => onDetalhes(treino)}>
+                                            Ver mais detalhes
+                                        </Button>
+                                    )}
+                                </div>
+                                <CardTitle className="text-lg">{treino.nome}</CardTitle>
+
+                            </CardHeader>
+                            <CardContent className="flex flex-1 flex-col gap-4">
+                                <ExerciciosVisiveis ficha={fichas[treino.id]} nomeDe={nomeDe} apresentacao="tags" />
+                                {treino.podeEditar ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        <Button size="sm" asChild>
+                                            <Link to={`/treinos/${treino.id}/realizar`}>Realizar treino</Link>
+                                        </Button>
+                                        <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => onEditar(treino)}>
+                                            <Edit3 className="h-4 w-4" />Editar
+                                        </Button>
+                                        <Button type="button" variant="outline" size="sm" className="gap-1.5 text-destructive" onClick={() => onExcluir(treino)}>
+                                            <Trash2 className="h-4 w-4" />Excluir
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="mt-auto w-full space-y-2 self-end">
+                                        {onCopiar && (
+                                            <Button
+                                                type="button"
+                                                className="h-auto w-full cursor-pointer self-end whitespace-normal"
+                                                disabled={copiandoId !== null}
+                                                onClick={() => onCopiar(treino)}
+                                            >
+                                                {copiandoId === treino.id ? "Adicionando…" : "Adicionar aos meus treinos"}
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function PainelCatalogo({
+    estado, itens, total, texto, grupo, modalidade, grupos,
+    onTexto, onGrupo, onModalidade, onTentarNovamente, onAdicionar, children,
+}: {
+    estado: Consulta<CatalogoExercicioResponseDTO[]>;
+    itens: CatalogoExercicioResponseDTO[];
+    total: number;
+    texto: string;
+    grupo: string;
+    modalidade: FiltroModalidade;
+    grupos: string[];
+    onTexto: (valor: string) => void;
+    onGrupo: (valor: string) => void;
+    onModalidade: (valor: FiltroModalidade) => void;
+    onTentarNovamente: () => void;
+    onAdicionar: (item: CatalogoExercicioResponseDTO) => void;
+    children: ReactNode;
+}) {
+    const [buscaConfirmada, setBuscaConfirmada] = useState("");
+    const [pesquisaPorFiltros, setPesquisaPorFiltros] = useState(false);
+    const temFiltro = grupo !== "TODOS" || modalidade !== "TODAS";
+    const semTexto = texto.trim().length === 0;
+    useEffect(() => {
+        const timer = window.setTimeout(() => setBuscaConfirmada(texto), 300);
+        return () => window.clearTimeout(timer);
+    }, [texto]);
+    const mostrarResultados = semTexto
+        ? temFiltro && pesquisaPorFiltros
+        : texto === buscaConfirmada;
+
+    return (
+        <Card>
+            <CardHeader className="pb-3">
+                <CardTitle className="text-base">Exercícios do treino</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="busca-catalogo" className="sr-only">Buscar no catálogo</Label>
+                    <Input id="busca-catalogo" className="w-full" placeholder="Pesquisar exercício" value={texto} onChange={(event) => { setPesquisaPorFiltros(false); onTexto(event.target.value); }} />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="grupo-catalogo">Grupo muscular</Label>
+                        <select id="grupo-catalogo" className="h-10 w-full rounded-md border bg-background px-3 text-sm text-foreground [&>option]:bg-background [&>option]:text-foreground" value={grupo} onChange={(event) => { setPesquisaPorFiltros(false); onGrupo(event.target.value); }}>
+                            <option value="TODOS">Todos</option>
+                            {grupos.map((item) => <option key={item} value={item}>{item}</option>)}
+                        </select>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="modalidade-catalogo">Modalidade do catálogo</Label>
+                        <select id="modalidade-catalogo" className="h-10 w-full rounded-md border bg-background px-3 text-sm text-foreground [&>option]:bg-background [&>option]:text-foreground" value={modalidade} onChange={(event) => { setPesquisaPorFiltros(false); onModalidade(event.target.value as FiltroModalidade); }}>
+                            <option value="TODAS">Todas</option>
+                            <option value="MUSCULACAO">Musculação</option>
+                            <option value="AEROBICO">Aeróbico</option>
+                        </select>
+                    </div>
+                </div>
+                {semTexto && (
+                    <Button type="button" variant="outline" disabled={!temFiltro} onClick={() => setPesquisaPorFiltros(true)}>
+                        Pesquisar com filtros
+                    </Button>
+                )}
+                {estado.status === "erro" && (
+                    <div role="alert" className="space-y-2">
+                        <p className="text-sm text-destructive">{estado.mensagem}</p>
+                        <Button type="button" variant="outline" onClick={onTentarNovamente}>Tentar carregar o catálogo novamente</Button>
+                    </div>
+                )}
+                <div aria-live="polite">
+                    {!mostrarResultados ? (
+                        <p className="py-4 text-center text-sm text-muted-foreground">pesquise o exercício</p>
+                    ) : estado.status === "carregando" ? (
+                        <p role="status" className="text-sm text-muted-foreground">Carregando…</p>
+                    ) : estado.status === "sucesso" && (
+                        total === 0 ? <p className="text-sm text-muted-foreground">Nenhum exercício disponível.</p>
+                            : itens.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum exercício encontrado na busca.</p>
+                                : <ul className="space-y-2">
+                                    {itens.map((item) => (
+                                        <li key={item.id} className="flex items-center gap-3 rounded-lg border p-3">
+                                            <div className="min-w-0 flex-1">
+                                                <p className="break-words text-sm font-medium">{item.nome}</p>
+                                                <p className="text-xs text-muted-foreground">{item.grupoMuscular} · {ROTULO_TIPO[item.modalidade]}</p>
+                                            </div>
+                                            <Button type="button" variant="default" size="sm" className="shrink-0 cursor-pointer" aria-label={`Adicionar ${item.nome}`} onClick={() => onAdicionar(item)}>Adicionar</Button>
+                                        </li>
+                                    ))}
+                                </ul>
+                    )}
+                </div>
+                {children}
+            </CardContent>
+        </Card>
     );
 }

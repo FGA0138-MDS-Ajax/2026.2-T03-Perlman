@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -19,14 +19,12 @@ const navigationItems = [
 ];
 
 export default function AdminLayout({ title, children }: AdminLayoutProps) {
-    const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, logout, isSuperusuario, enviando } = useAuth();
 
     if (!user) return null;
 
     function handleLogout() {
-        logout();
-        navigate("/login");
+        void logout();
     }
 
     return (
@@ -43,7 +41,7 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
                 </div>
 
                 <nav className="flex flex-1 flex-col gap-1.5">
-                    {navigationItems.map(({ label, to, icon: Icon }) => (
+                    {navigationItems.filter((item) => item.to !== "/admin/superusuario" || isSuperusuario).map(({ label, to, icon: Icon }) => (
                         <Button
                             key={to}
                             variant="ghost"
@@ -72,6 +70,7 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
                     variant="ghost"
                     className="justify-start gap-2 text-destructive hover:bg-destructive/10"
                     onClick={handleLogout}
+                    disabled={enviando}
                 >
                     <LogOut className="h-4 w-4" />
                     Sair
