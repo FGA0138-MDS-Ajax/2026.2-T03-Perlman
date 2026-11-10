@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Dumbbell, Home, LogOut, Play, Plus, Shield, Trash2, Edit3 } from "lucide-react";
+import { Dumbbell, Home, LogOut, Play, Plus, Shield, Trash2, Edit3, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -20,11 +21,13 @@ import {
     ROTULO_TIPO,
     ROTULO_VISIBILIDADE,
     filtrarCatalogo,
-    formatarDataTreino,
     gruposDoCatalogo,
     validarNomeTreino,
     type FiltroModalidade,
 } from "@/lib/treinos-apresentacao";
+import HeaderMenu from "@/components/menu";
+import Header from "@/components/header";
+import Aside from "@/components/aside";
 
 type Consulta<T> =
     | { status: "carregando" }
@@ -72,11 +75,6 @@ function useConsulta<T>(buscar: (signal: AbortSignal) => Promise<T>, versao: num
     }, [buscar, versao]);
 
     return [estado, setEstado] as const;
-}
-
-function iniciais(email: string): string {
-    const base = email.trim().slice(0, 2).toUpperCase();
-    return base || "AL";
 }
 
 type ExercicioSelecionado = {
@@ -184,15 +182,17 @@ export default function PaginaTreinos() {
     const [selecionados, setSelecionados] = useState<ExercicioSelecionado[]>([]);
     const [copiandoId, setCopiandoId] = useState<number | null>(null);
     const [erroCopia, setErroCopia] = useState("");
+    const [menuAberto, setMenuAberto] = useState(true);
+    const [treinoDetalhado, setTreinoDetalhado] = useState<TreinoResponseDTO | null>(null);
+    const origemDetalhesRef = useRef<HTMLElement | null>(null);
     const [textoCatalogo, setTextoCatalogo] = useState("");
     const [grupoCatalogo, setGrupoCatalogo] = useState("TODOS");
     const [modalidadeCatalogo, setModalidadeCatalogo] = useState<FiltroModalidade>("TODAS");
+    const origemFormularioRef = useRef<HTMLElement | null>(null);
     const montado = useRef(true);
     const salvando = useRef(false);
     const exclusaoEmAndamento = useRef(false);
     const copiaEmAndamento = useRef(false);
-    const formularioRef = useRef<HTMLDivElement>(null);
-    const levarAoTreino = useRef(false);
     const location = useLocation();
     const meusTreinosRef = useRef<HTMLDivElement>(null);
     const [aba, setAba] = useState<"conta" | "publicos">("conta");
@@ -210,12 +210,6 @@ export default function PaginaTreinos() {
             montado.current = false;
         };
     }, []);
-
-    useEffect(() => {
-        if (!levarAoTreino.current || aba !== "conta" || !formularioAberto) return;
-        levarAoTreino.current = false;
-        formularioRef.current?.scrollIntoView?.({ block: "start" });
-    }, [aba, formularioAberto, editando]);
 
     useEffect(() => {
         if (!realizarPedido || aba !== "conta" || treinos.status !== "sucesso") return;
@@ -247,6 +241,10 @@ export default function PaginaTreinos() {
     }, [treinos]);
 
     function abrirCriacao() {
+        setTextoCatalogo("");
+        setGrupoCatalogo("TODOS");
+        setModalidadeCatalogo("TODAS");
+        origemFormularioRef.current = document.activeElement as HTMLElement;
         setEditando(null);
         setNome("");
         setTipo("MUSCULACAO");
@@ -257,6 +255,10 @@ export default function PaginaTreinos() {
     }
 
     function abrirEdicao(treino: TreinoResponseDTO) {
+        setTextoCatalogo("");
+        setGrupoCatalogo("TODOS");
+        setModalidadeCatalogo("TODAS");
+        origemFormularioRef.current = document.activeElement as HTMLElement;
         setEditando(treino);
         setNome(treino.nome);
         setTipo(treino.tipo);
@@ -379,7 +381,7 @@ export default function PaginaTreinos() {
             const copia = await copiarTreinoPublico(treino.id);
             if (!montado.current) return;
             publicar(copia);
-            levarAoTreino.current = true;
+            setTreinoDetalhado(null);
             setAba("conta");
             abrirEdicao(copia);
         } catch (error) {
@@ -407,66 +409,30 @@ export default function PaginaTreinos() {
 
     const email = user?.email ?? "";
 
+    const asideClass = (menuAberto: boolean) => {
+        return menuAberto
+            ? "w-full fixed md:static md:!flex md:flex-col bottom-0 md:bottom-auto md:h-full md:w-64  border-r bg-muted p-6 md:flex"
+            : "!hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex";
+    };
+
     return (
-        <div className="flex min-h-screen bg-background">
-            <aside className="hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex">
-                <div className="mb-6 flex items-center gap-2">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                        <Dumbbell className="h-5 w-5" />
-                    </div>
-                    <span className="font-heading text-lg font-bold">MotivaFit</span>
-                </div>
-                <nav className="flex flex-1 flex-col gap-1.5">
-                    <Button variant="ghost" className="justify-start gap-2.5" asChild>
-                        <Link to="/principal"><Home className="h-4 w-4" />Início</Link>
-                    </Button>
-                    <Button variant="secondary" className="justify-start gap-2.5" asChild>
-                        <Link to="/treinos"><Dumbbell className="h-4 w-4" />Meus Treinos</Link>
-                    </Button>
-                    <Button variant="ghost" className="justify-start gap-2.5" asChild>
-                        <Link to="/treinos" state={{ realizar: true }}><Play className="h-4 w-4" />Realizar treino</Link>
-                    </Button>
-                    {isAdmin && (
-                        <>
-                            <Separator className="my-3" />
-                            <Button variant="outline" size="sm" className="justify-start gap-2 text-xs" asChild>
-                                <Link to="/admin"><Shield className="h-3.5 w-3.5" />Painel Administrativo</Link>
-                            </Button>
-                        </>
-                    )}
-                </nav>
-                <Separator className="my-4" />
-                <Button
-                    variant="ghost"
-                    className="justify-start gap-2 text-destructive hover:bg-destructive/10"
-                    onClick={() => { void logout(); }}
-                    disabled={saindo}
-                >
-                    <LogOut className="h-4 w-4" />Sair
-                </Button>
-            </aside>
+        <div className="flex min-h-screen bg-background h-screen">
+            <Aside
+                menuAberto={menuAberto}
+                setMenuAberto={setMenuAberto}
+                email={email}
+                isAdmin={isAdmin}
+                logout={logout}
+                saindo={saindo} />
 
             <div className="flex flex-1 flex-col overflow-x-hidden">
-                <header className="flex items-center justify-between border-b bg-background/60 px-6 py-4 backdrop-blur">
-                    <div>
-                        <p className="mb-1 md:hidden">
-                            <Link to="/principal" className="text-sm text-primary underline-offset-4 hover:underline">Início</Link>
-                        </p>
-                        <h1 className="font-heading text-xl font-bold">Meus Treinos</h1>
-                        <p className="text-xs text-muted-foreground">Gerenciamento e montagem de treinos</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <ThemeToggle variant="outline" className="h-9 w-9" />
-                        <div className="hidden text-right sm:block">
-                            <span className="block text-sm font-medium">{email || "Aluno"}</span>
-                        </div>
-                        <Avatar className="h-9 w-9 border border-primary/20">
-                            <AvatarFallback className="bg-primary/10 font-bold text-primary">
-                                {iniciais(email)}
-                            </AvatarFallback>
-                        </Avatar>
-                    </div>
-                </header>
+                <Header
+                    email={email}
+                    menuAberto={menuAberto}
+                    setMenuAberto={setMenuAberto}
+                    title="Treinos"
+                    subtitle="Gerencie seus treinos e exercícios."
+                />
 
                 <div className="flex items-center justify-center  bg-background/60 px-6 py-3">
                     <Button
@@ -497,19 +463,19 @@ export default function PaginaTreinos() {
                             </Button>
                         </div>
 
-                        {formularioAberto && aba == "conta" && (
-                            <Card ref={formularioRef}>
-                                <CardHeader>
-                                    <CardTitle>{editando ? "Editar treino" : "Novo treino"}</CardTitle>
-                                    <CardDescription>
-                                        O treino é gravado primeiro. Cada exercício escolhido é associado em seguida, com a meta numérica da modalidade.
-                                    </CardDescription>
-                                </CardHeader>
+                        <Dialog open={formularioAberto} onOpenChange={(aberto) => { if (!salvando.current) setFormularioAberto(aberto); }}>
+                            <DialogContent className="max-h-[90dvh] md:max-w-[50dvw] md:p-10 overflow-y-auto sm:max-w-4xl" showCloseButton={!enviando} finalFocus={origemFormularioRef}>
+                                <DialogHeader className="pr-8">
+                                    <DialogTitle>{editando ? "Editar treino" : "Novo treino"}</DialogTitle>
+                                    <DialogDescription className="sr-only">
+                                        Defina o treino, escolha os exercícios do catálogo e preencha suas metas.
+                                    </DialogDescription>
+                                </DialogHeader>
                                 <form onSubmit={(event) => { void salvarTreino(event); }}>
                                     <fieldset disabled={enviando} className="space-y-4">
-                                        <CardContent className="space-y-4">
+                                        <div className="space-y-4">
                                             {erroForm && <p role="alert" className="text-sm text-destructive">{erroForm}</p>}
-                                            <div className="space-y-1.5">
+                                            <div className="flex flex-col gap-2">
                                                 <Label htmlFor="nomeTreino">Nome do treino</Label>
                                                 <Input
                                                     id="nomeTreino"
@@ -519,8 +485,8 @@ export default function PaginaTreinos() {
                                                     autoFocus
                                                 />
                                             </div>
-                                            <div className="space-y-1.5">
-                                                <Label id="rotulo-tipo">Modalidade do treino</Label>
+                                            <div className="flex flex-col gap-2">
+                                                <Label id="rotulo-tipo">Modalidade</Label>
                                                 <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="rotulo-tipo">
                                                     {(["MUSCULACAO", "AEROBICO"] as const).map((opcao) => (
                                                         <Button
@@ -535,7 +501,7 @@ export default function PaginaTreinos() {
                                                     ))}
                                                 </div>
                                             </div>
-                                            <div className="space-y-1.5">
+                                            <div className="flex flex-col gap-2">
                                                 <Label id="rotulo-visibilidade">Visibilidade</Label>
                                                 <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="rotulo-visibilidade">
                                                     {(["PRIVADO", "PUBLICO"] as const).map((opcao) => (
@@ -551,6 +517,22 @@ export default function PaginaTreinos() {
                                                     ))}
                                                 </div>
                                             </div>
+
+                                        </div>
+                                        <PainelCatalogo
+                                            estado={catalogo}
+                                            itens={catalogoFiltrado}
+                                            total={itensCatalogo.length}
+                                            texto={textoCatalogo}
+                                            grupo={grupoVisivel}
+                                            modalidade={modalidadeCatalogo}
+                                            grupos={grupos}
+                                            onTexto={setTextoCatalogo}
+                                            onGrupo={setGrupoCatalogo}
+                                            onModalidade={setModalidadeCatalogo}
+                                            onTentarNovamente={() => setVersaoCatalogo((versao) => versao + 1)}
+                                            onAdicionar={adicionarDoCatalogo}
+                                        >
                                             <ExerciciosSelecionados
                                                 itens={selecionados}
                                                 nomeDe={nomeDoCatalogo}
@@ -562,15 +544,15 @@ export default function PaginaTreinos() {
                                                 }))}
                                                 onDesfazer={(chave) => setSelecionados((atual) => atual.map((item) => item.chave === chave ? { ...item, removido: false } : item))}
                                             />
-                                        </CardContent>
-                                        <div className="flex items-center justify-between border-t p-4">
+                                        </PainelCatalogo>
+                                        <div className="flex items-center justify-between border-t pt-4">
                                             <Button type="button" variant="outline" onClick={() => setFormularioAberto(false)}>Cancelar</Button>
                                             <Button type="submit">{enviando ? "Salvando…" : "Salvar treino"}</Button>
                                         </div>
                                     </fieldset>
                                 </form>
-                            </Card>
-                        )}
+                            </DialogContent>
+                        </Dialog>
 
                         {treinos.status === "carregando" && <p role="status">Carregando treinos…</p>}
                         {treinos.status === "erro" && (
@@ -585,15 +567,15 @@ export default function PaginaTreinos() {
                             {erroCopia && <p role="alert" className="text-sm text-destructive">{erroCopia}</p>}
                             {treinos.status === "sucesso" && aba == "conta" && (
                                 <div ref={meusTreinosRef} id="meus-treinos">
-                                <ListaTreinos
-                                    titulo="Meus treinos"
-                                    vazio="Nenhum treino criado."
-                                    treinos={meusTreinos}
-                                    fichas={fichas}
-                                    nomeDe={nomeDoCatalogo}
-                                    onEditar={abrirEdicao}
-                                    onExcluir={(treino) => { setErroExclusao(""); setExclusao(treino); }}
-                                />
+                                    <ListaTreinos
+                                        titulo="Meus treinos"
+                                        vazio="Nenhum treino criado."
+                                        treinos={meusTreinos}
+                                        fichas={fichas}
+                                        nomeDe={nomeDoCatalogo}
+                                        onEditar={abrirEdicao}
+                                        onExcluir={(treino) => { setErroExclusao(""); setExclusao(treino); }}
+                                    />
                                 </div>
                             )}
 
@@ -608,27 +590,36 @@ export default function PaginaTreinos() {
                                     onExcluir={(treino) => { setErroExclusao(""); setExclusao(treino); }}
                                     onCopiar={(treino) => { void copiarTreino(treino); }}
                                     copiandoId={copiandoId}
+                                    onDetalhes={(treino) => {
+                                        origemDetalhesRef.current = document.activeElement as HTMLElement;
+                                        setErroCopia("");
+                                        setTreinoDetalhado(treino);
+                                    }}
                                 />
                             )}
                         </div>
                     </section>
 
-                    <PainelCatalogo
-                        estado={catalogo}
-                        itens={catalogoFiltrado}
-                        total={itensCatalogo.length}
-                        texto={textoCatalogo}
-                        grupo={grupoVisivel}
-                        modalidade={modalidadeCatalogo}
-                        grupos={grupos}
-                        onTexto={setTextoCatalogo}
-                        onGrupo={setGrupoCatalogo}
-                        onModalidade={setModalidadeCatalogo}
-                        onTentarNovamente={() => setVersaoCatalogo((versao) => versao + 1)}
-                        onAdicionar={formularioAberto ? adicionarDoCatalogo : undefined}
-                    />
                 </main>
             </div>
+
+            <Dialog open={treinoDetalhado !== null} onOpenChange={(aberto) => { if (!aberto && !copiaEmAndamento.current) setTreinoDetalhado(null); }}>
+                <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl" showCloseButton={copiandoId === null} finalFocus={origemDetalhesRef}>
+                    {treinoDetalhado && (
+                        <>
+                            <DialogHeader className="pr-8">
+                                <DialogTitle>{treinoDetalhado.nome}</DialogTitle>
+                                <DialogDescription>{ROTULO_TIPO[treinoDetalhado.tipo]} · Exercícios e metas</DialogDescription>
+                            </DialogHeader>
+                            <ExerciciosVisiveis ficha={fichas[treinoDetalhado.id]} nomeDe={nomeDoCatalogo} apresentacao="cards" />
+                            {erroCopia && <p role="alert" className="text-sm text-destructive">{erroCopia}</p>}
+                            <Button type="button" className="w-full cursor-pointer" disabled={copiandoId !== null} onClick={() => { void copiarTreino(treinoDetalhado); }}>
+                                {copiandoId === treinoDetalhado.id ? "Adicionando…" : "Adicionar aos meus treinos"}
+                            </Button>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
 
             {exclusao && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="presentation">
@@ -654,13 +645,42 @@ export default function PaginaTreinos() {
 function ExerciciosVisiveis({
     ficha,
     nomeDe,
+    apresentacao = "lista",
 }: {
     ficha?: Consulta<ExercicioResponseDTO[]>;
     nomeDe: (id: number) => string;
+    apresentacao?: "lista" | "tags" | "cards";
 }) {
     if (!ficha || ficha.status === "carregando") return <p role="status">Carregando exercícios…</p>;
     if (ficha.status === "erro") return <p className="text-sm text-muted-foreground">{ficha.mensagem}</p>;
     if (ficha.dados.length === 0) return <p className="text-sm text-muted-foreground">Nenhum exercício neste treino.</p>;
+    if (apresentacao === "tags") {
+        return (
+            <div className="flex flex-wrap gap-2">
+                {ficha.dados.map((item) => (
+                    <Badge key={item.id} variant="secondary" className="inline-block rounded-md break-words">
+                        {nomeDe(item.catalogoExercicioId)}
+                    </Badge>
+                ))}
+            </div>
+        );
+    }
+    if (apresentacao === "cards") {
+        return (
+            <div className="space-y-3">
+                {ficha.dados.map((item) => (
+                    <Card key={item.id}>
+                        <CardHeader className="p-4 pb-2">
+                            <CardTitle className="text-base">{nomeDe(item.catalogoExercicioId)}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="px-4 pb-4 text-sm text-muted-foreground">
+                            {formatarMetaVisivel(item.meta)}
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        );
+    }
     return (
         <ul className="space-y-1 text-sm">
             {ficha.dados.map((item) => (
@@ -685,9 +705,8 @@ function ExerciciosSelecionados({
 }) {
     return (
         <div className="space-y-3">
-            <h3 className="text-sm font-medium">Exercícios do treino</h3>
             {itens.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Nenhum exercício selecionado. O treino pode ser salvo assim.</p>
+                <p className="text-sm text-muted-foreground">Nenhum exercício adicionado.</p>
             ) : (
                 <ul className="space-y-3">
                     {itens.map((item) => {
@@ -695,8 +714,8 @@ function ExerciciosSelecionados({
                         const pace = paceDosCampos(item.campos);
                         const metaAnterior = item.metaOriginal && !lerMeta(item.modalidade, item.metaOriginal) ? item.metaOriginal : "";
                         return (
-                            <li key={item.chave} className="space-y-2 rounded-lg border p-3">
-                                <p className="text-sm font-medium">{nome}</p>
+                            <li key={item.chave} className="flex items-end gap-3 overflow-x-auto rounded-lg border p-3">
+                                <p className="min-w-28 flex-1 self-center text-sm font-medium">{nome}</p>
                                 {item.removido ? (
                                     <>
                                         <p className="text-sm text-muted-foreground">{nome} será removido ao salvar.</p>
@@ -715,10 +734,10 @@ function ExerciciosSelecionados({
                                             <>
                                                 <CampoMeta id={`tempo-${item.chave}`} rotulo={`Tempo de ${nome} (s)`} valor={item.campos.tempoS} onChange={(valor) => onCampo(item.chave, "tempoS", valor)} />
                                                 <CampoMeta id={`distancia-${item.chave}`} rotulo={`Distância de ${nome} (m)`} valor={item.campos.distanciaM} onChange={(valor) => onCampo(item.chave, "distanciaM", valor)} />
-                                                <p className="text-sm text-muted-foreground">{pace === null ? "O pace aparece quando tempo e distância são positivos." : `Pace: ${pace} s/km`}</p>
+                                                <p className="text-sm text-muted-foreground">{pace !== null && `Pace: ${pace} s/km`}</p>
                                             </>
                                         )}
-                                        <Button type="button" variant="outline" size="sm" onClick={() => onRemover(item.chave)}>Remover {nome}</Button>
+                                        <Button type="button" variant="outline" size="sm" aria-label={`Remover ${nome}`} onClick={() => onRemover(item.chave)}>Remover</Button>
                                     </>
                                 )}
                             </li>
@@ -732,9 +751,9 @@ function ExerciciosSelecionados({
 
 function CampoMeta({ id, rotulo, valor, onChange }: { id: string; rotulo: string; valor: string; onChange: (valor: string) => void }) {
     return (
-        <div className="space-y-1.5">
-            <Label htmlFor={id}>{rotulo}</Label>
-            <Input id={id} inputMode="decimal" value={valor} onChange={(event) => onChange(event.target.value)} />
+        <div className="flex w-24 shrink-0 flex-col gap-2">
+            <Label htmlFor={id}>{rotulo.replace(/ de .*?(?= \(|$)/, "")}</Label>
+            <Input aria-label={rotulo} id={id} inputMode="decimal" value={valor} onChange={(event) => onChange(event.target.value)} />
         </div>
     );
 }
@@ -748,6 +767,7 @@ function ListaTreinos({
     onEditar,
     onExcluir,
     onCopiar,
+    onDetalhes,
     copiandoId = null,
 }: {
     titulo: string;
@@ -759,6 +779,7 @@ function ListaTreinos({
     onExcluir: (treino: TreinoResponseDTO) => void;
     onCopiar?: (treino: TreinoResponseDTO) => void;
     copiandoId?: number | null;
+    onDetalhes?: (treino: TreinoResponseDTO) => void;
 }) {
     return (
         <div className="space-y-3">
@@ -768,19 +789,24 @@ function ListaTreinos({
             ) : (
                 <div className="grid gap-4 md:grid-cols-2">
                     {treinos.map((treino) => (
-                        <Card key={treino.id}>
+                        <Card key={treino.id} className="flex h-full min-w-0 flex-col">
                             <CardHeader className="space-y-2">
-                                <div className="flex flex-wrap gap-2">
-                                    <Badge variant="outline">{ROTULO_TIPO[treino.tipo]}</Badge>
-                                    <Badge variant="secondary">{ROTULO_VISIBILIDADE[treino.visibilidade]}</Badge>
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className="flex flex-wrap gap-2">
+                                        <Badge variant="outline">{ROTULO_TIPO[treino.tipo]}</Badge>
+                                        <Badge variant="secondary">{ROTULO_VISIBILIDADE[treino.visibilidade]}</Badge>
+                                    </div>
+                                    {onDetalhes && (
+                                        <Button type="button" variant="ghost" size="sm" className="h-auto shrink-0 cursor-pointer px-2 py-1" onClick={() => onDetalhes(treino)}>
+                                            Ver mais detalhes
+                                        </Button>
+                                    )}
                                 </div>
                                 <CardTitle className="text-lg">{treino.nome}</CardTitle>
-                                <CardDescription>
-                                    Criado em {formatarDataTreino(treino.createdAt)}. Atualizado em {formatarDataTreino(treino.updatedAt)}.
-                                </CardDescription>
+
                             </CardHeader>
-                            <CardContent className="space-y-3">
-                                <ExerciciosVisiveis ficha={fichas[treino.id]} nomeDe={nomeDe} />
+                            <CardContent className="flex flex-1 flex-col gap-4">
+                                <ExerciciosVisiveis ficha={fichas[treino.id]} nomeDe={nomeDe} apresentacao="tags" />
                                 {treino.podeEditar ? (
                                     <div className="flex flex-wrap gap-2">
                                         <Button size="sm" asChild>
@@ -794,12 +820,11 @@ function ListaTreinos({
                                         </Button>
                                     </div>
                                 ) : (
-                                    <div className="space-y-2 w-full">
-                                        <p className="text-sm text-muted-foreground">Você pode consultar este treino, mas não alterá-lo.</p>
+                                    <div className="mt-auto w-full space-y-2 self-end">
                                         {onCopiar && (
                                             <Button
                                                 type="button"
-                                                className="h-auto whitespace-normal w-full sm:w-auto"
+                                                className="h-auto w-full cursor-pointer self-end whitespace-normal"
                                                 disabled={copiandoId !== null}
                                                 onClick={() => onCopiar(treino)}
                                             >
@@ -818,18 +843,8 @@ function ListaTreinos({
 }
 
 function PainelCatalogo({
-    estado,
-    itens,
-    total,
-    texto,
-    grupo,
-    modalidade,
-    grupos,
-    onTexto,
-    onGrupo,
-    onModalidade,
-    onTentarNovamente,
-    onAdicionar,
+    estado, itens, total, texto, grupo, modalidade, grupos,
+    onTexto, onGrupo, onModalidade, onTentarNovamente, onAdicionar, children,
 }: {
     estado: Consulta<CatalogoExercicioResponseDTO[]>;
     itens: CatalogoExercicioResponseDTO[];
@@ -842,79 +857,82 @@ function PainelCatalogo({
     onGrupo: (valor: string) => void;
     onModalidade: (valor: FiltroModalidade) => void;
     onTentarNovamente: () => void;
-    onAdicionar?: (item: CatalogoExercicioResponseDTO) => void;
+    onAdicionar: (item: CatalogoExercicioResponseDTO) => void;
+    children: ReactNode;
 }) {
+    const [buscaConfirmada, setBuscaConfirmada] = useState("");
+    const [pesquisaPorFiltros, setPesquisaPorFiltros] = useState(false);
+    const temFiltro = grupo !== "TODOS" || modalidade !== "TODAS";
+    const semTexto = texto.trim().length === 0;
+    useEffect(() => {
+        const timer = window.setTimeout(() => setBuscaConfirmada(texto), 300);
+        return () => window.clearTimeout(timer);
+    }, [texto]);
+    const mostrarResultados = semTexto
+        ? temFiltro && pesquisaPorFiltros
+        : texto === buscaConfirmada;
+
     return (
-        <section className="mx-auto max-w-5xl space-y-4">
-            <div>
-                <h2 className="font-heading text-lg font-bold">Catálogo de exercícios</h2>
-                <p className="text-sm text-muted-foreground">
-                    {onAdicionar
-                        ? "Escolha um exercício do catálogo e informe a meta numérica no treino. Exercícios pessoais não fazem parte do catálogo."
-                        : "Abra a criação ou a edição de um treino para associar exercícios do catálogo."}
-                </p>
-            </div>
-            {estado.status === "carregando" && <p role="status">Carregando catálogo…</p>}
-            {estado.status === "erro" && (
-                <div role="alert" className="space-y-3 rounded-lg border border-destructive/40 p-4">
-                    <p className="text-sm">{estado.mensagem}</p>
-                    <Button type="button" variant="outline" onClick={onTentarNovamente}>Tentar carregar o catálogo novamente</Button>
+        <Card>
+            <CardHeader className="pb-3">
+                <CardTitle className="text-base">Exercícios do treino</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="busca-catalogo" className="sr-only">Buscar no catálogo</Label>
+                    <Input id="busca-catalogo" className="w-full" placeholder="Pesquisar exercício" value={texto} onChange={(event) => { setPesquisaPorFiltros(false); onTexto(event.target.value); }} />
                 </div>
-            )}
-            {estado.status === "sucesso" && (
-                <div className="space-y-4">
-                    <div className="grid gap-3 md:grid-cols-3">
-                        <div className="space-y-1.5">
-                            <Label htmlFor="busca-catalogo">Buscar no catálogo</Label>
-                            <Input id="busca-catalogo" value={texto} onChange={(event) => onTexto(event.target.value)} />
-                        </div>
-                        <div className="space-y-1.5">
-                            <Label htmlFor="grupo-catalogo">Grupo muscular</Label>
-                            <select
-                                id="grupo-catalogo"
-                                className="h-10 w-full rounded-md border border-input bg-background text-foreground px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 scheme-light dark:scheme-dark"
-                                value={grupo}
-                                onChange={(event) => onGrupo(event.target.value)}
-                            >
-                                <option value="TODOS" className="bg-background text-foreground">Todos</option>
-                                {grupos.map((item) => <option key={item} value={item} className="bg-background text-foreground">{item}</option>)}
-                            </select>
-                        </div>
-                        <div className="space-y-1.5">
-                            <Label htmlFor="modalidade-catalogo">Modalidade do catálogo</Label>
-                            <select
-                                id="modalidade-catalogo"
-                                className="h-10 w-full rounded-md border border-input bg-background text-foreground px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 scheme-light dark:scheme-dark"
-                                value={modalidade}
-                                onChange={(event) => onModalidade(event.target.value as FiltroModalidade)}
-                            >
-                                <option value="TODAS" className="bg-background text-foreground">Todas</option>
-                                <option value="MUSCULACAO" className="bg-background text-foreground">Musculação</option>
-                                <option value="AEROBICO" className="bg-background text-foreground">Aeróbico</option>
-                            </select>
-                        </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="grupo-catalogo">Grupo muscular</Label>
+                        <select id="grupo-catalogo" className="h-10 w-full rounded-md border bg-background px-3 text-sm text-foreground [&>option]:bg-background [&>option]:text-foreground" value={grupo} onChange={(event) => { setPesquisaPorFiltros(false); onGrupo(event.target.value); }}>
+                            <option value="TODOS">Todos</option>
+                            {grupos.map((item) => <option key={item} value={item}>{item}</option>)}
+                        </select>
                     </div>
-                    {total === 0 ? (
-                        <p className="text-sm text-muted-foreground">Nenhum exercício ativo no catálogo.</p>
-                    ) : itens.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">Nenhum exercício encontrado na busca.</p>
-                    ) : (
-                        <ul className="grid gap-2 sm:grid-cols-2">
-                            {itens.map((item) => (
-                                <li key={item.id} className="space-y-2 rounded-lg border p-3">
-                                    <p className="text-sm font-medium">{item.nome}</p>
-                                    <p className="text-xs text-muted-foreground">{item.grupoMuscular} · {ROTULO_TIPO[item.modalidade]}</p>
-                                    {onAdicionar && (
-                                        <Button type="button" variant="outline" size="sm" onClick={() => onAdicionar(item)}>
-                                            Adicionar {item.nome}
-                                        </Button>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="modalidade-catalogo">Modalidade do catálogo</Label>
+                        <select id="modalidade-catalogo" className="h-10 w-full rounded-md border bg-background px-3 text-sm text-foreground [&>option]:bg-background [&>option]:text-foreground" value={modalidade} onChange={(event) => { setPesquisaPorFiltros(false); onModalidade(event.target.value as FiltroModalidade); }}>
+                            <option value="TODAS">Todas</option>
+                            <option value="MUSCULACAO">Musculação</option>
+                            <option value="AEROBICO">Aeróbico</option>
+                        </select>
+                    </div>
+                </div>
+                {semTexto && (
+                    <Button type="button" variant="outline" disabled={!temFiltro} onClick={() => setPesquisaPorFiltros(true)}>
+                        Pesquisar com filtros
+                    </Button>
+                )}
+                {estado.status === "erro" && (
+                    <div role="alert" className="space-y-2">
+                        <p className="text-sm text-destructive">{estado.mensagem}</p>
+                        <Button type="button" variant="outline" onClick={onTentarNovamente}>Tentar carregar o catálogo novamente</Button>
+                    </div>
+                )}
+                <div aria-live="polite">
+                    {!mostrarResultados ? (
+                        <p className="py-4 text-center text-sm text-muted-foreground">pesquise o exercício</p>
+                    ) : estado.status === "carregando" ? (
+                        <p role="status" className="text-sm text-muted-foreground">Carregando…</p>
+                    ) : estado.status === "sucesso" && (
+                        total === 0 ? <p className="text-sm text-muted-foreground">Nenhum exercício disponível.</p>
+                            : itens.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum exercício encontrado na busca.</p>
+                                : <ul className="space-y-2">
+                                    {itens.map((item) => (
+                                        <li key={item.id} className="flex items-center gap-3 rounded-lg border p-3">
+                                            <div className="min-w-0 flex-1">
+                                                <p className="break-words text-sm font-medium">{item.nome}</p>
+                                                <p className="text-xs text-muted-foreground">{item.grupoMuscular} · {ROTULO_TIPO[item.modalidade]}</p>
+                                            </div>
+                                            <Button type="button" variant="default" size="sm" className="shrink-0 cursor-pointer" aria-label={`Adicionar ${item.nome}`} onClick={() => onAdicionar(item)}>Adicionar</Button>
+                                        </li>
+                                    ))}
+                                </ul>
                     )}
                 </div>
-            )}
-        </section>
+                {children}
+            </CardContent>
+        </Card>
     );
 }

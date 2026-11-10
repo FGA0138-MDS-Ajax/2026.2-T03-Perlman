@@ -34,6 +34,9 @@ import {
     WORKOUT_ENROLLMENTS_UPDATED_EVENT,
 } from "@/lib/workout-enrollments";
 import { WORKOUT_PLANS } from "@/lib/workout-plans";
+import HeaderMenu from "@/components/menu";
+import Aside from "@/components/aside";
+import Header from "@/components/header";
 
 type EstadoHistorico =
     | { status: "carregando" }
@@ -73,6 +76,7 @@ export default function PaginaPrincipal() {
     const fichasDoUsuario = WORKOUT_PLANS.filter((ficha) => fichasInscritas.includes(ficha.id));
     const execucoesNaSemana = indicadores.status === "sucesso" ? indicadores.execucoesNaSemana : null;
     const sequenciaAtiva = indicadores.status === "sucesso" ? indicadores.sequenciaDias : null;
+    const [menuAberto, setMenuAberto] = useState(true);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -118,10 +122,6 @@ export default function PaginaPrincipal() {
         };
     }, [user]);
 
-    function handleLogout() {
-        void logout();
-    }
-
     async function carregarMais() {
         if (historico.status !== "sucesso" || !historico.temMais || carregandoMais) return;
         const pagina = historico.proximaPagina;
@@ -159,96 +159,27 @@ export default function PaginaPrincipal() {
         setFichasInscritas(getUserWorkoutPlanIds(user.email));
     }
 
+    const asideClass = (menuAberto: boolean) => {
+        return menuAberto
+            ? "w-full fixed md:static md:!flex md:flex-col bottom-0 md:bottom-auto md:h-full md:w-64  border-r bg-muted p-6 md:flex"
+            : "!hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex";
+    };
+
     return (
-        <div className="flex min-h-screen bg-background">
+        <div className="flex min-h-screen w-full bg-background">
             {/* Sidebar */}
-            <aside className="hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex">
-                <div className="flex items-center gap-2 mb-6">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-                        <Dumbbell className="h-5 w-5" />
-                    </div>
-                    <span className="text-lg font-heading font-bold text-foreground">MotivaFit</span>
-                </div>
-
-                <nav className="flex flex-1 flex-col gap-1.5">
-                    <Button variant="secondary" className="justify-start gap-2.5">
-                        <Home className="h-4 w-4" />
-                        Início
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        className="justify-start gap-2.5"
-                        onClick={() => navigate("/treinos")}
-                    >
-                        <Dumbbell className="h-4 w-4" />
-                        Meus Treinos
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        className="justify-start gap-2.5"
-                        onClick={() => navigate("/treinos", { state: { realizar: true } })}
-                    >
-                        <Play className="h-4 w-4" />
-                        Realizar treino
-                    </Button>
-                    <Separator className="my-3" />
-
-                    <div className="space-y-1.5 px-0.5">
-                        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block px-1">
-                            Tema
-                        </span>
-                        <ThemeSelector className="w-full" />
-                    </div>
-
-                    {isAdmin && (
-                        <>
-                            <Separator className="my-3" />
-                            <Button variant="outline" size="sm" className="justify-start gap-2 text-xs" asChild>
-                                <Link to="/admin">
-                                    <Shield className="h-3.5 w-3.5" />
-                                    Painel Administrativo
-                                </Link>
-                            </Button>
-                        </>
-                    )}
-                </nav>
-
-                <Separator className="my-4" />
-                <Button
-                    variant="ghost"
-                    className="justify-start gap-2 text-destructive hover:bg-destructive/10"
-                    onClick={handleLogout}
-                    disabled={enviando}
-                >
-                    <LogOut className="h-4 w-4" />
-                    Sair
-                </Button>
-            </aside>
+            <Aside menuAberto={menuAberto} setMenuAberto={setMenuAberto} email={user?.email || ""} isAdmin={isAdmin} logout={logout} saindo={enviando} />
 
             {/* Main Content */}
             <div className="flex flex-1 flex-col overflow-x-hidden">
                 {/* Top Bar */}
-                <header className="flex items-center justify-between border-b px-6 py-4 bg-background/60 backdrop-blur">
-                    <div>
-                        <h1 className="text-xl font-heading font-bold">Painel do Aluno</h1>
-                        <p className="text-xs text-muted-foreground">
-                            Olá, {user?.nome || "aluno"} — acompanhe sua atividade e suas fichas.
-                        </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <ThemeToggle variant="outline" className="h-9 w-9" />
-                        <div className="text-right hidden sm:block">
-                            <span className="block text-sm font-medium">{user?.nome || "Aluno"}</span>
-                            <span className="block text-xs text-muted-foreground">{user?.email || "aluno@motivafit.com"}</span>
-                        </div>
-                        <Avatar className="h-9 w-9 border border-primary/20">
-                            <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                                {user?.nome ? user.nome.slice(0, 2).toUpperCase() : "AL"}
-                            </AvatarFallback>
-                        </Avatar>
-                    </div>
-                </header>
+                <Header
+                    email={user?.email || ""}
+                    menuAberto={menuAberto}
+                    setMenuAberto={setMenuAberto}
+                    title="Painel do Aluno"
+                    subtitle="Acompanhe sua atividade e suas fichas."
+                />
 
                 {/* Dashboard Content */}
                 <main className="flex-1 space-y-6 p-6">
