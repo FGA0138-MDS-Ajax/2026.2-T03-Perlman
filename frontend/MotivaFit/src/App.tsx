@@ -11,6 +11,7 @@ import PaginaRelatoriosAdmin from "@/pages-admin/pagina-relatorios-admin";
 import PaginaSuperUsuario from "@/pages-admin/pagina-superusuario";
 import PaginaTreinos from "./pages-user/pagina-treinos";
 import PaginaRealizarTreino from "./pages-user/pagina-realizar-treino";
+import PaginaTermosDeUso from "@/pages-user/pagina-termos-de-uso";
 
 function App() {
     return (
@@ -100,6 +101,9 @@ function App() {
                                 </RotaSuperusuario>
                             }
                         />
+
+                        {/* Termos de Uso — acessível publicamente */}
+                        <Route path="/termos-de-uso" element={<PaginaTermosDeUso />} />
 
                         {/* Bloqueia qualquer rota não reconhecida, redirecionando para a raiz */}
                         <Route path="*" element={<Navigate to="/" replace />} />

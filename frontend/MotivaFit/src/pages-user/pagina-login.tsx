@@ -11,7 +11,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Link, useLocation } from "react-router-dom";
-import { Dumbbell, ArrowLeft } from "lucide-react";
+import { Dumbbell, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth, mensagemAutenticacao } from "@/lib/auth-context";
 
@@ -21,6 +21,7 @@ export default function PaginaLogin() {
     const location = useLocation();
     const { login, enviando, limparAviso } = useAuth();
     const [erro, setErro] = useState("");
+    const [mostrarSenha, setMostrarSenha] = useState(false);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -79,15 +80,27 @@ export default function PaginaLogin() {
                                 <Label htmlFor="senha">Senha</Label>
                                 <span className="text-xs text-muted-foreground">Recuperação de senha em breve</span>
                             </div>
+                            <div className="relative">
                             <Input
                                 id="senha"
                                 autoComplete="current-password"
-                                type="password"
+                                type={mostrarSenha ? "text" : "password"}
                                 placeholder="••••••••"
                                 value={senha}
                                 onChange={(e) => setSenha(e.target.value)}
                                 required
+                                className="pr-10"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setMostrarSenha(!mostrarSenha)}
+                                className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground transition-colors"
+                                aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                                tabIndex={-1}
+                            >
+                                {mostrarSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                            </div>
                         </div>
 
                        
@@ -102,6 +115,12 @@ export default function PaginaLogin() {
                             <Link to="/cadastro" className="font-semibold text-primary underline-offset-4 hover:underline">
                                 Cadastre-se gratuitamente
                             </Link>
+                        </p>
+                        <p className="text-center text-xs text-muted-foreground">
+                            Ao utilizar o MotivaFit, você concorda com nossos{" "}
+                            <Link to="/termos-de-uso" className="font-semibold text-primary underline-offset-4 hover:underline">
+                                Termos de Uso e Política de Privacidade
+                            </Link>.
                         </p>
                     </CardFooter>
                     </fieldset>

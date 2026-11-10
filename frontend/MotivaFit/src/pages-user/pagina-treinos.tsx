@@ -872,25 +872,25 @@ function PainelCatalogo({
                             <Label htmlFor="grupo-catalogo">Grupo muscular</Label>
                             <select
                                 id="grupo-catalogo"
-                                className="h-10 w-full rounded-md border bg-transparent px-3 text-sm"
+                                className="h-10 w-full rounded-md border border-input bg-background text-foreground px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 scheme-light dark:scheme-dark"
                                 value={grupo}
                                 onChange={(event) => onGrupo(event.target.value)}
                             >
-                                <option value="TODOS">Todos</option>
-                                {grupos.map((item) => <option key={item} value={item}>{item}</option>)}
+                                <option value="TODOS" className="bg-background text-foreground">Todos</option>
+                                {grupos.map((item) => <option key={item} value={item} className="bg-background text-foreground">{item}</option>)}
                             </select>
                         </div>
                         <div className="space-y-1.5">
                             <Label htmlFor="modalidade-catalogo">Modalidade do catálogo</Label>
                             <select
                                 id="modalidade-catalogo"
-                                className="h-10 w-full rounded-md border bg-transparent px-3 text-sm"
+                                className="h-10 w-full rounded-md border border-input bg-background text-foreground px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 scheme-light dark:scheme-dark"
                                 value={modalidade}
                                 onChange={(event) => onModalidade(event.target.value as FiltroModalidade)}
                             >
-                                <option value="TODAS">Todas</option>
-                                <option value="MUSCULACAO">Musculação</option>
-                                <option value="AEROBICO">Aeróbico</option>
+                                <option value="TODAS" className="bg-background text-foreground">Todas</option>
+                                <option value="MUSCULACAO" className="bg-background text-foreground">Musculação</option>
+                                <option value="AEROBICO" className="bg-background text-foreground">Aeróbico</option>
                             </select>
                         </div>
                     </div>

@@ -11,7 +11,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { Dumbbell, ArrowLeft, AlertCircle } from "lucide-react";
+import { Dumbbell, ArrowLeft, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth, mensagemAutenticacao } from "@/lib/auth-context";
 
@@ -20,6 +20,8 @@ export default function PaginaCadastro() {
     const [senha, setSenha] = useState("");
     const [confirmarSenha, setConfirmarSenha] = useState("");
     const [erro, setErro] = useState("");
+    const [mostrarSenha, setMostrarSenha] = useState(false);
+    const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
     const navigate = useNavigate();
     const { cadastro, enviando, limparAviso } = useAuth();
 
@@ -97,9 +99,10 @@ export default function PaginaCadastro() {
                         <div className="space-y-2">
                             <Label htmlFor="senha">Senha</Label>
                             <p id="regras-senha" className="text-xs text-muted-foreground">Use 12 ou mais caracteres, com maiúscula, minúscula, número e símbolo.</p>
+                            <div className="relative">
                             <Input
                                 id="senha"
-                                type="password"
+                                type={mostrarSenha ? "text" : "password"}
                                 placeholder="Mínimo de 12 caracteres"
                                 aria-describedby="regras-senha"
                                 minLength={12}
@@ -107,20 +110,43 @@ export default function PaginaCadastro() {
                                 value={senha}
                                 onChange={(e) => setSenha(e.target.value)}
                                 required
+                                className="pr-10"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setMostrarSenha(!mostrarSenha)}
+                                className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground transition-colors"
+                                aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                                tabIndex={-1}
+                            >
+                                {mostrarSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                            </div>
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="confirmar-senha">Confirmar senha</Label>
+                            <div className="relative">
                             <Input
                                 id="confirmar-senha"
                                 autoComplete="new-password"
-                                type="password"
+                                type={mostrarConfirmarSenha ? "text" : "password"}
                                 placeholder="Repita sua senha"
                                 value={confirmarSenha}
                                 onChange={(e) => setConfirmarSenha(e.target.value)}
                                 required
+                                className="pr-10"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setMostrarConfirmarSenha(!mostrarConfirmarSenha)}
+                                className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground transition-colors"
+                                aria-label={mostrarConfirmarSenha ? "Ocultar senha" : "Mostrar senha"}
+                                tabIndex={-1}
+                            >
+                                {mostrarConfirmarSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                            </div>
                         </div>
 
                         
@@ -130,6 +156,12 @@ export default function PaginaCadastro() {
                         <Button type="submit" className="w-full h-11 font-medium shadow-sm">
                             {enviando ? "Criando conta…" : "Criar minha conta"}
                         </Button>
+                        <p className="text-center text-xs text-muted-foreground">
+                            Ao criar sua conta, você concorda com nossos{" "}
+                            <Link to="/termos-de-uso" className="font-semibold text-primary underline-offset-4 hover:underline">
+                                Termos de Uso e Política de Privacidade
+                            </Link>.
+                        </p>
                         <p className="text-center text-sm text-muted-foreground">
                             Já tem uma conta?{" "}
                             <Link to="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
