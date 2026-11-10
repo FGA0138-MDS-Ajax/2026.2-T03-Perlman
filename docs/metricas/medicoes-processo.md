@@ -1,6 +1,6 @@
 # Medições do Processo
 
-Métricas de acompanhamento do processo da equipe, calculadas a partir das atas de reunião e conferidas com o repositório. A conferência item a item está em [Conferência das Atas](conferencia-atas.md).
+Métricas de acompanhamento do processo da equipe, calculadas a partir das atas de reunião e conferidas com o repositório (commits, Pull Requests e branches).
 
 **Data da medição:** 09/11/2026 · **Período:** Sprints 1 a 7 (22/09 a 08/11/2026)
 
@@ -35,7 +35,7 @@ Métricas de acompanhamento do processo da equipe, calculadas a partir das atas 
 
 ## P2 — Pontualidade
 
-**Cálculo:** encaminhamentos concluídos até o prazo ÷ encaminhamentos concluídos que tinham prazo em data. Os itens 5.1 e 5.2 ficam de fora porque a ata não registrou a data de conclusão.
+**Cálculo:** encaminhamentos concluídos até o prazo ÷ encaminhamentos concluídos que tinham prazo em data. A definição de quem apresenta os documentos e a entrega da atividade de métricas (ata nº 5) ficam de fora porque a ata não registrou a data de conclusão.
 
 | Item | Ação | Prazo | Conclusão | Atraso |
 | :-: | :-- | :-: | :-: | :-: |
@@ -57,7 +57,7 @@ Métricas de acompanhamento do processo da equipe, calculadas a partir das atas 
 **Cálculo:** conclusões declaradas nas atas que tinham evidência na data da reunião ÷ total de conclusões declaradas.
 
 - **Conclusões declaradas:** 14 (ata nº 3: 3; ata nº 4: 4; ata nº 6: 5; ata nº 7: 2).
-- **Sem evidência na data:** 6. São os itens 2.1 e 2.2, na ata nº 3, e os itens 3.1, 3.2, 3.3 e 3.4, na ata nº 4.
+- **Sem evidência na data:** 6. São o documento de arquitetura e a estrutura base do back-end, marcados como concluídos na ata nº 3, e os quatro encaminhamentos da ata nº 3 marcados como concluídos na ata nº 4: estrutura base do front-end, acompanhamento das métricas M1 a M4, casos de teste de RF-13 a RF-23 e registro de execução dos testes.
 - **Resultado:** 8 ÷ 14 = **57%**.
 
 Além disso, a revisão da ata nº 2 não foi preenchida (5 itens), e a da ata nº 5 tem 3 status em branco.

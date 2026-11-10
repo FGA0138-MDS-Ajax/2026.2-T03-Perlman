@@ -111,7 +111,6 @@ nav:
       - Quadro GQM: metricas/gqm.md
       - Medições do GQM: metricas/medicoes-gqm.md
       - Medições do Processo: metricas/medicoes-processo.md
-      - Conferência das Atas: metricas/conferencia-atas.md
   - Testes:
       - Estratégia de Testes: testes/estrategia.md
       - Roteiro de Teste: testes/roteiro.md

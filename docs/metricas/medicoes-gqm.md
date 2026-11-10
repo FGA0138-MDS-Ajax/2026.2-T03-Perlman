@@ -98,7 +98,7 @@ Comparação dos resultados medidos com os objetivos definidos no [Quadro GQM](g
 - **A M1 foi medida de forma adaptada.** O quadro GQM define a contagem por issues concluídas no GitHub Projects. Como o repositório não tem issues, foram contados Pull Requests mesclados, uma aproximação razoável que não é a métrica exatamente como definida.
 - **A G3 foi atingida só em parte.** O objetivo fala em proteção "no contexto da integração contínua", mas os 82,0% vêm de uma execução manual. Sem workflow de CI, nada impede que um Pull Request reduza a cobertura. A cobertura de ramos, de 56,9%, indica caminhos alternativos das regras de negócio sem teste.
 - **Os testes ainda não cobrem a interface.** A rodada de 08/11 validou a API e o banco por `curl`; o fluxo pelas telas do front-end ainda não foi testado, e o cadastro duplicado (409) e a persistência após a criação de treino seguem pendentes.
-- **G2 e G4 dependem de configurações ainda não feitas.** A ata nº 4 registra a configuração das métricas M1 a M4 como concluída, mas issues, label `bug`, CI e análise estática não existem no repositório (ver [Conferência das Atas](conferencia-atas.md), item 3.2).
+- **G2 e G4 dependem de configurações ainda não feitas.** A ata nº 4 registra a configuração das métricas M1 a M4 como concluída, mas issues, label `bug`, CI e análise estática não existem no repositório.
 
 ### Plano de ação
 
