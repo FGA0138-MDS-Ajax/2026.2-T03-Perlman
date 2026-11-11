@@ -1,14 +1,51 @@
-import { apiRequest, exigirValor } from "@/lib/api/http-client";
-
 export type Tema = "dark" | "light" | "system";
-interface Preferencias { tema: Tema }
+
+export interface Preferencias {
+    tema: Tema
+}
+
+const STORAGE_KEY = "@app:preferencias";
+
 function preferenciasValidas(valor: unknown): valor is Preferencias {
     if (typeof valor !== "object" || valor === null || !("tema" in valor)) return false;
-    return valor.tema === "light" || valor.tema === "dark" || valor.tema === "system";
+
+    const tema = (valor as Record<string, unknown>).tema;
+    return tema === "light" || tema === "dark" || tema === "system";
 }
+
 export async function buscarPreferencias(signal?: AbortSignal): Promise<Preferencias> {
-    return exigirValor(await apiRequest<unknown>("/api/usuarios/me/preferencias", { signal }), preferenciasValidas);
+    const padrao: Preferencias = { tema: "system" };
+
+
+    if (typeof window === "undefined") {
+        return padrao;
+    }
+
+    try {
+        const item = localStorage.getItem(STORAGE_KEY);
+        if (!item) return padrao;
+
+        const parseado = JSON.parse(item);
+        if (preferenciasValidas(parseado)) {
+            return parseado;
+        }
+    } catch (erro) {
+        console.warn("Erro ao buscar preferências no localStorage:", erro);
+    }
+
+    return padrao;
 }
+
 export async function salvarTema(tema: Tema, signal?: AbortSignal): Promise<Preferencias> {
-    return exigirValor(await apiRequest<unknown>("/api/usuarios/me/preferencias", { method: "PUT", body: { tema }, signal }), preferenciasValidas);
+    const preferencias: Preferencias = { tema };
+
+    if (typeof window !== "undefined") {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(preferencias));
+        } catch (erro) {
+            console.error("Erro ao salvar o tema no localStorage:", erro);
+        }
+    }
+
+    return preferencias;
 }
