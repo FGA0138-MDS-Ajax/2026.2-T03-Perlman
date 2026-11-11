@@ -12,9 +12,9 @@ public record UsuarioRequestDTO(
         String email,
 
         @NotBlank(message = "Senha é obrigatória")
-        @Schema(description = "Mínimo de 12 caracteres, incluindo maiúscula, minúscula, número e símbolo. Espaços internos são permitidos.", example = "SenhaSegura123!")
+        @Schema(description = "Mínimo de 6 caracteres, incluindo maiúscula, minúscula, número e símbolo. Espaços internos são permitidos.", example = "SenhaSegura123!")
         @Pattern(
-                regexp = "^(?=.*\\p{Lu})(?=.*\\p{Ll})(?=.*\\d)(?=.*[^\\p{L}\\d\\s]).{12,}$",
+                regexp = "^(?=.*\\p{Lu})(?=.*\\p{Ll})(?=.*\\d)(?=.*[^\\p{L}\\d\\s]).{6,}$",
                 message = "A senha deve ter pelo menos 12 caracteres e incluir letra maiúscula, letra minúscula, número e símbolo"
         )
         String senha
