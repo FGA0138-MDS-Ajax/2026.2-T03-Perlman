@@ -36,8 +36,8 @@ export default function PaginaCadastro() {
             return;
         }
 
-        if (!/^(?=.*\p{Lu})(?=.*\p{Ll})(?=.*\d)(?=.*[^\p{L}\d\s]).{12,}$/u.test(senha)) {
-            setErro("A senha deve ter pelo menos 12 caracteres, incluindo maiúscula, minúscula, número e símbolo.");
+        if (!/^(?=.*\p{Lu})(?=.*\p{Ll})(?=.*\d)(?=.*[^\p{L}\d\s]).{6,}$/u.test(senha)) {
+            setErro("A senha deve ter pelo menos 6 caracteres, incluindo maiúscula, minúscula, número e símbolo.");
             return;
         }
 
@@ -98,14 +98,14 @@ export default function PaginaCadastro() {
 
                         <div className="space-y-2">
                             <Label htmlFor="senha">Senha</Label>
-                            <p id="regras-senha" className="text-xs text-muted-foreground">Use 12 ou mais caracteres, com maiúscula, minúscula, número e símbolo.</p>
+                            <p id="regras-senha" className="text-xs text-muted-foreground">Use 6 ou mais caracteres, com maiúscula, minúscula, número e símbolo.</p>
                             <div className="relative">
                             <Input
                                 id="senha"
                                 type={mostrarSenha ? "text" : "password"}
-                                placeholder="Mínimo de 12 caracteres"
+                                placeholder="Mínimo de 6 caracteres"
                                 aria-describedby="regras-senha"
-                                minLength={12}
+                                minLength={6}
                                 autoComplete="new-password"
                                 value={senha}
                                 onChange={(e) => setSenha(e.target.value)}

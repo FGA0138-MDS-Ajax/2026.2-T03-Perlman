@@ -15,7 +15,7 @@ public record UsuarioRequestDTO(
         @Schema(description = "Mínimo de 6 caracteres, incluindo maiúscula, minúscula, número e símbolo. Espaços internos são permitidos.", example = "SenhaSegura123!")
         @Pattern(
                 regexp = "^(?=.*\\p{Lu})(?=.*\\p{Ll})(?=.*\\d)(?=.*[^\\p{L}\\d\\s]).{6,}$",
-                message = "A senha deve ter pelo menos 12 caracteres e incluir letra maiúscula, letra minúscula, número e símbolo"
+                message = "A senha deve ter pelo menos 6 caracteres e incluir letra maiúscula, letra minúscula, número e símbolo"
         )
         String senha
 ) {

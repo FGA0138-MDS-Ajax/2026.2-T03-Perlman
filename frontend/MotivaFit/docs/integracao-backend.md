@@ -35,7 +35,7 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 
 ## Autenticação nas telas
 
-- O cadastro envia somente e-mail e senha, exige a política do backend (12 caracteres, maiúscula, minúscula, número e símbolo) e encaminha ao login. O nome não é solicitado porque a API não o persiste.
+- O cadastro envia somente e-mail e senha, exige a política do backend (mínimo de 6 caracteres, maiúscula, minúscula, número e símbolo) e encaminha ao login. O nome não é solicitado porque a API não o persiste.
 - O contexto inicia em carregamento e restaura a sessão pelo refresh; as guardas aguardam essa verificação. O e-mail identifica a conta na interface.
 - Os perfis `USUARIO`, `ADMINISTRADOR` e `SUPERUSUARIO` controlam menus e rotas. A área de superusuário é exclusiva desse perfil; autorização efetiva permanece no servidor.
 - Tokens e permissões não são persistidos no navegador. `motivafit_user` e `motivafit_banco_admins` do protótipo são descartados. Preferências de tema são mantidas.

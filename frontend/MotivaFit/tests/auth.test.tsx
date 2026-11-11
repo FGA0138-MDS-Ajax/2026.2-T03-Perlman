@@ -113,10 +113,10 @@ describe('autenticação integrada', () => {
     it('cadastro usa contrato da API e encaminha ao login sem criar sessão', async () => {
         const fetch = vi.fn().mockResolvedValue(Response.json({ id: 42, email: 'aluno@example.com', perfil: 'USUARIO', ativo: true }, { status: 201 }));
         vi.stubGlobal('fetch', fetch);
-        mount('/cadastro'); await fillRegister();
+        mount('/cadastro'); await fillRegister('Aa1!bc');
         await screen.findByText('Conta criada. Entre com seu e-mail e senha.');
         expect(fetch.mock.calls[0][0]).toBe('/api/auth/cadastro');
-        expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ email: 'aluno@example.com', senha: 'SenhaCorreta123!' });
+        expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ email: 'aluno@example.com', senha: 'Aa1!bc' });
         expect(getAccessToken()).toBeNull();
     });
 
@@ -124,7 +124,7 @@ describe('autenticação integrada', () => {
         const fetch = vi.fn().mockResolvedValue(error(409, 'E-mail já cadastrado'));
         vi.stubGlobal('fetch', fetch);
         mount('/cadastro'); await fillRegister('senhasemsimbolos');
-        expect((await screen.findByRole('alert')).textContent).toContain('12 caracteres');
+        expect((await screen.findByRole('alert')).textContent).toContain('6 caracteres');
         expect(fetch).not.toHaveBeenCalled();
         await fillRegister();
         expect((await screen.findByRole('alert')).textContent).toContain('E-mail já cadastrado');

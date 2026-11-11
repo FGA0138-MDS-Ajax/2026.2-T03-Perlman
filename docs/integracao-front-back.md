@@ -52,12 +52,12 @@ As entregas 5 e 6 podem avançar independentemente após suas dependências. Cad
 **Contrato existente:** `POST /api/auth/cadastro`, corpo `{ email, senha }`, resposta `UsuarioResponseDTO` com `id`, `email`, `perfil`, `ativo`.
 
 - [x] Tornar o cadastro assíncrono e chamar `registerAccount`; não criar identidade usando `Date.now()`.
-- [x] Alinhar validação de senha: a tela exige seis caracteres, enquanto o backend exige pelo menos 12, com maiúscula, minúscula, número e símbolo. Manter confirmação de senha apenas na interface.
+- [x] Alinhar validação de senha: tela e backend exigem pelo menos seis caracteres, com maiúscula, minúscula, número e símbolo. Manter confirmação de senha apenas na interface.
 - [x] Resolver o campo nome: a tela o exige, mas a API não o recebe nem retorna. Decisão aplicada nesta entrega: remover o campo de nome e exibir e-mail; se nome persistido for requisito, adicionar campo, migration e DTOs antes de anunciá-lo como salvo.
 - [x] Após cadastro, encaminhar para login. Caso seja adotado login automático, executar uma chamada real de login; a resposta do cadastro não contém token.
 - [x] Tratar validação e e-mail duplicado sem perder o formulário ou navegar em caso de falha.
 
-**Implementação da tarefa 2:** formulário conectado à API, validação de senha alinhada e encaminhamento ao login após sucesso; erros mantêm o formulário.
+**Implementação da tarefa 2:** formulário conectado à API, validação de senha alinhada ao mínimo de seis caracteres e encaminhamento ao login após sucesso; erros mantêm o formulário.
 
 **Aceite:** conta persistida permite login após recarregar a página; senha inválida e e-mail duplicado não criam sessão local.
 
