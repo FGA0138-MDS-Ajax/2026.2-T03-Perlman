@@ -1,11 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
-import { Dumbbell, Home, Play } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import Aside from "@/components/aside";
+import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mensagemAutenticacao } from "@/lib/auth-context";
+import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
 import { listarExerciciosDoTreino } from "@/lib/api/exercicios-api";
@@ -58,13 +59,15 @@ function pedidoInvalido(modalidade: ModalidadeBackend, campos: Campos): string |
 }
 
 export default function PaginaRealizarTreino() {
+    const navigate = useNavigate();
+    const { user, isAdmin, logout, enviando: saindo } = useAuth();
+    const [menuAberto, setMenuAberto] = useState(false);
     const parametro = Number(useParams().treinoId);
     const idValido = Number.isInteger(parametro) && parametro > 0;
     const [consulta, setConsulta] = useState<Consulta<Ficha>>({ status: "carregando" });
     const [campos, setCampos] = useState<Record<number, Campos>>({});
     const [enviando, setEnviando] = useState(false);
     const [aviso, setAviso] = useState("");
-    const [registrado, setRegistrado] = useState(false);
     const [tentativa, setTentativa] = useState(0);
     const [pedidoAtual, setPedidoAtual] = useState({ id: parametro, tentativa });
     if (pedidoAtual.id !== parametro || pedidoAtual.tentativa !== tentativa) {
@@ -97,7 +100,6 @@ export default function PaginaRealizarTreino() {
     }
 
     function alterar(exercicioId: number, campo: keyof Campos, valor: string) {
-        setRegistrado(false);
         setAviso("");
         setCampos((atual) => ({ ...atual, [exercicioId]: { ...valores(exercicioId), ...atual[exercicioId], [campo]: valor, registrado: false } }));
     }
@@ -148,26 +150,16 @@ export default function PaginaRealizarTreino() {
                 return;
             }
         }
-        setCampos({});
-        setRegistrado(true);
-        setEnviando(false);
+        navigate("/realizar-treino", { replace: true });
     }
 
     return (
         <div className="flex min-h-screen bg-background">
-            <aside className="hidden w-64 flex-col border-r bg-muted/30 p-6 md:flex">
-                <div className="mb-6 flex items-center gap-2">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground"><Dumbbell className="h-5 w-5" /></div>
-                    <span className="font-heading text-lg font-bold">MotivaFit</span>
-                </div>
-                <nav className="flex flex-1 flex-col gap-1.5">
-                    <Button variant="ghost" className="justify-start gap-2.5" asChild><Link to="/principal"><Home className="h-4 w-4" />Início</Link></Button>
-                    <Button variant="ghost" className="justify-start gap-2.5" asChild><Link to="/treinos"><Dumbbell className="h-4 w-4" />Meus Treinos</Link></Button>
-                    <Button variant="secondary" className="justify-start gap-2.5" asChild><Link to="/treinos" state={{ realizar: true }}><Play className="h-4 w-4" />Realizar treino</Link></Button>
-                </nav>
-            </aside>
+            <Aside menuAberto={menuAberto} setMenuAberto={setMenuAberto} isAdmin={isAdmin} logout={logout} saindo={saindo} />
+            <div className="flex min-w-0 flex-1 flex-col">
+                <Header menuAberto={menuAberto} setMenuAberto={setMenuAberto} email={user?.email ?? ""} title="Realizar treino" subtitle="Registre os exercícios realizados." />
             <main className="min-w-0 flex-1 space-y-6 p-4 sm:p-6">
-                <p><Link to="/treinos" className="text-sm text-primary underline-offset-4 hover:underline">Voltar aos treinos</Link></p>
+                <p><Link to="/realizar-treino" className="text-sm text-primary underline-offset-4 hover:underline">Voltar aos treinos</Link></p>
                 {!idValido && <p role="alert">Treino inválido.</p>}
                 {idValido && consulta.status === "carregando" && <p role="status">Carregando treino…</p>}
                 {idValido && consulta.status === "erro" && (
@@ -187,7 +179,6 @@ export default function PaginaRealizarTreino() {
                         {consulta.dados.treino.meuTreino && consulta.dados.exercicios.length > 0 && (
                             <form className="space-y-4" onSubmit={(event) => { void salvar(event); }}>
                                 {aviso && <p role="alert" className="text-sm text-destructive">{aviso}</p>}
-                                {registrado && <p role="status" className="text-sm">Execução registrada.</p>}
                                 {consulta.dados.exercicios.map((exercicio) => {
                                     const catalogo = consulta.dados.catalogo.find((item) => item.id === exercicio.catalogoExercicioId);
                                     const modalidade = catalogo?.modalidade ?? consulta.dados.treino.tipo;
@@ -223,6 +214,7 @@ export default function PaginaRealizarTreino() {
                     </section>
                 )}
             </main>
+            </div>
         </div>
     );
 }

@@ -1,20 +1,25 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Dumbbell, Home, LogOut, Play, Shield } from "lucide-react";
+import { Dumbbell, History, Home, LogOut, Play, Shield } from "lucide-react";
 import { Separator } from "@base-ui/react";
 
 export default function HeaderMenu({ isAdmin, setMenuAberto, logout, saindo }: { isAdmin: boolean, setMenuAberto: (aberto: boolean) => void, logout: () => Promise<void>, saindo: boolean }) {
+    const { pathname } = useLocation();
+    const realizando = pathname === "/realizar-treino" || /^\/treinos\/[^/]+\/realizar$/.test(pathname);
     return (
         <>
             <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-1.5" onClick={(event) => { if ((event.target as HTMLElement).closest("a")) setMenuAberto(false); }}>
-                <Button variant="ghost" className="justify-start gap-2.5" asChild>
-                    <Link to="/principal"><Home className="h-4 w-4" />Início</Link>
+                <Button variant={pathname === "/principal" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
+                    <Link to="/principal" aria-current={pathname === "/principal" ? "page" : undefined}><Home className="h-4 w-4" />Início</Link>
                 </Button>
-                <Button variant="secondary" className="justify-start gap-2.5" asChild>
-                    <Link to="/treinos"><Dumbbell className="h-4 w-4" />Meus Treinos</Link>
+                <Button variant={pathname === "/treinos" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
+                    <Link to="/treinos" aria-current={pathname === "/treinos" ? "page" : undefined}><Dumbbell className="h-4 w-4" />Meus Treinos</Link>
                 </Button>
-                <Button variant="ghost" className="justify-start gap-2.5" asChild>
-                    <Link to="/treinos" state={{ realizar: true }}><Play className="h-4 w-4" />Realizar treino</Link>
+                <Button variant={realizando ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
+                    <Link to="/realizar-treino" aria-current={realizando ? "page" : undefined}><Play className="h-4 w-4" />Realizar treino</Link>
+                </Button>
+                <Button variant={pathname === "/historico" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
+                    <Link to="/historico" aria-current={pathname === "/historico" ? "page" : undefined}><History className="h-4 w-4" />Histórico</Link>
                 </Button>
                 {isAdmin && (
                     <>

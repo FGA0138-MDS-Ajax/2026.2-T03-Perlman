@@ -31,6 +31,7 @@ function mount(tipo: string, modalidade: string, registrar?: (body: unknown) => 
         return Promise.resolve(Response.json({ codigo: 'ERRO', mensagem: 'não mapeado', dataHora: '2026-11-05T18:30:00Z' }, { status: 500 }));
     }));
     return render(<MemoryRouter initialEntries={['/treinos/7/realizar']}><AuthProvider><Routes>
+        <Route path="/realizar-treino" element={<h1>Lista de treinos para realizar</h1>} />
         <Route path="/treinos/:treinoId/realizar" element={<RotaProtegida><PaginaRealizarTreino /></RotaProtegida>} />
     </Routes></AuthProvider></MemoryRouter>);
 }
@@ -56,7 +57,8 @@ describe('realizar treino', () => {
         fireEvent.change(screen.getByLabelText('Carga de Supino reto (kg)'), { target: { value: '20,5' } });
         fireEvent.change(screen.getByLabelText('Tempo de Supino reto (minutos)'), { target: { value: '1,5' } });
         fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
-        expect(await screen.findByText('Execução registrada.')).toBeTruthy();
+        expect(await screen.findByRole('heading', { name: 'Lista de treinos para realizar' })).toBeTruthy();
+        expect(screen.queryByRole('button', { name: 'Salvar treino' })).toBeNull();
         expect(corpos[0]).toMatchObject({ catalogoId: 1, treinoId: 7, exercicioId: 21, series: 4, repeticoes: 10, cargaKg: 20.5, tempoS: 90 });
         expect(corpos[0]).not.toHaveProperty('distanciaM');
     });
@@ -87,8 +89,10 @@ describe('realizar treino', () => {
         fireEvent.change(screen.getByLabelText('Tempo de Supino reto (minutos)'), { target: { value: '1,5' } });
         fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
         expect((await screen.findByRole('alert')).textContent).toContain('falhou');
+        expect(screen.queryByRole('heading', { name: 'Lista de treinos para realizar' })).toBeNull();
         fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
-        expect(await screen.findByText('Execução registrada.')).toBeTruthy();
+        expect(await screen.findByRole('heading', { name: 'Lista de treinos para realizar' })).toBeTruthy();
+        expect(screen.queryByRole('button', { name: 'Salvar treino' })).toBeNull();
         expect(corpos).toHaveLength(2);
         expect(corpos[0].chaveIdempotencia).toMatch(/^[0-9a-f-]{36}$/);
         expect(corpos[1].chaveIdempotencia).toBe(corpos[0].chaveIdempotencia);

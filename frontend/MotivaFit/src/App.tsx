@@ -11,13 +11,14 @@ import PaginaRelatoriosAdmin from "@/pages-admin/pagina-relatorios-admin";
 import PaginaSuperUsuario from "@/pages-admin/pagina-superusuario";
 import PaginaTreinos from "./pages-user/pagina-treinos";
 import PaginaRealizarTreino from "./pages-user/pagina-realizar-treino";
+import PaginaHistorico from "./pages-user/pagina-historico";
 import PaginaTermosDeUso from "@/pages-user/pagina-termos-de-uso";
 
 function App() {
     return (
-        <ThemeProvider defaultTheme="light" storageKey="motivafit-theme">
-            <Router>
-                <AuthProvider>
+        <Router>
+            <AuthProvider>
+                <ThemeProvider defaultTheme="light">
                     <Routes>
                         {/* Rota inicial */}
                         <Route path="/" element={<PaginaInterfaceInicial />} />
@@ -55,15 +56,27 @@ function App() {
                             path="/treinos"
                             element={
                                 <RotaProtegida>
-                                    <PaginaTreinos />
+                                    <PaginaTreinos key="gerenciar" />
                                 </RotaProtegida>
                             }
+                        />
+                        <Route
+                            path="/realizar-treino"
+                            element={<RotaProtegida><PaginaTreinos key="realizar" modo="realizar" /></RotaProtegida>}
                         />
                         <Route
                             path="/treinos/:treinoId/realizar"
                             element={
                                 <RotaProtegida>
                                     <PaginaRealizarTreino />
+                                </RotaProtegida>
+                            }
+                        />
+                        <Route
+                            path="/historico"
+                            element={
+                                <RotaProtegida>
+                                    <PaginaHistorico />
                                 </RotaProtegida>
                             }
                         />
@@ -108,9 +121,9 @@ function App() {
                         {/* Bloqueia qualquer rota não reconhecida, redirecionando para a raiz */}
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
-                </AuthProvider>
-            </Router>
-        </ThemeProvider>
+                </ThemeProvider>
+            </AuthProvider>
+        </Router>
     );
 }
 

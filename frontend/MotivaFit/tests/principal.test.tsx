@@ -32,13 +32,14 @@ const paginaInicial = Array.from({ length: TAMANHO_PAGINA_HISTORICO }, (_, indic
 ));
 const paginaSeguinte = [execucao(900, 'Remada final', '2026-11-03T15:00:00.000Z', 'Costas arquivado')];
 
-function mount(registros: (url: URL) => unknown[]) {
+function mount(registros: (url: URL) => unknown[], treinos: unknown[] = []) {
     document.cookie = 'csrfToken=csrf; Path=/';
     vi.stubGlobal('fetch', vi.fn((url: string) => {
         const endereco = String(url);
         if (endereco.includes('/api/auth/refresh')) {
             return Promise.resolve(Response.json({ token: token(), expirationAt: new Date(Date.now() + 900000).toISOString() }));
         }
+        if (endereco.endsWith('/api/treinos')) return Promise.resolve(Response.json(treinos));
         if (endereco.includes('/api/registros')) return Promise.resolve(Response.json(registros(new URL(endereco, 'http://localhost'))));
         return Promise.resolve(Response.json({ codigo: 'ERRO', mensagem: 'não mapeado', dataHora: '2026-11-06T15:00:00Z' }, { status: 500 }));
     }));
@@ -59,6 +60,25 @@ afterEach(() => {
 });
 
 describe('painel do aluno', () => {
+    it.each([0, 1, 3])('conta %i treinos da conta e exclui treinos públicos de outros usuários', async (quantidade) => {
+        const treinos = Array.from({ length: quantidade + 2 }, (_, id) => ({
+            id, nome: `Treino ${id}`, tipo: 'MUSCULACAO', visibilidade: 'PUBLICO',
+            createdAt: agora.toISOString(), updatedAt: agora.toISOString(),
+            meuTreino: id < quantidade, podeEditar: id < quantidade,
+        }));
+        localStorage.setItem('motivafit_workout_enrollments', 'dados antigos inválidos');
+        mount(() => [], treinos);
+        await waitFor(() => {
+            const cartao = screen.getByText('Fichas inscritas').closest('.shadow-sm');
+            expect(cartao?.querySelector('.text-3xl')?.textContent).toBe(String(quantidade));
+        });
+        for (let id = 0; id < quantidade; id++) expect(screen.getByText(`Treino ${id}`)).toBeTruthy();
+        expect(screen.queryByText(`Treino ${quantidade}`)).toBeNull();
+        expect(screen.getByRole('link', { name: 'Adicionar ficha de treino' }).getAttribute('href')).toBe('/treinos');
+        expect(screen.getByRole('link', { name: 'Ver histórico' }).getAttribute('href')).toBe('/historico');
+        expect(screen.getByText(quantidade === 1 ? 'Ficha vinculada ao seu perfil' : 'Fichas vinculadas ao seu perfil')).toBeTruthy();
+    });
+
     it('mostra execuções da conta, preserva o nome histórico e não conclui uma sessão', async () => {
         mount((url) => {
             const tamanho = Number(url.searchParams.get('tamanho'));

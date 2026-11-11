@@ -170,7 +170,7 @@ export function RotaPublica({ children }: { children: React.ReactNode }) {
     if (!isAuthenticated) return <>{children}</>;
     if (enviando) return <AguardandoSessao />;
     const from = location.state?.from?.pathname;
-    const destinos = ["/principal", "/treinos", ...(isAdmin ? ["/admin", "/admin/treinos", "/admin/relatorios"] : []),
+    const destinos = ["/principal", "/treinos", "/historico", ...(isAdmin ? ["/admin", "/admin/treinos", "/admin/relatorios"] : []),
         ...(isSuperusuario ? ["/admin/superusuario"] : [])];
     return <Navigate to={destinos.includes(from) ? from : isAdmin ? "/admin" : "/principal"} replace />;
 }

@@ -10,6 +10,23 @@ export function camposVazios(modalidade: ModalidadeBackend): CamposMeta {
         : { modalidade, tempoS: "", distanciaM: "" };
 }
 
+export function camposPadrao(modalidade: ModalidadeBackend, meta = ""): CamposMeta {
+    const existentes = lerMeta(modalidade, meta);
+    if (modalidade === "MUSCULACAO") {
+        return {
+            modalidade,
+            series: existentes?.modalidade === modalidade && existentes.series || "3",
+            repeticoes: existentes?.modalidade === modalidade && existentes.repeticoes || "12",
+            cargaKg: existentes?.modalidade === modalidade && existentes.cargaKg || "0",
+        };
+    }
+    return {
+        modalidade,
+        tempoS: existentes?.modalidade === modalidade && existentes.tempoS || "600",
+        distanciaM: existentes?.modalidade === modalidade && existentes.distanciaM || "1000",
+    };
+}
+
 function inteiro(valor: string): number | null {
     if (!/^\d+$/.test(valor.trim())) return null;
     const numero = Number(valor);

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Plus, Trash2, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,9 +11,9 @@ import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
 import { adicionarExercicioAoTreino, atualizarExercicioDoTreino, listarExerciciosDoTreino, removerExercicioDoTreino } from "@/lib/api/exercicios-api";
-import { atualizarTreino, copiarTreinoPublico, criarTreino, excluirTreino, listarTreinos } from "@/lib/api/treinos-api";
+import { atualizarTreino, criarTreino, excluirTreino, listarTreinos } from "@/lib/api/treinos-api";
 import type { CatalogoExercicioResponseDTO, ExercicioResponseDTO, ModalidadeBackend, TipoTreinoBackend, TreinoResponseDTO, VisibilidadeBackend } from "@/lib/api/contracts";
-import { camposVazios, formatarMetaVisivel, lerMeta, paceDosCampos, serializarMeta, validarMeta, type CamposMeta } from "@/lib/meta-exercicio";
+import { camposPadrao, formatarMetaVisivel, lerMeta, paceDosCampos, serializarMeta, validarMeta, type CamposMeta } from "@/lib/meta-exercicio";
 import {
     ROTULO_TIPO,
     ROTULO_VISIBILIDADE,
@@ -158,7 +158,8 @@ async function sincronizarExercicios(
     return { itens: atuais, erro: null };
 }
 
-export default function PaginaTreinos() {
+export default function PaginaTreinos({ modo = "gerenciar" }: { modo?: "gerenciar" | "realizar" }) {
+    const realizando = modo === "realizar";
     const { user, logout, isAdmin, enviando: saindo } = useAuth();
     const [versaoTreinos, setVersaoTreinos] = useState(0);
     const [versaoCatalogo, setVersaoCatalogo] = useState(0);
@@ -189,15 +190,7 @@ export default function PaginaTreinos() {
     const salvando = useRef(false);
     const exclusaoEmAndamento = useRef(false);
     const copiaEmAndamento = useRef(false);
-    const location = useLocation();
-    const meusTreinosRef = useRef<HTMLDivElement>(null);
     const [aba, setAba] = useState<"conta" | "publicos">("conta");
-    const [pedidoRealizar, setPedidoRealizar] = useState<string | null>(null);
-    const realizarPedido = Boolean((location.state as { realizar?: boolean } | null)?.realizar);
-    if (realizarPedido && pedidoRealizar !== location.key) {
-        setPedidoRealizar(location.key);
-        setAba("conta");
-    }
 
     useEffect(() => {
         montado.current = true;
@@ -208,15 +201,10 @@ export default function PaginaTreinos() {
     }, []);
 
     useEffect(() => {
-        if (!realizarPedido || aba !== "conta" || treinos.status !== "sucesso") return;
-        meusTreinosRef.current?.scrollIntoView?.({ block: "start" });
-    }, [realizarPedido, location.key, aba, treinos.status]);
-
-    useEffect(() => {
         if (treinos.status !== "sucesso") return;
         const controller = new AbortController();
         let ativo = true;
-        void Promise.all(treinos.dados.map(async (treino) => {
+        void Promise.all(treinos.dados.filter((treino) => !realizando || treino.meuTreino).map(async (treino) => {
             try {
                 const dados = await listarExerciciosDoTreino(treino.id, controller.signal);
                 return [treino.id, { status: "sucesso", dados }] as const;
@@ -234,7 +222,7 @@ export default function PaginaTreinos() {
             ativo = false;
             controller.abort();
         };
-    }, [treinos]);
+    }, [treinos, realizando]);
 
     function abrirCriacao() {
         setTextoCatalogo("");
@@ -271,7 +259,7 @@ export default function PaginaTreinos() {
                         chave: `salvo-${item.id}`,
                         catalogoExercicioId: item.catalogoExercicioId,
                         modalidade,
-                        campos: lerMeta(modalidade, item.meta) ?? camposVazios(modalidade),
+                        campos: camposPadrao(modalidade, item.meta),
                         metaOriginal: item.meta,
                         metaRecorde: item.metaRecorde ?? "",
                         persistidoId: item.id,
@@ -291,7 +279,7 @@ export default function PaginaTreinos() {
             chave: `novo-${item.id}-${atual.length}-${Date.now()}`,
             catalogoExercicioId: item.id,
             modalidade: item.modalidade,
-            campos: camposVazios(item.modalidade),
+            campos: camposPadrao(item.modalidade),
             metaOriginal: "",
             metaRecorde: "",
             persistidoId: null,
@@ -337,6 +325,7 @@ export default function PaginaTreinos() {
                 return;
             }
             setFormularioAberto(false);
+            setAba("conta");
         } catch (error) {
             if (!montado.current || ignorarConsulta(error)) return;
             setErroForm(mensagemAutenticacao(error));
@@ -374,12 +363,28 @@ export default function PaginaTreinos() {
         setCopiandoId(treino.id);
         setErroCopia("");
         try {
-            const copia = await copiarTreinoPublico(treino.id);
+            const [lista, catalogoRascunho] = await Promise.all([
+                listarExerciciosDoTreino(treino.id),
+                catalogo.status === "sucesso" ? Promise.resolve(catalogo.dados) : listarCatalogoExercicios(),
+            ]);
             if (!montado.current) return;
-            publicar(copia);
+            abrirCriacao();
+            setNome(treino.nome);
+            setTipo(treino.tipo);
+            setSelecionados(lista.map((item) => {
+                const modalidade = catalogoRascunho.find((entrada) => entrada.id === item.catalogoExercicioId)?.modalidade ?? treino.tipo;
+                return {
+                    chave: `rascunho-${item.id}`,
+                    catalogoExercicioId: item.catalogoExercicioId,
+                    modalidade,
+                    campos: camposPadrao(modalidade, item.meta),
+                    metaOriginal: "",
+                    metaRecorde: "",
+                    persistidoId: null,
+                    removido: false,
+                };
+            }));
             setTreinoDetalhado(null);
-            setAba("conta");
-            abrirEdicao(copia);
         } catch (error) {
             if (!montado.current || ignorarConsulta(error)) return;
             setErroCopia(mensagemAutenticacao(error));
@@ -419,11 +424,11 @@ export default function PaginaTreinos() {
                     email={email}
                     menuAberto={menuAberto}
                     setMenuAberto={setMenuAberto}
-                    title="Treinos"
-                    subtitle="Gerencie seus treinos e exercícios."
+                    title={realizando ? "Realizar treino" : "Meus treinos"}
+                    subtitle={realizando ? "Escolha um dos seus treinos para realizar." : "Gerencie seus treinos e explore os treinos públicos."}
                 />
 
-                <div className="flex flex-wrap items-center justify-center bg-background/60 px-4 py-3 sm:px-6">
+                {!realizando && <div className="flex flex-wrap items-center justify-center bg-background/60 px-4 py-3 sm:px-6">
                     <Button
                         type="button"
                         className="rounded-r-none cursor-pointer"
@@ -439,20 +444,20 @@ export default function PaginaTreinos() {
                         variant={aba == "publicos" ? "default" : "outline"}
                         onClick={() => setAba("publicos")}
                     >
-                        Treinos da Públicos
+                        Treinos públicos
                     </Button>
-                </div>
+                </div>}
 
                 <main className="min-w-0 flex-1 space-y-8 p-4 sm:p-6">
                     <section className="mx-auto max-w-5xl space-y-4">
                         <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
-                            <h2 className="font-heading text-lg font-bold">Treinos da conta</h2>
-                            <Button onClick={abrirCriacao} disabled={enviando} className="gap-2">
+                            <h2 className="font-heading text-lg font-bold">{realizando ? "Treinos disponíveis para realizar" : "Treinos da conta"}</h2>
+                            {!realizando && <Button onClick={abrirCriacao} disabled={enviando} className="gap-2">
                                 <Plus className="h-4 w-4" />Criar treino
-                            </Button>
+                            </Button>}
                         </div>
 
-                        <Dialog open={formularioAberto} onOpenChange={(aberto) => { if (!salvando.current) setFormularioAberto(aberto); }}>
+                        {!realizando && <Dialog open={formularioAberto} onOpenChange={(aberto) => { if (!salvando.current) setFormularioAberto(aberto); }}>
                             <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-4xl md:max-w-[50dvw] md:p-10" showCloseButton={!enviando} finalFocus={origemFormularioRef}>
                                 <DialogHeader className="pr-8">
                                     <DialogTitle>{editando ? "Editar treino" : "Novo treino"}</DialogTitle>
@@ -541,7 +546,7 @@ export default function PaginaTreinos() {
                                     </fieldset>
                                 </form>
                             </DialogContent>
-                        </Dialog>
+                        </Dialog>}
 
                         {treinos.status === "carregando" && <p role="status">Carregando treinos…</p>}
                         {treinos.status === "erro" && (
@@ -554,11 +559,12 @@ export default function PaginaTreinos() {
                         )}
                         <div className="space-y-6">
                             {erroCopia && <p role="alert" className="text-sm text-destructive">{erroCopia}</p>}
-                            {treinos.status === "sucesso" && aba == "conta" && (
-                                <div ref={meusTreinosRef} id="meus-treinos">
+                            {treinos.status === "sucesso" && (realizando || aba == "conta") && (
+                                <div id="meus-treinos">
                                     <ListaTreinos
                                         titulo="Meus treinos"
-                                        vazio="Nenhum treino criado."
+                                        vazio={realizando ? "Você ainda não tem treinos para realizar. Adicione uma ficha em Meus treinos." : "Nenhum treino criado."}
+                                        realizar={realizando}
                                         treinos={meusTreinos}
                                         fichas={fichas}
                                         nomeDe={nomeDoCatalogo}
@@ -568,7 +574,7 @@ export default function PaginaTreinos() {
                                 </div>
                             )}
 
-                            {treinos.status === "sucesso" && aba == "publicos" && (
+                            {treinos.status === "sucesso" && !realizando && aba == "publicos" && (
                                 <ListaTreinos
                                     titulo="Treinos públicos de outras pessoas"
                                     vazio="Nenhum treino público de outras pessoas."
@@ -758,7 +764,9 @@ function ListaTreinos({
     onCopiar,
     onDetalhes,
     copiandoId = null,
+    realizar = false,
 }: {
+    realizar?: boolean;
     titulo: string;
     vazio: string;
     treinos: TreinoResponseDTO[];
@@ -796,11 +804,10 @@ function ListaTreinos({
                             </CardHeader>
                             <CardContent className="flex flex-1 flex-col gap-4">
                                 <ExerciciosVisiveis ficha={fichas[treino.id]} nomeDe={nomeDe} apresentacao="tags" />
-                                {treino.podeEditar ? (
+                                {realizar && treino.meuTreino ? (
+                                    <Button size="sm" asChild><Link to={`/treinos/${treino.id}/realizar`}>Realizar treino</Link></Button>
+                                ) : !realizar && treino.podeEditar ? (
                                     <div className="flex flex-wrap gap-2">
-                                        <Button size="sm" asChild>
-                                            <Link to={`/treinos/${treino.id}/realizar`}>Realizar treino</Link>
-                                        </Button>
                                         <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => onEditar(treino)}>
                                             <Edit3 className="h-4 w-4" />Editar
                                         </Button>

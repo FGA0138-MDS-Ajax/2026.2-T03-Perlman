@@ -15,7 +15,7 @@ export function ThemeToggle({
     size,
     showLabel = false,
 }: ThemeToggleProps) {
-    const { resolvedTheme, toggleTheme } = useTheme();
+    const { resolvedTheme, toggleTheme, ocupado } = useTheme();
     const isDark = resolvedTheme === "dark";
 
     return (
@@ -23,6 +23,7 @@ export function ThemeToggle({
             type="button"
             variant={variant}
             size={size || (showLabel ? "default" : "icon")}
+            disabled={ocupado}
             onClick={toggleTheme}
             className={`relative transition-all duration-300 ${className}`}
             title={isDark ? "Mudar para modo claro" : "Mudar para modo escuro"}
@@ -54,7 +55,7 @@ export function ThemeToggle({
 }
 
 export function ThemeSelector({ className = "" }: { className?: string }) {
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme, ocupado } = useTheme();
 
     return (
         <div
@@ -64,6 +65,7 @@ export function ThemeSelector({ className = "" }: { className?: string }) {
         >
             <button
                 type="button"
+                disabled={ocupado}
                 onClick={() => setTheme("light")}
                 className={`flex items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition-all ${
                     theme === "light"
@@ -77,6 +79,7 @@ export function ThemeSelector({ className = "" }: { className?: string }) {
             </button>
             <button
                 type="button"
+                disabled={ocupado}
                 onClick={() => setTheme("dark")}
                 className={`flex items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition-all ${
                     theme === "dark"
@@ -90,6 +93,7 @@ export function ThemeSelector({ className = "" }: { className?: string }) {
             </button>
             <button
                 type="button"
+                disabled={ocupado}
                 onClick={() => setTheme("system")}
                 className={`flex items-center justify-center gap-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition-all ${
                     theme === "system"

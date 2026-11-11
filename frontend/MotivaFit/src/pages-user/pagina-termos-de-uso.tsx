@@ -335,11 +335,10 @@ export default function PaginaTermosDeUso() {
                             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                 <Cookie className="h-5 w-5" />
                             </div>
-                            <h3 className="text-lg font-heading font-bold">9. Cookies e Armazenamento Local (localStorage)</h3>
+                            <h3 className="text-lg font-heading font-bold">9. Cookies e Preferências da Conta</h3>
                         </div>
                         <p className="text-sm leading-relaxed text-muted-foreground">
-                            O MotivaFit utiliza mecanismos de armazenamento local no navegador (<code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">localStorage</code>)
-                            e cookies de sessão estritamente essenciais para:
+                            O MotivaFit utiliza cookies de autenticação e salva preferências no servidor para:
                         </p>
                         <ul className="space-y-1.5 text-sm text-muted-foreground ml-2">
                             <li className="flex items-start gap-2.5">
@@ -348,7 +347,7 @@ export default function PaginaTermosDeUso() {
                             </li>
                             <li className="flex items-start gap-2.5">
                                 <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                                <span>Memorizar a preferência visual de tema (modo claro ou modo escuro).</span>
+                                <span>Salvar a preferência visual de tema na conta autenticada, sem usar o armazenamento local do navegador.</span>
                             </li>
                         </ul>
                         <p className="text-sm leading-relaxed text-muted-foreground">

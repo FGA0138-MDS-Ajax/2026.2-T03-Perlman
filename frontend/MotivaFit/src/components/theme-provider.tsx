@@ -1,118 +1,97 @@
 import * as React from "react";
+import { buscarPreferencias, salvarTema, type Tema } from "@/lib/api/preferencias-api";
+import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
+import { ApiError } from "@/lib/api/http-client";
 
-export type Theme = "dark" | "light" | "system";
-
+export type Theme = Tema;
 export interface ThemeProviderProps {
     children: React.ReactNode;
     defaultTheme?: Theme;
-    storageKey?: string;
 }
-
 export interface ThemeProviderState {
     theme: Theme;
     resolvedTheme: "dark" | "light";
     setTheme: (theme: Theme) => void;
     toggleTheme: () => void;
+    ocupado: boolean;
+}
+const ThemeProviderContext = React.createContext<ThemeProviderState>({
+    theme: "light", resolvedTheme: "light", setTheme: () => {}, toggleTheme: () => {}, ocupado: false,
+});
+
+export function ThemeProvider(props: ThemeProviderProps) {
+    const { user } = useAuth();
+    return <TemaDaConta key={user?.id ?? "visitante"} {...props} autenticado={Boolean(user)} />;
 }
 
-const initialState: ThemeProviderState = {
-    theme: "system",
-    resolvedTheme: "light",
-    setTheme: () => null,
-    toggleTheme: () => null,
-};
-
-const ThemeProviderContext = React.createContext<ThemeProviderState>(initialState);
-
-export function ThemeProvider({
-    children,
-    defaultTheme = "light",
-    storageKey = "motivafit-theme",
-}: ThemeProviderProps) {
-    const [theme, setThemeState] = React.useState<Theme>(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem(storageKey) as Theme | null;
-            if (saved === "light" || saved === "dark" || saved === "system") {
-                return saved;
-            }
-        }
-        return defaultTheme;
-    });
-
-    const [resolvedTheme, setResolvedTheme] = React.useState<"dark" | "light">(() => {
-        if (typeof window !== "undefined") {
-            if (theme === "system") {
-                return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-            }
-            return theme;
-        }
-        return "light";
-    });
+function TemaDaConta({ children, defaultTheme = "light", autenticado }: ThemeProviderProps & { autenticado: boolean }) {
+    const [theme, setThemeState] = React.useState<Theme>(defaultTheme);
+    const [resolvedTheme, setResolvedTheme] = React.useState<"dark" | "light">("light");
+    const [carregando, setCarregando] = React.useState(autenticado);
+    const [salvando, setSalvando] = React.useState(false);
+    const [erro, setErro] = React.useState("");
+    const [falhaAoSalvar, setFalhaAoSalvar] = React.useState(false);
+    const [tentativa, setTentativa] = React.useState(0);
+    const pendente = React.useRef(false);
+    const gravacao = React.useRef<AbortController | null>(null);
 
     React.useEffect(() => {
-        const root = window.document.documentElement;
+        const controller = new AbortController();
+        if (autenticado) void buscarPreferencias(controller.signal).then(({ tema }) => {
+            if (!controller.signal.aborted) setThemeState(tema);
+        }, (error: unknown) => {
+            if (!controller.signal.aborted) setErro(`Não foi possível carregar o tema. ${mensagemAutenticacao(error)}`);
+        }).finally(() => { if (!controller.signal.aborted) setCarregando(false); });
+        return () => { controller.abort(); gravacao.current?.abort(); };
+    }, [autenticado, tentativa]);
 
-        const applyTheme = () => {
-            root.classList.remove("light", "dark");
-
-            let effective: "dark" | "light";
-            if (theme === "system") {
-                const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-                effective = systemDark ? "dark" : "light";
-            } else {
-                effective = theme;
-            }
-
-            root.classList.add(effective);
-            setResolvedTheme(effective);
+    React.useEffect(() => {
+        const media = window.matchMedia?.("(prefers-color-scheme: dark)");
+        const aplicar = () => {
+            const efetivo = theme === "system" ? media?.matches ? "dark" : "light" : theme;
+            document.documentElement.classList.remove("light", "dark");
+            document.documentElement.classList.add(efetivo);
+            setResolvedTheme(efetivo);
         };
-
-        applyTheme();
-
+        aplicar();
         if (theme === "system") {
-            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-            const listener = () => applyTheme();
-            mediaQuery.addEventListener("change", listener);
-            return () => mediaQuery.removeEventListener("change", listener);
+            media?.addEventListener("change", aplicar);
+            return () => media?.removeEventListener("change", aplicar);
         }
     }, [theme]);
 
-    const setTheme = React.useCallback(
-        (newTheme: Theme) => {
-            if (typeof window !== "undefined") {
-                localStorage.setItem(storageKey, newTheme);
+    const setTheme = React.useCallback((novo: Theme) => {
+        if (carregando || pendente.current) return;
+        setThemeState(novo);
+        if (!autenticado) return;
+        pendente.current = true;
+        setSalvando(true);
+        setErro("");
+        setFalhaAoSalvar(false);
+        const controller = new AbortController();
+        gravacao.current = controller;
+        void salvarTema(novo, controller.signal).then(({ tema }) => {
+            if (!controller.signal.aborted) setThemeState(tema);
+        }, (error: unknown) => {
+            if (!controller.signal.aborted && !(error instanceof ApiError && error.code === "SESSAO_ALTERADA")) {
+                setFalhaAoSalvar(true);
+                setErro(`O tema foi aplicado nesta página, mas não foi salvo na sua conta. ${mensagemAutenticacao(error)}`);
             }
-            setThemeState(newTheme);
-        },
-        [storageKey]
-    );
-
-    const toggleTheme = React.useCallback(() => {
-        const next = resolvedTheme === "dark" ? "light" : "dark";
-        setTheme(next);
-    }, [resolvedTheme, setTheme]);
-
-    const value = React.useMemo(
-        () => ({
-            theme,
-            resolvedTheme,
-            setTheme,
-            toggleTheme,
-        }),
-        [theme, resolvedTheme, setTheme, toggleTheme]
-    );
-
-    return (
-        <ThemeProviderContext.Provider value={value}>
-            {children}
-        </ThemeProviderContext.Provider>
-    );
+        }).finally(() => {
+            pendente.current = false;
+            if (!controller.signal.aborted) setSalvando(false);
+        });
+    }, [autenticado, carregando]);
+    const toggleTheme = React.useCallback(() => setTheme(resolvedTheme === "dark" ? "light" : "dark"), [resolvedTheme, setTheme]);
+    const value = React.useMemo(() => ({ theme, resolvedTheme, setTheme, toggleTheme, ocupado: carregando || salvando }), [theme, resolvedTheme, setTheme, toggleTheme, carregando, salvando]);
+    return <ThemeProviderContext.Provider value={value}>
+        {erro && <div className="border-b bg-background p-3 text-sm"><p role="alert">{erro}</p>
+            <button type="button" disabled={carregando || salvando} className="underline" onClick={() => {
+                if (falhaAoSalvar) { setTheme(theme); return; }
+                setErro(""); setCarregando(true); setTentativa((valor) => valor + 1);
+            }}>{falhaAoSalvar ? "Tentar salvar tema novamente" : "Recarregar preferência de tema"}</button>
+        </div>}
+        {children}
+    </ThemeProviderContext.Provider>;
 }
-
-export function useTheme() {
-    const context = React.useContext(ThemeProviderContext);
-    if (!context) {
-        throw new Error("useTheme deve ser usado dentro de um ThemeProvider");
-    }
-    return context;
-}
+export function useTheme() { return React.useContext(ThemeProviderContext); }

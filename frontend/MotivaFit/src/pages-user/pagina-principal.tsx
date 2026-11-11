@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
     Dumbbell,
     Flame,
@@ -17,19 +17,18 @@ import {
 } from "lucide-react";
 import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
-import type { RegistroDiarioResponseDTO } from "@/lib/api/contracts";
+import type { RegistroDiarioResponseDTO, TreinoResponseDTO } from "@/lib/api/contracts";
 import { listarRegistros, listarTodasAsExecucoes, TAMANHO_PAGINA_HISTORICO } from "@/lib/api/registros-api";
+import { listarTreinos } from "@/lib/api/treinos-api";
 import { resumirExecucoes } from "@/lib/indicadores-execucao";
 import { formatarDataTreino } from "@/lib/treinos-apresentacao";
-import {
-    enrollInWorkoutPlan,
-    getUserWorkoutPlanIds,
-    leaveWorkoutPlan,
-    WORKOUT_ENROLLMENTS_UPDATED_EVENT,
-} from "@/lib/workout-enrollments";
-import { WORKOUT_PLANS } from "@/lib/workout-plans";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
+
+type EstadoFichas =
+    | { status: "carregando" }
+    | { status: "sucesso"; itens: TreinoResponseDTO[] }
+    | { status: "erro"; mensagem: string };
 
 type EstadoHistorico =
     | { status: "carregando" }
@@ -56,17 +55,14 @@ function detalhesDaExecucao(registro: RegistroDiarioResponseDTO): string {
 }
 
 export default function PaginaPrincipal() {
-    const navigate = useNavigate();
     const { user, logout, isAdmin, enviando } = useAuth();
+    const [fichasVinculadas, setFichasVinculadas] = useState<EstadoFichas>({ status: "carregando" });
+    const [tentativaFichas, setTentativaFichas] = useState(0);
     const [historico, setHistorico] = useState<EstadoHistorico>({ status: "carregando" });
     const [indicadores, setIndicadores] = useState<EstadoIndicadores>({ status: "carregando" });
     const [carregandoMais, setCarregandoMais] = useState(false);
     const [avisoHistorico, setAvisoHistorico] = useState("");
     const [tentativa, setTentativa] = useState(0);
-    const [fichasInscritas, setFichasInscritas] = useState<string[]>(() =>
-        user ? getUserWorkoutPlanIds(user.email) : []
-    );
-    const fichasDoUsuario = WORKOUT_PLANS.filter((ficha) => fichasInscritas.includes(ficha.id));
     const execucoesNaSemana = indicadores.status === "sucesso" ? indicadores.execucoesNaSemana : null;
     const sequenciaAtiva = indicadores.status === "sucesso" ? indicadores.sequenciaDias : null;
     const [menuAberto, setMenuAberto] = useState(false);
@@ -100,20 +96,23 @@ export default function PaginaPrincipal() {
     }, [tentativa]);
 
     useEffect(() => {
-        function atualizarFichasInscritas() {
-            if (user) {
-                setFichasInscritas(getUserWorkoutPlanIds(user.email));
-            }
+        const controller = new AbortController();
+        let ativo = true;
+        setFichasVinculadas({ status: "carregando" });
+        if (user) {
+            listarTreinos(controller.signal).then((treinos) => {
+                if (!ativo) return;
+                setFichasVinculadas({ status: "sucesso", itens: treinos.filter((treino) => treino.meuTreino) });
+            }, (error: unknown) => {
+                if (!ativo || ignorar(error)) return;
+                setFichasVinculadas({ status: "erro", mensagem: mensagemAutenticacao(error) });
+            });
         }
-
-        window.addEventListener(WORKOUT_ENROLLMENTS_UPDATED_EVENT, atualizarFichasInscritas);
-        window.addEventListener("storage", atualizarFichasInscritas);
-
         return () => {
-            window.removeEventListener(WORKOUT_ENROLLMENTS_UPDATED_EVENT, atualizarFichasInscritas);
-            window.removeEventListener("storage", atualizarFichasInscritas);
+            ativo = false;
+            controller.abort();
         };
-    }, [user]);
+    }, [user, tentativaFichas]);
 
     async function carregarMais() {
         if (historico.status !== "sucesso" || !historico.temMais || carregandoMais) return;
@@ -136,20 +135,6 @@ export default function PaginaPrincipal() {
         } finally {
             setCarregandoMais(false);
         }
-    }
-
-    function alternarInscricao(workoutPlanId: string) {
-        if (!user) {
-            navigate("/login");
-            return;
-        }
-
-        if (fichasInscritas.includes(workoutPlanId)) {
-            leaveWorkoutPlan(user.email, workoutPlanId);
-        } else {
-            enrollInWorkoutPlan(user.email, workoutPlanId);
-        }
-        setFichasInscritas(getUserWorkoutPlanIds(user.email));
     }
 
     return (
@@ -204,10 +189,17 @@ export default function PaginaPrincipal() {
                                 <Dumbbell className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-heading font-bold text-foreground">{fichasDoUsuario.length}</div>
+                                <div className="text-3xl font-heading font-bold text-foreground">{fichasVinculadas.status === "sucesso" ? fichasVinculadas.itens.length : "—"}</div>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    {fichasDoUsuario.length === 1 ? "Ficha vinculada ao seu perfil" : "Fichas vinculadas ao seu perfil"}
+                                    {fichasVinculadas.status === "sucesso" && fichasVinculadas.itens.length === 1 ? "Ficha vinculada ao seu perfil" : "Fichas vinculadas ao seu perfil"}
                                 </p>
+                                {fichasVinculadas.status === "carregando" && <p role="status" className="mt-2 text-xs">Carregando fichas…</p>}
+                                {fichasVinculadas.status === "erro" && (
+                                    <div className="mt-2 space-y-2">
+                                        <p role="alert" className="text-xs text-destructive">{fichasVinculadas.mensagem}</p>
+                                        <Button variant="outline" onClick={() => setTentativaFichas((atual) => atual + 1)}>Tentar carregar fichas novamente</Button>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </section>
@@ -218,22 +210,22 @@ export default function PaginaPrincipal() {
                             <CardHeader>
                                 <CardTitle className="text-lg font-heading">Minhas fichas</CardTitle>
                                 <CardDescription>
-                                    A inscrição fica só neste navegador. A execução é gravada exercício a exercício em Realizar treino.
+                                    Treinos vinculados à sua conta. Adicione ou edite suas fichas em Meus treinos.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                {fichasDoUsuario.length === 0 ? (
+                                {fichasVinculadas.status === "carregando" ? <p role="status">Carregando suas fichas…</p> : fichasVinculadas.status === "erro" ? <p role="alert">{fichasVinculadas.mensagem}</p> : fichasVinculadas.itens.length === 0 ? (
                                     <p className="py-4 text-sm text-muted-foreground">
-                                        Você ainda não está inscrito em nenhuma ficha. Escolha uma nas fichas disponíveis abaixo.
+                                        Você ainda não tem fichas vinculadas. Adicione uma em Meus treinos.
                                     </p>
-                                ) : fichasDoUsuario.map((ficha) => (
+                                ) : fichasVinculadas.itens.map((ficha) => (
                                     <div key={ficha.id} className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
                                         <div>
-                                            <p className="font-medium">{ficha.title}</p>
-                                            <p className="text-sm text-muted-foreground">{ficha.frequency}</p>
+                                            <p className="font-medium">{ficha.nome}</p>
+                                            <p className="text-sm text-muted-foreground">{ficha.tipo === "MUSCULACAO" ? "Musculação" : "Aeróbico"}</p>
                                         </div>
                                         <Button variant="outline" asChild>
-                                            <Link to="/treinos">Realizar em Meus treinos</Link>
+                                            <Link to="/realizar-treino">Ir para Realizar treino</Link>
                                         </Button>
                                     </div>
                                 ))}
@@ -245,6 +237,9 @@ export default function PaginaPrincipal() {
                             <CardHeader>
                                 <CardTitle className="text-lg font-heading">Histórico de execuções</CardTitle>
                                 <CardDescription>Cada linha é um exercício registrado nesta conta, com o nome guardado na execução.</CardDescription>
+                                <Button variant="outline" size="sm" className="mt-2 w-fit" asChild>
+                                    <Link to="/historico">Ver histórico</Link>
+                                </Button>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {historico.status === "carregando" && <p role="status" className="text-sm">Carregando histórico…</p>}
@@ -280,44 +275,9 @@ export default function PaginaPrincipal() {
                         </Card>
                     </section>
 
-                    <section id="fichas-disponiveis" className="space-y-4">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <h2 className="text-xl font-heading font-bold">Fichas de Treino</h2>
-                                <p className="text-sm text-muted-foreground">
-                                    Inscrição, descrição e frequência destas fichas ficam só neste navegador. Para copiar um treino público, abra Meus treinos.
-                                </p>
-                            </div>
-                            <Button variant="outline" asChild>
-                                <Link to="/treinos">Abrir meus treinos</Link>
-                            </Button>
-                        </div>
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            {WORKOUT_PLANS.map((ficha) => {
-                                const inscrito = fichasInscritas.includes(ficha.id);
-                                return (
-                                    <Card key={ficha.id}>
-                                        <CardHeader>
-                                            <CardTitle>{ficha.title}</CardTitle>
-                                            <CardDescription>{ficha.description}</CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="space-y-3">
-                                            <p className="text-sm text-muted-foreground">
-                                                Frequência: {ficha.frequency}
-                                            </p>
-                                            <Button
-                                                className="w-full"
-                                                variant={inscrito ? "outline" : "default"}
-                                                onClick={() => alternarInscricao(ficha.id)}
-                                            >
-                                                {inscrito ? "Cancelar inscrição" : "Inscrever-se"}
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
-                                );
-                            })}
-                        </div>
-                    </section>
+                    <Button variant="outline" asChild>
+                        <Link to="/treinos">Adicionar ficha de treino</Link>
+                    </Button>
                 </main>
             </div>
         </div>
