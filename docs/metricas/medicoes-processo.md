@@ -107,11 +107,7 @@ Sem prazo, não é possível medir atraso. A ata nº 6 não definiu prazo para n
 
 **Resultado:** entre as 7 entregas concluídas, o desvio médio é de 18 ÷ 7 = **2,6 sprints**. Restam 3 sprints (8 a 10) para as entregas das Sprints 5 a 9 que ainda não começaram.
 
-## P7 — Revisão de código nos Pull Requests
 
-**Fonte:** API do GitHub (Pull Requests #1 a #13).
-
-**Resultado:** **0 de 13** PRs receberam revisão ou comentário, e todos foram mesclados pelo próprio autor. A revisão de código (Code Review) foi definida como prática da equipe nas atas nº 1 e 2, mas não há registro dela no repositório.
 
 ---
 
