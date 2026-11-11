@@ -1,0 +1,2150 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentação do projeto MotivaFit (Grupo Perlman — T03, Métodos de Desenvolvimento de Software, UnB)">
+      
+      
+        <meta name="author" content="Grupo Perlman — T03">
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Relatório de feedback — testes da API MotivaFit - MotivaFit — Documentação</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#relatorio-de-feedback-testes-da-api-motivafit" class="md-skip">
+          Pular para conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="../.." title="MotivaFit — Documentação" class="md-header__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MotivaFit — Documentação
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Relatório de feedback — testes da API MotivaFit
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo escuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo escuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando busca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../gestao/equipe/" class="md-tabs__link">
+          
+  
+  
+  Gestão e Metodologia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../produto/arquitetura/" class="md-tabs__link">
+          
+  
+  
+  Arquitetura
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../produto/sobre-documento/" class="md-tabs__link">
+          
+  
+  
+  Produto
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../metricas/gqm/" class="md-tabs__link">
+          
+  
+  
+  Métricas
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../estrategia/" class="md-tabs__link">
+          
+  
+  
+  Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../referencias/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Referências
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MotivaFit — Documentação" class="md-nav__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    MotivaFit — Documentação
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gestão e Metodologia
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Gestão e Metodologia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/equipe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equipe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/ciclo-de-vida/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ciclo de Vida
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/organizacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Organização
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/sprints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planejamento das Sprints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/comunicacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Comunicação
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/riscos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Riscos e Replanejamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/processo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Processo de Desenvolvimento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Atas de Reunião
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Atas de Reunião
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 6
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 7
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Arquitetura
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/arquitetura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/guia-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guia da API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Produto
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Produto
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/sobre-documento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sobre o Documento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/visao-geral/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visão Geral
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/escopo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Escopo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/perfis-cenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perfis e Cenários
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/backlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backlog do Produto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rastreabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Métricas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Métricas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/gqm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quadro GQM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/medicoes-gqm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Medições do GQM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/medicoes-processo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Medições do Processo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../estrategia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estratégia de Testes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roteiro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roteiro de Teste
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../relatorio-testes-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relatório de Testes da API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../referencias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Referências
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-conclusao-geral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Conclusão geral
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-resultados-detalhados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Resultados detalhados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-interpretacao-dos-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Interpretação dos resultados
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Interpretação dos resultados">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-o-backend-esta-funcionando" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 O backend está funcionando
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-a-criacao-de-treino-e-um-teste-de-integracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 A criação de treino é um teste de integração?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-feedback-para-o-time-de-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Feedback para o time de backend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Feedback para o time de backend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b01-confirmar-cadastro-duplicado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B01 — Confirmar cadastro duplicado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b02-confirmar-persistencia-do-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B02 — Confirmar persistência do treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b03-manter-documentacao-coerente-com-o-contrato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B03 — Manter documentação coerente com o contrato
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b04-nao-tratar-o-erro-de-https-como-falha-da-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B04 — Não tratar o erro de HTTPS como falha da API
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-feedback-para-o-time-de-frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Feedback para o time de frontend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Feedback para o time de frontend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#f01-resolver-conflito-de-merge-no-frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F01 — Resolver conflito de merge no frontend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f02-confirmar-url-da-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F02 — Confirmar URL da API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f03-confirmar-uso-real-das-funcoes-de-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F03 — Confirmar uso real das funções de API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f04-verificar-cors-pelo-navegador" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F04 — Verificar CORS pelo navegador
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-o-que-ainda-falta-testar-pelo-frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. O que ainda falta testar pelo frontend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-cuidados-com-o-registro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Cuidados com o registro
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-conclusao-para-o-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Conclusão para o time
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="relatorio-de-feedback-testes-da-api-motivafit">Relatório de feedback — testes da API MotivaFit<a class="headerlink" href="#relatorio-de-feedback-testes-da-api-motivafit" title="Permanent link">&para;</a></h1>
+<p><strong>Data:</strong> 09/11/2026<br />
+<strong>Ambiente:</strong> WSL/Ubuntu, backend local, PostgreSQL local<br />
+<strong>Backend:</strong> <code>http://localhost:8080</code><br />
+<strong>Origem informada nos testes:</strong> <code>http://localhost:3000</code><br />
+<strong>Banco:</strong> PostgreSQL local, banco <code>motivafit_test</code>  </p>
+<h2 id="1-conclusao-geral">1. Conclusão geral<a class="headerlink" href="#1-conclusao-geral" title="Permanent link">&para;</a></h2>
+<p>Os testes registrados neste relatório foram executados diretamente contra a API REST, utilizando <code>curl</code>. Eles validam a comunicação entre o cliente HTTP, o backend Spring Boot e o banco PostgreSQL.</p>
+<p>Portanto, são <strong>testes de integração da API/backend com o banco de dados</strong>. Eles ainda <strong>não são testes de integração entre a interface frontend e o backend</strong>, porque o frontend não foi iniciado e nenhum botão ou tela foi usado para gerar as requisições.</p>
+<p>Resultado geral dos casos comprovados no log:</p>
+<ul>
+<li>API disponível: aprovado;</li>
+<li>cadastro válido: aprovado;</li>
+<li>validação de senha fraca: aprovado;</li>
+<li>login válido: aprovado;</li>
+<li>rota protegida sem token: aprovado;</li>
+<li>listagem autenticada de treinos: aprovado;</li>
+<li>criação de treino autenticada: aprovado;</li>
+<li>CORS para <code>http://localhost:3000</code>: aparentemente aprovado pelos cabeçalhos retornados;</li>
+<li>cadastro duplicado: não há evidência suficiente no log para classificá-lo como executado;</li>
+<li>integração frontend–backend pela interface: ainda pendente.</li>
+</ul>
+<h2 id="2-resultados-detalhados">2. Resultados detalhados<a class="headerlink" href="#2-resultados-detalhados" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Caso</th>
+<th>Requisição/ação</th>
+<th style="text-align: right;">Resultado esperado</th>
+<th style="text-align: right;">Resultado observado</th>
+<th>Situação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T01</td>
+<td>Acesso à API usando HTTPS</td>
+<td><code>GET https://localhost:8080/v3/api-docs</code></td>
+<td style="text-align: right;">Resposta da API</td>
+<td style="text-align: right;">Falha de conexão</td>
+<td>Não é defeito confirmado</td>
+</tr>
+<tr>
+<td>T02</td>
+<td>Acesso à documentação usando HTTP</td>
+<td><code>GET http://localhost:8080/v3/api-docs</code></td>
+<td style="text-align: right;"><code>200</code></td>
+<td style="text-align: right;"><code>HTTP/1.1 200</code> e especificação OpenAPI retornada</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>T03</td>
+<td>Cadastro válido</td>
+<td><code>POST /api/auth/cadastro</code> com e-mail novo e senha forte</td>
+<td style="text-align: right;"><code>201</code></td>
+<td style="text-align: right;"><code>HTTP/1.1 201</code>; usuário criado com perfil <code>USUARIO</code></td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>T04</td>
+<td>Senha fraca</td>
+<td><code>POST /api/auth/cadastro</code> com senha <code>123</code></td>
+<td style="text-align: right;"><code>400</code></td>
+<td style="text-align: right;"><code>HTTP/1.1 400</code>; mensagem de senha inválida</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>T05</td>
+<td>Login válido</td>
+<td><code>POST /api/auth/login</code> com credenciais cadastradas</td>
+<td style="text-align: right;"><code>200</code> e token JWT</td>
+<td style="text-align: right;"><code>HTTP/1.1 200</code>; token e <code>expirationAt</code> retornados; cookies também foram enviados</td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>T06</td>
+<td>Obter token para chamadas protegidas</td>
+<td>Extração de <code>.token</code> com <code>jq</code></td>
+<td style="text-align: right;">Token não vazio</td>
+<td style="text-align: right;">Inicialmente vazio porque o <code>jq</code> ainda não estava instalado/extraído; após instalar e executar novamente, token foi obtido</td>
+<td>Corrigido durante a execução</td>
+</tr>
+<tr>
+<td>T07</td>
+<td>Listar treinos sem autenticação</td>
+<td><code>GET /api/treinos</code> sem <code>Authorization</code></td>
+<td style="text-align: right;"><code>401</code></td>
+<td style="text-align: right;"><code>HTTP/1.1 401</code>; <code>AUTENTICACAO_NECESSARIA</code></td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>T08</td>
+<td>Listar treinos autenticado</td>
+<td><code>GET /api/treinos</code> com <code>Bearer TOKEN</code></td>
+<td style="text-align: right;"><code>200</code></td>
+<td style="text-align: right;"><code>HTTP/1.1 200</code>; lista vazia <code>[]</code></td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>T09</td>
+<td>Criar treino autenticado</td>
+<td><code>POST /api/treinos</code> com nome, tipo <code>MUSCULACAO</code> e visibilidade <code>PRIVADO</code></td>
+<td style="text-align: right;"><code>201</code></td>
+<td style="text-align: right;"><code>HTTP/1.1 201</code>; treino criado com <code>id: 1</code></td>
+<td>Aprovado</td>
+</tr>
+<tr>
+<td>T10</td>
+<td>CORS da origem do frontend</td>
+<td>Requisições com <code>Origin: http://localhost:3000</code></td>
+<td style="text-align: right;">Cabeçalho de origem permitida</td>
+<td style="text-align: right;">Respostas retornaram <code>Access-Control-Allow-Origin: http://localhost:3000</code> e <code>Access-Control-Allow-Credentials: true</code></td>
+<td>Aparentemente aprovado</td>
+</tr>
+<tr>
+<td>T11</td>
+<td>Cadastro duplicado</td>
+<td>Repetir cadastro com o mesmo e-mail</td>
+<td style="text-align: right;"><code>409</code></td>
+<td style="text-align: right;">Não há evidência clara no log de uma segunda tentativa válida com o mesmo e-mail</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>T12</td>
+<td>Persistência após criação</td>
+<td>Listar novamente após criar treino</td>
+<td style="text-align: right;">Treino criado aparecer na lista</td>
+<td style="text-align: right;">O log disponível comprova a criação, mas não contém uma nova listagem posterior suficientemente clara</td>
+<td>Pendente de confirmação</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-interpretacao-dos-resultados">3. Interpretação dos resultados<a class="headerlink" href="#3-interpretacao-dos-resultados" title="Permanent link">&para;</a></h2>
+<h3 id="31-o-backend-esta-funcionando">3.1 O backend está funcionando<a class="headerlink" href="#31-o-backend-esta-funcionando" title="Permanent link">&para;</a></h3>
+<p>O retorno <code>HTTP/1.1 200</code> em <code>/v3/api-docs</code> confirma que a aplicação está em execução na porta <code>8080</code>. O cadastro retornou <code>201</code>, o login retornou <code>200</code>, a rota sem autenticação retornou <code>401</code> e a criação de treino retornou <code>201</code>.</p>
+<p>Isso demonstra que o fluxo abaixo funcionou:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  -&gt; API Spring Boot
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  -&gt; autenticação/validação
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  -&gt; PostgreSQL
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  -&gt; resposta HTTP
+</code></pre></div>
+<h3 id="32-a-criacao-de-treino-e-um-teste-de-integracao">3.2 A criação de treino é um teste de integração?<a class="headerlink" href="#32-a-criacao-de-treino-e-um-teste-de-integracao" title="Permanent link">&para;</a></h3>
+<p>Sim, no sentido de integração entre a API e o banco. O endpoint autenticado recebeu o JWT, identificou o usuário e criou um registro de treino. Contudo, como a requisição foi feita pelo <code>curl</code>, não houve participação do frontend.</p>
+<p>A classificação mais precisa é:</p>
+<blockquote>
+<p>Teste de integração de API/backend com persistência e autenticação.</p>
+</blockquote>
+<p>Para ser um teste de integração frontend–backend, seria necessário executar a aplicação frontend, interagir com a tela e observar a requisição saindo da página em <code>http://localhost:3000</code> para a API em <code>http://localhost:8080</code>.</p>
+<h2 id="4-feedback-para-o-time-de-backend">4. Feedback para o time de backend<a class="headerlink" href="#4-feedback-para-o-time-de-backend" title="Permanent link">&para;</a></h2>
+<h3 id="b01-confirmar-cadastro-duplicado">B01 — Confirmar cadastro duplicado<a class="headerlink" href="#b01-confirmar-cadastro-duplicado" title="Permanent link">&para;</a></h3>
+<p>O roteiro prevê que um e-mail já cadastrado retorne <code>409</code>. Esse caso não ficou comprovado no log. Reexecutar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE_URL</span><span class="s2">/api/auth/cadastro"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Origin: http://localhost:3000'</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s2">"{\"email\":\"</span><span class="nv">$EMAIL</span><span class="s2">\",\"senha\":\"</span><span class="nv">$SENHA</span><span class="s2">\"}"</span>
+</code></pre></div>
+<p>O esperado é <code>HTTP/1.1 409</code>.</p>
+<h3 id="b02-confirmar-persistencia-do-treino">B02 — Confirmar persistência do treino<a class="headerlink" href="#b02-confirmar-persistencia-do-treino" title="Permanent link">&para;</a></h3>
+<p>Após o <code>POST /api/treinos</code> retornar <code>201</code>, executar novamente:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-i<span class="w"> </span><span class="s2">"</span><span class="nv">$BASE_URL</span><span class="s2">/api/treinos"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Origin: http://localhost:3000'</span>
+</code></pre></div>
+<p>O treino criado deve aparecer na lista. Isso fecha a evidência de persistência no banco.</p>
+<h3 id="b03-manter-documentacao-coerente-com-o-contrato">B03 — Manter documentação coerente com o contrato<a class="headerlink" href="#b03-manter-documentacao-coerente-com-o-contrato" title="Permanent link">&para;</a></h3>
+<p>A documentação OpenAPI retornada informa corretamente os principais códigos de resposta dos endpoints testados. O time deve manter a documentação atualizada quando adicionar ou alterar campos de cadastro, login ou treino.</p>
+<h3 id="b04-nao-tratar-o-erro-de-https-como-falha-da-api">B04 — Não tratar o erro de HTTPS como falha da API<a class="headerlink" href="#b04-nao-tratar-o-erro-de-https-como-falha-da-api" title="Permanent link">&para;</a></h3>
+<p>A tentativa abaixo falhou:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>https://localhost:8080/v3/api-docs
+</code></pre></div>
+<p>O backend local está configurado para HTTP, não HTTPS. O comando correto é:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:8080/v3/api-docs
+</code></pre></div>
+<p>Esse item não exige correção no backend, a menos que o projeto passe a exigir TLS local.</p>
+<h2 id="5-feedback-para-o-time-de-frontend">5. Feedback para o time de frontend<a class="headerlink" href="#5-feedback-para-o-time-de-frontend" title="Permanent link">&para;</a></h2>
+<h3 id="f01-resolver-conflito-de-merge-no-frontend">F01 — Resolver conflito de merge no frontend<a class="headerlink" href="#f01-resolver-conflito-de-merge-no-frontend" title="Permanent link">&para;</a></h3>
+<p>Foi identificado anteriormente o arquivo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>frontend/MotivaFit/src/pages-user/pagina-principal.tsx
+</code></pre></div>
+<p>com marcadores de conflito Git:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>=======
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>&gt;&gt;&gt;&gt;&gt;&gt;&gt; developer
+</code></pre></div>
+<p>Esses marcadores não pertencem ao código final e impedem ou podem impedir a compilação do frontend. É necessário escolher e combinar manualmente a implementação correta, remover os três marcadores e testar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>grep<span class="w"> </span>-R<span class="w"> </span>-n<span class="w"> </span>-E<span class="w"> </span><span class="s1">'^(&lt;&lt;&lt;&lt;&lt;&lt;&lt;|=======|&gt;&gt;&gt;&gt;&gt;&gt;&gt;)'</span><span class="w"> </span>frontend/MotivaFit/src
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>npm<span class="w"> </span>run<span class="w"> </span>lint
+</code></pre></div>
+<p>O comando <code>grep</code> não deve retornar nenhum marcador, e o build deve terminar sem erro.</p>
+<h3 id="f02-confirmar-url-da-api">F02 — Confirmar URL da API<a class="headerlink" href="#f02-confirmar-url-da-api" title="Permanent link">&para;</a></h3>
+<p>Com o frontend em <code>http://localhost:3000</code>, a camada de API deve chamar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>http://localhost:8080
+</code></pre></div>
+<p>O frontend não deve tentar enviar requisições da API para a própria porta <code>3000</code>.</p>
+<h3 id="f03-confirmar-uso-real-das-funcoes-de-api">F03 — Confirmar uso real das funções de API<a class="headerlink" href="#f03-confirmar-uso-real-das-funcoes-de-api" title="Permanent link">&para;</a></h3>
+<p>As telas de login, cadastro e treinos devem chamar as funções da camada de API, e não apenas atualizar <code>localStorage</code> ou dados locais. O fluxo esperado é:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Tela de login
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>  -&gt; auth-api.ts
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  -&gt; POST http://localhost:8080/api/auth/login
+</code></pre></div>
+<p>E:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Tela de treinos
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>  -&gt; treinos-api.ts
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>  -&gt; GET/POST http://localhost:8080/api/treinos
+</code></pre></div>
+<h3 id="f04-verificar-cors-pelo-navegador">F04 — Verificar CORS pelo navegador<a class="headerlink" href="#f04-verificar-cors-pelo-navegador" title="Permanent link">&para;</a></h3>
+<p>Os testes via <code>curl</code> receberam cabeçalhos compatíveis com a origem <code>http://localhost:3000</code>. Ainda é necessário confirmar no navegador, porque o browser aplica as regras de CORS e preflight de forma diferente do <code>curl</code>.</p>
+<h2 id="6-o-que-ainda-falta-testar-pelo-frontend">6. O que ainda falta testar pelo frontend<a class="headerlink" href="#6-o-que-ainda-falta-testar-pelo-frontend" title="Permanent link">&para;</a></h2>
+<p>Depois de corrigir o conflito e iniciar o frontend, executar pela interface:</p>
+<ol>
+<li>Abrir <code>http://localhost:3000</code>;</li>
+<li>Cadastrar um novo usuário pela tela;</li>
+<li>Confirmar no DevTools &gt; Network que ocorreu <code>POST /api/auth/cadastro</code>;</li>
+<li>Fazer login pela tela;</li>
+<li>Confirmar <code>POST /api/auth/login</code> e o retorno do token;</li>
+<li>Abrir a tela de treinos;</li>
+<li>Confirmar <code>GET /api/treinos</code>;</li>
+<li>Criar um treino pela tela;</li>
+<li>Confirmar <code>POST /api/treinos</code> com resposta <code>201</code>;</li>
+<li>Atualizar a tela e confirmar que o treino permanece disponível.</li>
+</ol>
+<p>Esses serão os testes de integração frontend–backend propriamente ditos.</p>
+<h2 id="7-cuidados-com-o-registro">7. Cuidados com o registro<a class="headerlink" href="#7-cuidados-com-o-registro" title="Permanent link">&para;</a></h2>
+<p>Não adicionar ao GitHub:</p>
+<ul>
+<li>JWT completo;</li>
+<li>cookies <code>refreshToken</code> ou <code>csrfToken</code>;</li>
+<li>senha do banco;</li>
+<li>arquivo <code>.env</code> com credenciais;</li>
+<li>logs contendo tokens reais.</li>
+</ul>
+<p>No relatório compartilhado, registrar apenas os códigos HTTP, mensagens resumidas e o identificador anonimizado do caso.</p>
+<h2 id="8-conclusao-para-o-time">8. Conclusão para o time<a class="headerlink" href="#8-conclusao-para-o-time" title="Permanent link">&para;</a></h2>
+<p>A API está operacional e os principais fluxos de cadastro, autenticação, autorização e criação de treino foram aprovados por chamadas diretas. Não foi identificado, neste log, um defeito funcional confirmado no backend.</p>
+<p>Os próximos pontos são:</p>
+<ol>
+<li>resolver os marcadores <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code>, <code>=======</code> e <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; developer</code> no frontend;</li>
+<li>garantir que o frontend compile;</li>
+<li>confirmar a URL <code>http://localhost:8080</code> na camada de API;</li>
+<li>repetir cadastro, login e criação de treino pela interface;</li>
+<li>executar novamente os casos de cadastro duplicado e persistência para completar as evidências.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Voltar para o topo
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Grupo Perlman — T03 · Universidade de Brasília · MDS 2026
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>

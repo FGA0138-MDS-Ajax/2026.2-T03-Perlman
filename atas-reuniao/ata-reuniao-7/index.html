@@ -1,0 +1,2388 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentação do projeto MotivaFit (Grupo Perlman — T03, Métodos de Desenvolvimento de Software, UnB)">
+      
+      
+        <meta name="author" content="Grupo Perlman — T03">
+      
+      
+      
+        <link rel="prev" href="../ata-reuniao-6/">
+      
+      
+        <link rel="next" href="../../produto/arquitetura/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Ata 7 - MotivaFit — Documentação</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ata-de-reuniao-no-7-motivafit" class="md-skip">
+          Pular para conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="../.." title="MotivaFit — Documentação" class="md-header__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MotivaFit — Documentação
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Ata 7
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo escuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo escuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando busca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../gestao/equipe/" class="md-tabs__link">
+          
+  
+  
+  Gestão e Metodologia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../produto/arquitetura/" class="md-tabs__link">
+          
+  
+  
+  Arquitetura
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../produto/sobre-documento/" class="md-tabs__link">
+          
+  
+  
+  Produto
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../metricas/gqm/" class="md-tabs__link">
+          
+  
+  
+  Métricas
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../testes/estrategia/" class="md-tabs__link">
+          
+  
+  
+  Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../referencias/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Referências
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MotivaFit — Documentação" class="md-nav__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    MotivaFit — Documentação
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gestão e Metodologia
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Gestão e Metodologia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/equipe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equipe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/ciclo-de-vida/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ciclo de Vida
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/organizacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Organização
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/sprints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planejamento das Sprints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/comunicacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Comunicação
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/riscos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Riscos e Replanejamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/processo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Processo de Desenvolvimento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Atas de Reunião
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Atas de Reunião
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ata-reuniao-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ata-reuniao-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ata-reuniao-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ata-reuniao-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ata-reuniao-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ata-reuniao-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 6
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 7
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 7
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-participantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Participantes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-pauta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Pauta
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-revisao-dos-encaminhamentos-anteriores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Revisão dos encaminhamentos anteriores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-discussoes-e-decisoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Discussões e decisões
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Discussões e decisões">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-atraso-na-integracao-entre-back-end-e-front-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Atraso na integração entre back-end e front-end
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-reuniao-de-integracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Reunião de integração
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-andamento-do-front-end-e-do-back-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Andamento do front-end e do back-end
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-rotina-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Rotina de testes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-proximas-sprints-e-entregas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Próximas sprints e entregas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#46-ponto-de-controle-e-inspecoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6 Ponto de controle e inspeções
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-encaminhamentos-plano-de-acao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Encaminhamentos (plano de ação)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-riscos-e-impedimentos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Riscos e impedimentos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-proxima-reuniao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Próxima reunião
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-aprovacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Aprovação
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Arquitetura
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/arquitetura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/guia-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guia da API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Produto
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Produto
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/sobre-documento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sobre o Documento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/visao-geral/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visão Geral
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/escopo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Escopo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/perfis-cenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perfis e Cenários
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/backlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backlog do Produto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rastreabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Métricas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Métricas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/gqm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quadro GQM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/medicoes-gqm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Medições do GQM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/medicoes-processo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Medições do Processo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testes/estrategia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estratégia de Testes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testes/roteiro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roteiro de Teste
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testes/relatorio-testes-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relatório de Testes da API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../referencias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Referências
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-participantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Participantes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-pauta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Pauta
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-revisao-dos-encaminhamentos-anteriores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Revisão dos encaminhamentos anteriores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-discussoes-e-decisoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Discussões e decisões
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Discussões e decisões">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-atraso-na-integracao-entre-back-end-e-front-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Atraso na integração entre back-end e front-end
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-reuniao-de-integracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Reunião de integração
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-andamento-do-front-end-e-do-back-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Andamento do front-end e do back-end
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-rotina-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Rotina de testes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-proximas-sprints-e-entregas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Próximas sprints e entregas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#46-ponto-de-controle-e-inspecoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.6 Ponto de controle e inspeções
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-encaminhamentos-plano-de-acao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Encaminhamentos (plano de ação)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-riscos-e-impedimentos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Riscos e impedimentos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-proxima-reuniao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Próxima reunião
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-aprovacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Aprovação
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Versão</th>
+<th style="text-align: center;">Data</th>
+<th style="text-align: center;">Descrição da Alteração</th>
+<th style="text-align: center;">Nome(s) Integrante(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1.0</td>
+<td style="text-align: center;">05/11/2026</td>
+<td style="text-align: center;">Criação da ata</td>
+<td style="text-align: center;">Bruno Cruvinel Barros da Silva</td>
+</tr>
+</tbody>
+</table>
+<h1 id="ata-de-reuniao-no-7-motivafit">Ata de Reunião nº 7 — MotivaFit<a class="headerlink" href="#ata-de-reuniao-no-7-motivafit" title="Permanent link">&para;</a></h1>
+<p><strong>Disciplina:</strong> Métodos de Desenvolvimento de Software
+<strong>Projeto:</strong> MotivaFit
+<strong>Equipe:</strong> Grupo Perlman — T03
+<strong>Tipo de reunião:</strong> Interna da equipe
+<strong>Data:</strong> 04/11/2026
+<strong>Horário:</strong> início 19h00 — término 19h20
+<strong>Local:</strong> Discord
+<strong>Redator:</strong> Bruno Cruvinel Barros da Silva
+<strong>Facilitador:</strong> Mateus Fernandes Dantas (líder da equipe)</p>
+<hr />
+<h2 id="1-participantes">1. Participantes<a class="headerlink" href="#1-participantes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Nome</th>
+<th style="text-align: left;">Papel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Bernardo Campos Caxito Silveira</td>
+<td style="text-align: left;">GQM / Analista de Qualidade</td>
+</tr>
+<tr>
+<td style="text-align: left;">Bruno Cruvinel Barros da Silva</td>
+<td style="text-align: left;">Documentação</td>
+</tr>
+<tr>
+<td style="text-align: left;">Lucas Venâncio Pereira</td>
+<td style="text-align: left;">Back-end</td>
+</tr>
+<tr>
+<td style="text-align: left;">Luís Felipe Pontes Vieira Andrade</td>
+<td style="text-align: left;">Back-end</td>
+</tr>
+<tr>
+<td style="text-align: left;">Mateus Fernandes Dantas</td>
+<td style="text-align: left;">Front-end (líder)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Matheus Estevam Ferreira</td>
+<td style="text-align: left;">Back-end</td>
+</tr>
+<tr>
+<td style="text-align: left;">Rafael Souto Lopes Laube</td>
+<td style="text-align: left;">Front-end</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-pauta">2. Pauta<a class="headerlink" href="#2-pauta" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Revisão dos encaminhamentos anteriores</li>
+<li>Atraso na integração entre back-end e front-end</li>
+<li>Andamento do front-end e do back-end</li>
+<li>Rotina de testes</li>
+<li>Próximas sprints e entregas</li>
+<li>Ponto de controle (09/11) e inspeções (16/11)</li>
+<li>Reunião de integração</li>
+<li>Encaminhamentos e próxima reunião</li>
+</ol>
+<h2 id="3-revisao-dos-encaminhamentos-anteriores">3. Revisão dos encaminhamentos anteriores<a class="headerlink" href="#3-revisao-dos-encaminhamentos-anteriores" title="Permanent link">&para;</a></h2>
+<p>Encaminhamentos da ata nº 6 e compromisso de integração combinado para o domingo (01/11).</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Ação</th>
+<th style="text-align: left;">Responsável</th>
+<th style="text-align: left;">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Integrar o back-end com o front-end (combinado para o domingo, 01/11/2026)</td>
+<td style="text-align: left;">Back-end e front-end</td>
+<td style="text-align: left;">Pendente (não realizada; novo prazo máximo: sábado, 07/11/2026, ver item 4.1)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Iniciar o site de documentação em Markdown (MkDocs / GitHub Pages) (ata nº 6)</td>
+<td style="text-align: left;">Bruno Cruvinel Barros da Silva</td>
+<td style="text-align: left;">Concluída</td>
+</tr>
+<tr>
+<td style="text-align: left;">Iniciar a elaboração dos testes (ata nº 6)</td>
+<td style="text-align: left;">Bernardo Campos Caxito Silveira</td>
+<td style="text-align: left;">Em andamento (testes iniciados na máquina local, nada publicado ainda, ver item 4.4)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Desenvolver o front-end seguindo o modelo do Figma (ata nº 6)</td>
+<td style="text-align: left;">Front-end (Rafael Laube e Mateus Fernandes)</td>
+<td style="text-align: left;">Em andamento (telas do MVP prontas; falta a parte de gamificação, ver item 4.3)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Definir a data da próxima reunião (ata nº 6)</td>
+<td style="text-align: left;">Toda a equipe</td>
+<td style="text-align: left;">Concluída (reunião realizada em 04/11/2026)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-discussoes-e-decisoes">4. Discussões e decisões<a class="headerlink" href="#4-discussoes-e-decisoes" title="Permanent link">&para;</a></h2>
+<h3 id="41-atraso-na-integracao-entre-back-end-e-front-end">4.1 Atraso na integração entre back-end e front-end<a class="headerlink" href="#41-atraso-na-integracao-entre-back-end-e-front-end" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Discussão:</strong> a integração do back-end com o front-end estava combinada para o domingo anterior (01/11), pela manhã, mas não aconteceu: o horário não chegou a ser combinado entre os integrantes, e a integração acabou não sendo feita. Foi destacado que se trata de uma pendência urgente, que precisa ser resolvida ainda nesta semana, porque o semestre está acabando e a equipe precisa começar os testes e a correção de bugs o quanto antes.</li>
+<li><strong>Decisões:</strong></li>
+<li>O prazo máximo para concluir a integração passa a ser o <strong>sábado, 07/11/2026</strong>, podendo usar manhã, tarde ou noite, conforme a disponibilidade.</li>
+<li>O combinado e o novo prazo ficam registrados na ata, e os integrantes foram orientados a conferir o registro.</li>
+<li>Ficou entendido que o Docker Compose do back-end e o do front-end podem permanecer separados, por organização, e que o trabalho consiste em ligar um ao outro para que o sistema rode de verdade. Não houve objeções.</li>
+</ul>
+<h3 id="42-reuniao-de-integracao">4.2 Reunião de integração<a class="headerlink" href="#42-reuniao-de-integracao" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Discussão:</strong> como os integrantes do back-end não puderam participar desta reunião, a equipe decidiu combinar o horário da integração pelo grupo. Matheus e Luís responderam, por mensagem, que estão disponíveis no dia seguinte (05/11) a partir das 14h. Um dos integrantes está indisponível das 19h às 21h, e foi sugerido que a reunião possa ser antes desse horário. Para a noite, foi sugerido o horário de 19h, sem que ele seja imposto: vale o horário em que houver mais pessoas disponíveis.</li>
+<li><strong>Decisões:</strong></li>
+<li>A equipe se reunirá no dia <strong>05/11/2026</strong> para trabalhar na integração (front-end e back-end).</li>
+<li>O horário será escolhido por enquete no grupo de mensagens da equipe, com a sugestão de 19h. Se algum integrante não puder participar, a reunião segue com os que estiverem disponíveis, desde que haja alguém do back-end.</li>
+<li>Se não for possível integrar a todos em 05/11, a integração pode ser estendida até o sábado (07/11), o limite máximo.</li>
+</ul>
+<h3 id="43-andamento-do-front-end-e-do-back-end">4.3 Andamento do front-end e do back-end<a class="headerlink" href="#43-andamento-do-front-end-e-do-back-end" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Discussão:</strong></li>
+<li><strong>Back-end:</strong> foi conferido o que já está pronto em relação à Sprint 7 (painel administrativo, com os exercícios mais realizados, e painel do usuário, com submissão e remoção de desafios). Segundo mensagem de áudio de um dos responsáveis pelo back-end, praticamente nada falta no back-end até o painel administrativo. Foi informado que restava concluir o merge das branches do back-end e que o Matheus havia alterado branches, mas já tinha ajustado.</li>
+<li><strong>Front-end:</strong> Rafael montou a estrutura da tela inicial, em que o usuário vê os exercícios e monta seus treinos, e focou no MVP, sem chegar a fazer a parte de comunidade. O front-end informou que o CRUD de treinos e de exercícios, que faz parte do MVP, está pronto, e que as telas estão prontas para a integração: falta apenas puxar os códigos do back-end para o front-end. O que falta no front é a gamificação.</li>
+<li><strong>APIs:</strong> foi perguntado se houve alguma alteração relevante nas APIs. Quem estava na reunião informou que não mexeu nelas, e ficou combinado confirmar com os responsáveis pelo back-end.</li>
+<li><strong>Decisões:</strong></li>
+<li>O MVP está concluído em cada lado, e o próximo passo é integrá-los.</li>
+<li>A confirmação sobre mudanças nas APIs será feita com a equipe do back-end.</li>
+</ul>
+<h3 id="44-rotina-de-testes">4.4 Rotina de testes<a class="headerlink" href="#44-rotina-de-testes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Discussão:</strong> Bernardo entrou no meio da reunião e foi informado do que já tinha sido tratado.</li>
+<li><strong>Decisões:</strong></li>
+<li>Depois que a integração for feita, Bernardo inicia a rotina de testes, com <strong>pelo menos um teste por dia</strong>, cobrindo as funcionalidades do projeto, a partir do roteiro de testes que ele já montou.</li>
+<li>Bernardo faz o levantamento de todos os bugs e incongruências encontrados.</li>
+<li>Os testes devem ser feitos <strong>tanto no desktop quanto no celular</strong>, porque o professor pediu compatibilidade com diferentes telas como requisito não funcional.</li>
+<li>Bernardo informou que já começou alguns testes na noite anterior, mas na máquina local, e que ainda não subiu nada para o GitHub. Ficou combinado que ele subirá os documentos em Markdown (ou outro formato) e enviará a Bruno, no privado, para que as referências entrem na documentação do projeto.</li>
+</ul>
+<h3 id="45-proximas-sprints-e-entregas">4.5 Próximas sprints e entregas<a class="headerlink" href="#45-proximas-sprints-e-entregas" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Discussão:</strong> foram revisadas as sprints restantes:</li>
+<li><strong>Sprint 7 (02/11 a 08/11):</strong> painel administrativo (exercícios mais realizados) e painel do usuário (submissão e remoção de desafios). Essa é a sprint em andamento.</li>
+<li><strong>Sprint 8 (09/11 a 15/11):</strong> botão de recorde pessoal e sistema de compartilhamento comunitário (feed interativo).</li>
+<li><strong>Sprint 9 (16/11 a 22/11):</strong> inspeções, streak diário (elemento visual), feed de atividades interativo e integração opcional do login com o Google.</li>
+<li><strong>Sprint 10 (23/11 a 29/11):</strong> apenas correção de bugs e validação do que faltar.</li>
+<li>A viabilidade das entregas da Sprint 8 depende do back-end, que precisaria implementar o botão de recorde pessoal e o feed. Como a equipe de back-end não estava presente, a resposta ficou para depois da conversa com ela.</li>
+<li><strong>Decisões:</strong></li>
+<li>Fazer a integração nesta semana para ter o MVP rodando.</li>
+<li>A partir da próxima semana, avaliar se há risco de não conseguir entregar as partes de gamificação planejadas.</li>
+<li>A apresentação do software rodando está prevista para o dia 30 (30/11/2026).</li>
+</ul>
+<h3 id="46-ponto-de-controle-e-inspecoes">4.6 Ponto de controle e inspeções<a class="headerlink" href="#46-ponto-de-controle-e-inspecoes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Discussão:</strong></li>
+<li><strong>Ponto de controle:</strong> segunda-feira, 09/11, e quarta-feira seguinte (11/11). Em cada aula, grupos apresentam o desenvolvimento do software por 15 minutos cada, com presença obrigatória para toda a turma e chamada nas duas aulas. O que será apresentado é o MVP. O objetivo da integração até sábado é ter o projeto integrado no domingo, para saber o que será mostrado.</li>
+<li><strong>Presença nas aulas:</strong> a equipe discutiu apresentar logo na segunda para ficar livre na quarta. Na quarta, as opções são ir só para assinar a chamada, ir e concluir o que faltar na própria semana, ou faltar e usar o tempo para o trabalho pendente. A decisão ficou com o grupo.</li>
+<li><strong>Inspeções:</strong> no dia 16/11 (segunda). As inspeções são feitas de casa, mas todos precisam se reunir para inspecionar o grupo designado pelo professor. A equipe inspecionará o <strong>grupo Torvalds</strong>. Foi dito que, no momento, não se recomenda adiantar a inspeção: ela deve ser feita no dia 16, prazo dado pelo professor.</li>
+<li>Foi levantado que é bom ter ao menos o MVP publicado até lá, porque os inspetores podem avaliar a aplicação, e que essa dúvida pode ser confirmada com o monitor.</li>
+<li><strong>Decisões:</strong></li>
+<li>Mateus entrará em contato com o líder do grupo Torvalds para saber exatamente o que será inspecionado, e enviará ao grupo o texto com a descrição do projeto e o link do GitHub deles, para que todos possam se familiarizar.</li>
+<li>A equipe decidirá, até a segunda, como lidar com a presença da quarta-feira.</li>
+</ul>
+<h2 id="5-encaminhamentos-plano-de-acao">5. Encaminhamentos (plano de ação)<a class="headerlink" href="#5-encaminhamentos-plano-de-acao" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Nº</th>
+<th style="text-align: left;">Ação</th>
+<th style="text-align: left;">Responsável</th>
+<th style="text-align: center;">Prazo</th>
+<th style="text-align: center;">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Integrar o back-end com o front-end</td>
+<td style="text-align: left;">Back-end (Matheus Estevam, Luís e Lucas) e front-end (Rafael Laube e Mateus Fernandes)</td>
+<td style="text-align: center;">07/11/2026 (limite máximo)</td>
+<td style="text-align: center;">Pendente</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Reunião de integração entre front-end e back-end; definir o horário por enquete no grupo (sugestão: 19h)</td>
+<td style="text-align: left;">Toda a equipe; enquete por Mateus Fernandes Dantas</td>
+<td style="text-align: center;">05/11/2026</td>
+<td style="text-align: center;">Pendente</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Iniciar a rotina de testes após a integração: pelo menos 1 teste por dia, levantamento de bugs, em desktop e celular</td>
+<td style="text-align: left;">Bernardo Campos Caxito Silveira</td>
+<td style="text-align: center;">A partir da conclusão da integração</td>
+<td style="text-align: center;">Pendente</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">Subir os documentos de testes (Markdown ou outro formato) e enviar a Bruno no privado</td>
+<td style="text-align: left;">Bernardo Campos Caxito Silveira</td>
+<td style="text-align: center;">Pendente</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">Confirmar com o back-end se houve alteração relevante nas APIs</td>
+<td style="text-align: left;">A confirmar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">Verificar com o back-end a viabilidade do botão de recorde pessoal e do feed (compartilhamento comunitário)</td>
+<td style="text-align: left;">A confirmar</td>
+<td style="text-align: center;">Antes da Sprint 8 (09/11/2026)</td>
+<td style="text-align: center;">Pendente</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">Contatar o líder do grupo Torvalds e enviar ao grupo a descrição do projeto e o link do GitHub</td>
+<td style="text-align: left;">Mateus Fernandes Dantas</td>
+<td style="text-align: center;">Antes de 16/11/2026</td>
+<td style="text-align: center;">Pendente</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: left;">Inspecionar o grupo Torvalds</td>
+<td style="text-align: left;">Toda a equipe</td>
+<td style="text-align: center;">16/11/2026</td>
+<td style="text-align: center;">Pendente</td>
+</tr>
+<tr>
+<td style="text-align: center;">09</td>
+<td style="text-align: left;">Tirar com o monitor a dúvida sobre ter o MVP publicado para as inspeções</td>
+<td style="text-align: left;">Mateus Fernandes Dantas</td>
+<td style="text-align: center;">A definir</td>
+<td style="text-align: center;">Pendente</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: left;">Levantar o que foi tratado na reunião e enviar o resumo ao grupo</td>
+<td style="text-align: left;">Bruno Cruvinel Barros da Silva</td>
+<td style="text-align: center;">04/11/2026</td>
+<td style="text-align: center;">Pendente</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-riscos-e-impedimentos">6. Riscos e impedimentos<a class="headerlink" href="#6-riscos-e-impedimentos" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Atraso na integração entre back-end e front-end:</strong> já ocorreu uma vez (domingo, 01/11). O prazo limite agora é sábado, 07/11.</li>
+<li><strong>Disponibilidade do back-end:</strong> os responsáveis pelo back-end não puderam participar da reunião, o que atrasa a definição da integração e a resposta sobre as entregas da Sprint 8.</li>
+<li><strong>Entrega da gamificação:</strong> há dúvida se será possível entregar recorde pessoal, feed, streak e login com Google. O risco será reavaliado a partir da próxima semana, depois da integração.</li>
+<li><strong>Fim do semestre:</strong> a equipe precisa integrar e testar o quanto antes para ter o software rodando na apresentação de 30/11.</li>
+</ul>
+<h2 id="7-proxima-reuniao">7. Próxima reunião<a class="headerlink" href="#7-proxima-reuniao" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Data:</strong> 05/11/2026 (reunião de integração entre front-end e back-end)</li>
+<li><strong>Horário:</strong> a definir por enquete no grupo (sugestão: 19h; Matheus e Luís estão disponíveis a partir das 14h)</li>
+<li><strong>Local:</strong> Discord</li>
+<li><strong>Pauta preliminar:</strong> integração entre front-end e back-end; confirmação de mudanças nas APIs; preparação para o ponto de controle de 09/11.</li>
+</ul>
+<hr />
+<h2 id="8-aprovacao">8. Aprovação<a class="headerlink" href="#8-aprovacao" title="Permanent link">&para;</a></h2>
+<p>Ata redigida por <strong>Bruno Cruvinel Barros da Silva</strong> e revisada pela equipe em 07/12/2026.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Voltar para o topo
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../ata-reuniao-6/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Ata 6">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Ata 6
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../produto/arquitetura/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Documento de Arquitetura">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Documento de Arquitetura
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Grupo Perlman — T03 · Universidade de Brasília · MDS 2026
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>

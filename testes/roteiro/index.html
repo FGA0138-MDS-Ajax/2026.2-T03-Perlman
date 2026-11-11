@@ -1,0 +1,2845 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentação do projeto MotivaFit (Grupo Perlman — T03, Métodos de Desenvolvimento de Software, UnB)">
+      
+      
+        <meta name="author" content="Grupo Perlman — T03">
+      
+      
+      
+        <link rel="prev" href="../estrategia/">
+      
+      
+        <link rel="next" href="../relatorio-testes-api/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Roteiro de Teste - MotivaFit — Documentação</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#62-roteiro-de-teste" class="md-skip">
+          Pular para conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="../.." title="MotivaFit — Documentação" class="md-header__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MotivaFit — Documentação
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Roteiro de Teste
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo escuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo escuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Mudar para o modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mudar para o modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando busca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../gestao/equipe/" class="md-tabs__link">
+          
+  
+  
+  Gestão e Metodologia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../produto/arquitetura/" class="md-tabs__link">
+          
+  
+  
+  Arquitetura
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../produto/sobre-documento/" class="md-tabs__link">
+          
+  
+  
+  Produto
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../metricas/gqm/" class="md-tabs__link">
+          
+  
+  
+  Métricas
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../estrategia/" class="md-tabs__link">
+          
+  
+  
+  Testes
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../referencias/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Referências
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MotivaFit — Documentação" class="md-nav__button md-logo" aria-label="MotivaFit — Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.57 14.86 22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>
+
+    </a>
+    MotivaFit — Documentação
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gestão e Metodologia
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Gestão e Metodologia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/equipe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equipe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/ciclo-de-vida/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ciclo de Vida
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/organizacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Organização
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/sprints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planejamento das Sprints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/comunicacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Comunicação
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/riscos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Riscos e Replanejamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gestao/processo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Processo de Desenvolvimento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Atas de Reunião
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Atas de Reunião
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 6
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../atas-reuniao/ata-reuniao-7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata 7
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Arquitetura
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/arquitetura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documento de Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/guia-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guia da API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Produto
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Produto
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/sobre-documento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sobre o Documento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/visao-geral/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visão Geral
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/escopo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Escopo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/perfis-cenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perfis e Cenários
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/backlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backlog do Produto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../produto/rastreabilidade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rastreabilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Métricas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Métricas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/gqm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quadro GQM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/medicoes-gqm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Medições do GQM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../metricas/medicoes-processo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Medições do Processo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Testes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../estrategia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Estratégia de Testes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roteiro de Teste
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roteiro de Teste
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#621-detalhamento-dos-casos-de-teste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2.1 Detalhamento dos casos de teste
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2.1 Detalhamento dos casos de teste">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#t1-cadastro-de-usuario-com-e-mail-e-senha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T1 – Cadastro de usuário com e-mail e senha
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t2-login-com-credencial-valida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T2 – Login com credencial válida
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t3-login-com-dados-invalidos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T3 – Login com dados inválidos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t4-cadastro-de-treino-personalizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T4 – Cadastro de treino personalizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t5-validacao-de-treino-incompleto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T5 – Validação de treino incompleto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t6-alteracao-de-treino-existente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T6 – Alteração de treino existente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t7-exclusao-de-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T7 – Exclusão de treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t8-registro-de-exercicio-realizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T8 – Registro de exercício realizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t9-atualizacao-de-metricas-de-evolucao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T9 – Atualização de métricas de evolução
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t10-pontuacao-e-conquista-por-assiduidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T10 – Pontuação e conquista por assiduidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t11-restricao-do-painel-de-admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T11 – Restrição do painel de admin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t12-login-com-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T12 – Login com Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t13-falha-ou-cancelamento-no-login-com-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T13 – Falha ou cancelamento no login com Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t14-listagem-de-treinos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T14 – Listagem de treinos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t15-cadastro-de-exercicio-no-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T15 – Cadastro de exercício no treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t16-listagem-de-exercicios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T16 – Listagem de exercícios
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t17-alteracao-de-exercicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T17 – Alteração de exercício
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t18-exclusao-de-exercicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T18 – Exclusão de exercício
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t19-acompanhamento-de-recorde-pessoal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T19 – Acompanhamento de recorde pessoal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t20-usabilidade-do-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T20 – Usabilidade do MVP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t21-token-google-invalido-ou-expirado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T21 – Token Google inválido ou expirado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t22-rota-protegida-sem-sessao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T22 – Rota protegida sem sessão
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../relatorio-testes-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Relatório de Testes da API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../referencias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Referências
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#621-detalhamento-dos-casos-de-teste" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2.1 Detalhamento dos casos de teste
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2.1 Detalhamento dos casos de teste">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#t1-cadastro-de-usuario-com-e-mail-e-senha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T1 – Cadastro de usuário com e-mail e senha
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t2-login-com-credencial-valida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T2 – Login com credencial válida
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t3-login-com-dados-invalidos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T3 – Login com dados inválidos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t4-cadastro-de-treino-personalizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T4 – Cadastro de treino personalizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t5-validacao-de-treino-incompleto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T5 – Validação de treino incompleto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t6-alteracao-de-treino-existente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T6 – Alteração de treino existente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t7-exclusao-de-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T7 – Exclusão de treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t8-registro-de-exercicio-realizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T8 – Registro de exercício realizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t9-atualizacao-de-metricas-de-evolucao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T9 – Atualização de métricas de evolução
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t10-pontuacao-e-conquista-por-assiduidade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T10 – Pontuação e conquista por assiduidade
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t11-restricao-do-painel-de-admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T11 – Restrição do painel de admin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t12-login-com-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T12 – Login com Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t13-falha-ou-cancelamento-no-login-com-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T13 – Falha ou cancelamento no login com Google
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t14-listagem-de-treinos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T14 – Listagem de treinos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t15-cadastro-de-exercicio-no-treino" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T15 – Cadastro de exercício no treino
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t16-listagem-de-exercicios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T16 – Listagem de exercícios
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t17-alteracao-de-exercicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T17 – Alteração de exercício
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t18-exclusao-de-exercicio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T18 – Exclusão de exercício
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t19-acompanhamento-de-recorde-pessoal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T19 – Acompanhamento de recorde pessoal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t20-usabilidade-do-mvp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T20 – Usabilidade do MVP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t21-token-google-invalido-ou-expirado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T21 – Token Google inválido ou expirado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#t22-rota-protegida-sem-sessao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        T22 – Rota protegida sem sessão
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="62-roteiro-de-teste">6.2 Roteiro de teste<a class="headerlink" href="#62-roteiro-de-teste" title="Permanent link">&para;</a></h1>
+<p>Os códigos T identificam os casos de teste.</p>
+<p>O roteiro documenta os cenários de validação planejados (Test Plan). O resultado obtido, a referência da evidência, os reparos e o número de ciclos devem ser atualizados no registro de execução após cada teste. Evidências externas devem ser identificadas por caminho ou URL (Uniform Resource Locator, endereço de um recurso), versão do código e data. Casos apenas planejados não garantem ausência de defeitos, mas estabelecem o critério de sucesso.</p>
+<p>O roteiro é organizado em duas tabelas vinculadas pelo ID: planejamento (tipo, nível, pré-condições e resultado previsto) e execução (resultado obtido, evidência, reparos e ciclos). O detalhamento apresenta o objetivo e, nos novos casos, os procedimentos. T2 e T3 validam e-mail e senha do MVP; não testam a senha do Google. O consentimento cancelado é tratado em T13, tokens inválidos ou expirados em T21 e acesso sem sessão em T22.</p>
+<p>Os casos T1 a T8, T14 a T18 e T22 devem ser executados nas Sprints 3 e 4; T20 valida o conjunto do MVP na Sprint 4. T9 será executado na Sprint 5, T19 na Sprint 8 e T10 na Sprint 9. T11 acompanha a entrega das funcionalidades administrativas. T12, T13 e T21 dependem da implementação de RF-24 nas Sprints 9 e 10. Os casos funcionais ainda não detalhados de RF-13 a RF-19, RF-21 e RF-23 deverão ser definidos antes da Sprint de implementação de cada requisito, com atualização da matriz. O teste de acesso T11 não substitui os testes funcionais do painel administrativo.</p>
+<p><strong>Tabela 19 – Planejamento dos testes</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">ID / nome</th>
+<th style="text-align: left;">Tipo</th>
+<th style="text-align: left;">Nível</th>
+<th style="text-align: left;">Pré-condições</th>
+<th style="text-align: left;">Resultado previsto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>T1</strong> Cadastro de usuário com e-mail e senha</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário ainda não cadastrado; acesso à tela de cadastro; e-mail e senha válidos para o cadastro</td>
+<td style="text-align: left;">A conta e o perfil do usuário são criados. O usuário pode acessar a tela de login para se autenticar com o e-mail e a senha cadastrados</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T2</strong> Login com credencial válida</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário previamente cadastrado; e-mail e senha válidos</td>
+<td style="text-align: left;">O sistema autentica o usuário e exibe a tela principal correspondente ao perfil</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T3</strong> Login com dados inválidos</td>
+<td style="text-align: left;">Funcional / Segurança</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário cadastrado; senha ou e-mail incorreto</td>
+<td style="text-align: left;">O sistema nega o acesso e apresenta uma mensagem clara, sem revelar informação sensível</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T4</strong> Cadastro de treino personalizado</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; acesso ao formulário de treino; nome e tipo válidos</td>
+<td style="text-align: left;">O treino é validado, salvo no banco de dados e exibido na lista de treinos do usuário</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T5</strong> Validação de treino incompleto</td>
+<td style="text-align: left;">Funcional / Validação</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; acesso à tela de criação de treino</td>
+<td style="text-align: left;">O sistema impede o salvamento e informa quais campos precisam ser preenchidos. Nenhum registro incompleto é criado</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T6</strong> Alteração de treino existente</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; existência de um treino salvo</td>
+<td style="text-align: left;">As alterações são salvas e aparecem corretamente na visualização do treino</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T7</strong> Exclusão de treino</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; existência de treino salvo</td>
+<td style="text-align: left;">O sistema solicita confirmação, exclui o treino após a confirmação e remove o item da listagem. Se o usuário cancelar, o treino permanece salvo</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T8</strong> Registro de exercício realizado</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; existência de treino cadastrado</td>
+<td style="text-align: left;">O exercício é marcado como realizado, o histórico é atualizado e as informações são persistidas pelo banco de dados</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T9</strong> Atualização de métricas de evolução</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; existência de exercícios realizados com datas e cargas registradas</td>
+<td style="text-align: left;">Os gráficos e indicadores apresentam os dados correspondentes aos exercícios realizados</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T10</strong> Pontuação e conquista por assiduidade</td>
+<td style="text-align: left;">Funcional / Gamificação</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; critérios de conquista definidos; registros de assiduidade preparados</td>
+<td style="text-align: left;">O sistema exibe a conquista no perfil somente quando os critérios de assiduidade são atingidos</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T11</strong> Restrição do painel de admin</td>
+<td style="text-align: left;">Não funcional / Segurança</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Existência de um usuário comum e um usuário administrador</td>
+<td style="text-align: left;">O usuário comum não consegue acessar o painel administrativo. O administrador consegue acessá-lo normalmente</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T12</strong> Login com Google</td>
+<td style="text-align: left;">Funcional / Autenticação</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Integração com o Google implementada e configurada; conta Google válida; serviço de autenticação disponível</td>
+<td style="text-align: left;">Após autorização e validação da autenticação com o Google, o usuário acessa o sistema com seu perfil. O login com e-mail e senha permanece disponível</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T13</strong> Falha ou cancelamento no login com Google</td>
+<td style="text-align: left;">Funcional / Segurança</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Integração com o Google implementada; falha de autenticação, indisponibilidade do serviço ou cancelamento pelo usuário; conta local válida para verificar o acesso com e-mail e senha</td>
+<td style="text-align: left;">O sistema não autentica o usuário pelo Google, informa a falha ou cancelamento e mantém disponível o acesso com e-mail e senha. Credenciais locais válidas permitem acessar o sistema</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T14</strong> Listagem de treinos</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; treinos próprios e de outro usuário cadastrados</td>
+<td style="text-align: left;">Exibir os treinos próprios e permitir adicionar um treino já montado; não expor treinos privados de outro usuário</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T15</strong> Cadastro de exercício no treino</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; treino próprio cadastrado; exercício predefinido disponível</td>
+<td style="text-align: left;">Exercício válido vinculado ao treino com a meta informada; dados obrigatórios ausentes impedem o cadastro</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T16</strong> Listagem de exercícios</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; treino com exercícios e treino sem exercícios</td>
+<td style="text-align: left;">Exibir os nomes e metas corretos de cada treino; apresentar estado vazio quando não houver exercícios</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T17</strong> Alteração de exercício</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Usuário autenticado; exercício vinculado a treino próprio</td>
+<td style="text-align: left;">Informações alteradas persistidas e exibidas; demais exercícios mantidos</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T18</strong> Exclusão de exercício</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; treino próprio com dois exercícios</td>
+<td style="text-align: left;">Exercício removido da lista do treino; outro exercício mantido</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T19</strong> Recorde pessoal</td>
+<td style="text-align: left;">Funcional</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">Usuário autenticado; funcionalidade de PR implementada; exercício com meta de recorde pessoal</td>
+<td style="text-align: left;">Meta e acompanhamento de recorde pessoal persistidos e exibidos corretamente, sem alterar registros de outros exercícios</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T20</strong> Usabilidade do MVP</td>
+<td style="text-align: left;">Não funcional / Usabilidade</td>
+<td style="text-align: left;">Sistema</td>
+<td style="text-align: left;">MVP disponível; conta de teste; navegador em telas móvel e desktop</td>
+<td style="text-align: left;">Fluxos concluídos sem bloqueios de navegação, campos ou botões inacessíveis, texto ilegível ou sobreposição; mensagens orientam a correção de entradas inválidas</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T21</strong> Token Google inválido ou expirado</td>
+<td style="text-align: left;">Funcional / Segurança</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">RF-24 implementado; resposta de autenticação simulável com token inválido e expirado</td>
+<td style="text-align: left;">Tokens rejeitados sem criação de sessão; acesso protegido negado; login local permanece disponível</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>T22</strong> Rota protegida sem sessão</td>
+<td style="text-align: left;">Funcional / Segurança</td>
+<td style="text-align: left;">Integração</td>
+<td style="text-align: left;">Aplicação disponível; nenhuma sessão autenticada</td>
+<td style="text-align: left;">Acesso negado sem exposição de dados; interface encaminha ao login e API retorna resposta de não autorização</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<p><strong>Tabela 20 – Registro de execução dos testes</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">ID</th>
+<th style="text-align: left;">Resultado obtido</th>
+<th style="text-align: left;">Evidência</th>
+<th style="text-align: left;">Reparos</th>
+<th style="text-align: center;">Ciclos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">T1</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T2</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T3</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T4</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T5</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T6</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T7</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T8</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T9</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T10</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T11</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T12</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T13</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T14</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T15</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T16</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T17</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T18</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T19</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T20</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T21</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">T22</td>
+<td style="text-align: left;">Não executado</td>
+<td style="text-align: left;">Não disponível</td>
+<td style="text-align: left;">Não registrados</td>
+<td style="text-align: center;">0</td>
+</tr>
+</tbody>
+</table>
+<p><em>Fonte: elaborado pelos autores (2026).</em></p>
+<h2 id="621-detalhamento-dos-casos-de-teste">6.2.1 Detalhamento dos casos de teste<a class="headerlink" href="#621-detalhamento-dos-casos-de-teste" title="Permanent link">&para;</a></h2>
+<h3 id="t1-cadastro-de-usuario-com-e-mail-e-senha">T1 – Cadastro de usuário com e-mail e senha<a class="headerlink" href="#t1-cadastro-de-usuario-com-e-mail-e-senha" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se um novo usuário consegue criar uma conta informando e-mail e senha (RF-01, CF-01).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário ainda não cadastrado; acesso à tela de cadastro; e-mail e senha válidos para o cadastro.</li>
+<li><strong>Procedimento:</strong> preencher e-mail e senha válidos, enviar o cadastro e verificar a conta criada; repetir com e-mail já cadastrado e dados obrigatórios ausentes.</li>
+<li><strong>Resultado esperado:</strong> a conta e o perfil do usuário são criados. O usuário pode acessar a tela de login para se autenticar com o e-mail e a senha cadastrados.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Após a execução, registrar se foi aprovado, reprovado ou bloqueado. Se houver falha, informar a correção realizada e o número da execução.</li>
+</ul>
+<h3 id="t2-login-com-credencial-valida">T2 – Login com credencial válida<a class="headerlink" href="#t2-login-com-credencial-valida" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se um usuário cadastrado consegue acessar o sistema com e-mail e senha válidos (RF-02, CF-02).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário previamente cadastrado; e-mail e senha válidos.</li>
+<li><strong>Procedimento:</strong> informar e-mail e senha corretos, confirmar o login e acessar a tela principal.</li>
+<li><strong>Resultado esperado:</strong> o sistema autentica o usuário e exibe a tela principal correspondente ao perfil.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado real e eventuais correções.</li>
+</ul>
+<h3 id="t3-login-com-dados-invalidos">T3 – Login com dados inválidos<a class="headerlink" href="#t3-login-com-dados-invalidos" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o sistema impede o acesso quando o usuário informa e-mail ou senha incorretos (RF-02, CF-02).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional / segurança</li>
+<li><strong>Pré-condições:</strong> usuário cadastrado; senha ou e-mail incorreto.</li>
+<li><strong>Procedimento:</strong> informar senha incorreta e depois e-mail não cadastrado; tentar acessar uma rota protegida após cada tentativa.</li>
+<li><strong>Resultado esperado:</strong> o sistema nega o acesso e apresenta uma mensagem clara, sem revelar informação sensível.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar se o bloqueio ocorreu corretamente. Corrigir mensagens ou regras de autenticação caso necessário.</li>
+</ul>
+<h3 id="t4-cadastro-de-treino-personalizado">T4 – Cadastro de treino personalizado<a class="headerlink" href="#t4-cadastro-de-treino-personalizado" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar o cadastro de treino com nome e tipo (RF-03, CF-03). A inclusão de exercícios e metas é validada em T15.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; acesso ao formulário de treino; nome e tipo válidos.</li>
+<li><strong>Procedimento:</strong> informar nome e tipo de treino, salvar e conferir os dados na lista do usuário.</li>
+<li><strong>Resultado esperado:</strong> o treino é validado, salvo no banco de dados e exibido na lista de treinos do usuário.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Caso o treino não seja salvo ou apresente dados incorretos, registrar o defeito e a correção aplicada.</li>
+</ul>
+<h3 id="t5-validacao-de-treino-incompleto">T5 – Validação de treino incompleto<a class="headerlink" href="#t5-validacao-de-treino-incompleto" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o sistema impede o cadastro de um treino sem informações obrigatórias.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / validação</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; acesso à tela de criação de treino.</li>
+<li><strong>Procedimento:</strong> deixar nome ou tipo obrigatório vazio, tentar salvar e verificar a mensagem e a ausência de persistência.</li>
+<li><strong>Resultado esperado:</strong> o sistema impede o salvamento e informa quais campos precisam ser preenchidos. Nenhum registro incompleto é criado.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado e corrigir validações ausentes, se necessário.</li>
+</ul>
+<h3 id="t6-alteracao-de-treino-existente">T6 – Alteração de treino existente<a class="headerlink" href="#t6-alteracao-de-treino-existente" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o usuário consegue alterar as informações de um treino já cadastrado.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; existência de um treino salvo.</li>
+<li><strong>Procedimento:</strong> editar nome e tipo do treino, salvar e recarregar a visualização.</li>
+<li><strong>Resultado esperado:</strong> as alterações são salvas e aparecem corretamente na visualização do treino.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado e eventuais correções na tela ou na API.</li>
+</ul>
+<h3 id="t7-exclusao-de-treino">T7 – Exclusão de treino<a class="headerlink" href="#t7-exclusao-de-treino" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o usuário consegue excluir um treino já cadastrado.</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; existência de treino salvo.</li>
+<li><strong>Procedimento:</strong> cancelar uma exclusão e verificar a permanência do treino; repetir confirmando a exclusão e consultar a lista.</li>
+<li><strong>Resultado esperado:</strong> o sistema solicita confirmação, exclui o treino após a confirmação e remove o item da listagem. Se o usuário cancelar, o treino permanece salvo.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar se a confirmação e a exclusão funcionaram corretamente.</li>
+</ul>
+<h3 id="t8-registro-de-exercicio-realizado">T8 – Registro de exercício realizado<a class="headerlink" href="#t8-registro-de-exercicio-realizado" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar o registro da execução de um exercício, com carga, repetições, séries e tempo (RF-11, CF-04).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; existência de treino cadastrado.</li>
+<li><strong>Procedimento:</strong> registrar a execução do exercício com os valores de carga, repetições, séries e tempo; recarregar o histórico e comparar os valores.</li>
+<li><strong>Resultado esperado:</strong> o exercício é marcado como realizado, o histórico é atualizado e as informações são persistidas pelo banco de dados.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado e corrigir problemas de persistência ou duplicidade, caso encontrados.</li>
+</ul>
+<h3 id="t9-atualizacao-de-metricas-de-evolucao">T9 – Atualização de métricas de evolução<a class="headerlink" href="#t9-atualizacao-de-metricas-de-evolucao" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o registro de exercícios atualiza corretamente a frequência, cargas e demais estatísticas.</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; existência de exercícios realizados com datas e cargas registradas.</li>
+<li><strong>Procedimento:</strong> inserir registros com datas e cargas conhecidas, consultar as métricas e comparar os indicadores com os registros de origem.</li>
+<li><strong>Resultado esperado:</strong> os gráficos e indicadores apresentam os dados correspondentes aos exercícios realizados.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Comparar os dados exibidos com os dados armazenados e registrar eventuais correções.</li>
+</ul>
+<h3 id="t10-pontuacao-e-conquista-por-assiduidade">T10 – Pontuação e conquista por assiduidade<a class="headerlink" href="#t10-pontuacao-e-conquista-por-assiduidade" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se o sistema libera conquistas por assiduidade de acordo com os critérios definidos para RF-22.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / gamificação</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; critérios de conquista definidos; registros de assiduidade preparados.</li>
+<li><strong>Procedimento:</strong> preparar registros que atendam e que não atendam aos critérios de conquista definidos para RF-22; processar a assiduidade e conferir o perfil.</li>
+<li><strong>Resultado esperado:</strong> o sistema exibe a conquista no perfil somente quando os critérios de assiduidade são atingidos.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Conferir os cálculos e registrar correções em caso de pontuação incorreta.</li>
+</ul>
+<h3 id="t11-restricao-do-painel-de-admin">T11 – Restrição do painel de admin<a class="headerlink" href="#t11-restricao-do-painel-de-admin" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar se somente os usuários autorizados conseguem acessar funcionalidades administrativas.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> não funcional / segurança / autorização</li>
+<li><strong>Pré-condições:</strong> existência de um usuário comum e um usuário administrador.</li>
+<li><strong>Procedimento:</strong> tentar acessar painel e rotas administrativas com usuário comum; repetir com administrador autorizado.</li>
+<li><strong>Resultado esperado:</strong> o usuário comum não consegue acessar o painel administrativo. O administrador consegue acessá-lo normalmente.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Registrar o resultado e corrigir permissões ou validações de acesso, caso necessário.</li>
+</ul>
+<h3 id="t12-login-com-google">T12 – Login com Google<a class="headerlink" href="#t12-login-com-google" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar a autenticação opcional com o Google (RF-24, CF-09), após a implementação prevista nas Sprints finais.</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / autenticação</li>
+<li><strong>Pré-condições:</strong> integração com o Google implementada e configurada; conta Google válida; serviço de autenticação disponível.</li>
+<li><strong>Procedimento:</strong> iniciar o login pelo Google, autorizar o consentimento e conferir o acesso; verificar que o login local continua disponível.</li>
+<li><strong>Resultado esperado:</strong> após autorização e validação da autenticação com o Google, o usuário acessa o sistema com seu perfil. O login com e-mail e senha permanece disponível.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Execução prevista nas Sprints finais, caso RF-24 seja implementado. Registrar resultado observado, correções e reexecuções.</li>
+</ul>
+<h3 id="t13-falha-ou-cancelamento-no-login-com-google">T13 – Falha ou cancelamento no login com Google<a class="headerlink" href="#t13-falha-ou-cancelamento-no-login-com-google" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> verificar que falhas ou cancelamento na autenticação com o Google não liberam acesso e não impedem o uso do login com e-mail e senha (RF-24, CF-09).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / segurança</li>
+<li><strong>Pré-condições:</strong> integração com o Google implementada; falha de autenticação, indisponibilidade do serviço ou cancelamento pelo usuário; conta local válida para verificar o acesso com e-mail e senha.</li>
+<li><strong>Procedimento:</strong> iniciar o login pelo Google, cancelar o consentimento e conferir a ausência de sessão; simular indisponibilidade do provedor e verificar o login local.</li>
+<li><strong>Resultado esperado:</strong> o sistema não autentica o usuário pelo Google, informa a falha ou cancelamento e mantém disponível o acesso com e-mail e senha. Credenciais locais válidas permitem acessar o sistema.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado. Execução prevista nas Sprints finais, caso RF-24 seja implementado. Registrar resultado observado, correções e reexecuções.</li>
+</ul>
+<h3 id="t14-listagem-de-treinos">T14 – Listagem de treinos<a class="headerlink" href="#t14-listagem-de-treinos" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a listagem de treinos (RF-04, CF-03).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; treinos próprios e de outro usuário cadastrados.</li>
+<li><strong>Procedimento:</strong> abrir a lista de treinos; comparar com os registros do usuário; selecionar um treino já montado e adicioná-lo à lista.</li>
+<li><strong>Resultado esperado:</strong> exibir os treinos próprios e permitir adicionar um treino já montado; não expor treinos privados de outro usuário.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h3 id="t15-cadastro-de-exercicio-no-treino">T15 – Cadastro de exercício no treino<a class="headerlink" href="#t15-cadastro-de-exercicio-no-treino" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar o cadastro de exercício no treino (RF-07, CF-04).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; treino próprio cadastrado; exercício predefinido disponível.</li>
+<li><strong>Procedimento:</strong> selecionar o exercício, informar a meta e salvar; repetir sem exercício ou meta obrigatória.</li>
+<li><strong>Resultado esperado:</strong> exercício válido vinculado ao treino com a meta informada; dados obrigatórios ausentes impedem o cadastro.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h3 id="t16-listagem-de-exercicios">T16 – Listagem de exercícios<a class="headerlink" href="#t16-listagem-de-exercicios" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a listagem de exercícios (RF-08, CF-04).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; treino com exercícios e treino sem exercícios.</li>
+<li><strong>Procedimento:</strong> abrir os dois treinos e conferir os exercícios exibidos.</li>
+<li><strong>Resultado esperado:</strong> exibir os nomes e metas corretos de cada treino; apresentar estado vazio quando não houver exercícios.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h3 id="t17-alteracao-de-exercicio">T17 – Alteração de exercício<a class="headerlink" href="#t17-alteracao-de-exercicio" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a alteração de exercício (RF-09, CF-04).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; exercício vinculado a treino próprio.</li>
+<li><strong>Procedimento:</strong> alterar as metas, salvar e recarregar a tela.</li>
+<li><strong>Resultado esperado:</strong> informações alteradas persistidas e exibidas; demais exercícios mantidos.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h3 id="t18-exclusao-de-exercicio">T18 – Exclusão de exercício<a class="headerlink" href="#t18-exclusao-de-exercicio" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a exclusão de exercício (RF-10, CF-04).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; treino próprio com dois exercícios.</li>
+<li><strong>Procedimento:</strong> remover um exercício e recarregar a lista.</li>
+<li><strong>Resultado esperado:</strong> exercício removido da lista do treino; outro exercício mantido.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h3 id="t19-acompanhamento-de-recorde-pessoal">T19 – Acompanhamento de recorde pessoal<a class="headerlink" href="#t19-acompanhamento-de-recorde-pessoal" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar o acompanhamento de recorde pessoal (RF-20, CF-05).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> funcional</li>
+<li><strong>Pré-condições:</strong> usuário autenticado; funcionalidade de PR implementada; exercício com meta de recorde pessoal.</li>
+<li><strong>Procedimento:</strong> cadastrar a meta de recorde pessoal no campo do exercício, salvar, consultar e atualizar o acompanhamento.</li>
+<li><strong>Resultado esperado:</strong> meta e acompanhamento de recorde pessoal persistidos e exibidos corretamente, sem alterar registros de outros exercícios.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h3 id="t20-usabilidade-do-mvp">T20 – Usabilidade do MVP<a class="headerlink" href="#t20-usabilidade-do-mvp" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar a usabilidade do MVP (RF-01 a RF-11).</li>
+<li><strong>Nível:</strong> sistema · <strong>Tipo:</strong> não funcional / usabilidade</li>
+<li><strong>Pré-condições:</strong> MVP disponível; conta de teste; navegador em telas móvel e desktop.</li>
+<li><strong>Procedimento:</strong> executar cadastro, login, criação de treino, inclusão de exercício e registro de execução; verificar navegação por teclado, legibilidade, mensagens e adaptação da tela.</li>
+<li><strong>Resultado esperado:</strong> fluxos concluídos sem bloqueios de navegação, campos ou botões inacessíveis, texto ilegível ou sobreposição; mensagens orientam a correção de entradas inválidas.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h3 id="t21-token-google-invalido-ou-expirado">T21 – Token Google inválido ou expirado<a class="headerlink" href="#t21-token-google-invalido-ou-expirado" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar o tratamento de token Google inválido ou expirado (RF-24, CF-09).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / segurança</li>
+<li><strong>Pré-condições:</strong> RF-24 implementado; resposta de autenticação simulável com token inválido e expirado.</li>
+<li><strong>Procedimento:</strong> enviar cada token ao retorno da autenticação Google e tentar acessar rota protegida.</li>
+<li><strong>Resultado esperado:</strong> tokens rejeitados sem criação de sessão; acesso protegido negado; login local permanece disponível.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+<h3 id="t22-rota-protegida-sem-sessao">T22 – Rota protegida sem sessão<a class="headerlink" href="#t22-rota-protegida-sem-sessao" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Objetivo do teste:</strong> validar rota protegida sem sessão (RF-02, CF-02; RF-24, CF-09 quando implementado).</li>
+<li><strong>Nível:</strong> integração · <strong>Tipo:</strong> funcional / segurança</li>
+<li><strong>Pré-condições:</strong> aplicação disponível; nenhuma sessão autenticada.</li>
+<li><strong>Procedimento:</strong> acessar diretamente uma rota protegida pela interface e pela API, sem sessão; repetir após encerramento da sessão.</li>
+<li><strong>Resultado esperado:</strong> acesso negado sem exposição de dados; interface encaminha ao login e API retorna resposta de não autorização.</li>
+<li><strong>Resultado da execução e correções:</strong> não executado; evidência não disponível; reparos não registrados; zero ciclos executados.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Voltar para o topo
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../estrategia/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Estratégia de Testes">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Estratégia de Testes
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../relatorio-testes-api/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Relatório de Testes da API">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Relatório de Testes da API
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Grupo Perlman — T03 · Universidade de Brasília · MDS 2026
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>

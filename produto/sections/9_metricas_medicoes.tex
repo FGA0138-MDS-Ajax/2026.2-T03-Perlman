@@ -1,0 +1,139 @@
+% GQM e fichas conforme Documento_Visao_MotivaFit_Final_Com_Diagrama.pdf.
+\clearpage
+\section{MÉTRICAS E MEDIÇÕES}
+
+Para assegurar a saúde e a transparência do projeto, aplicamos a abordagem GQM (Goal-Question-Metric, objetivo--questão--métrica) estruturada para garantir rastreabilidade entre as metas de negócio e as métricas operacionais coletadas [6].
+
+\subsection{O QUADRO GQM ESTRUTURADO E QUESTÕES}
+
+Os códigos G, Q e M identificam, respectivamente, objetivos (Goals), questões (Questions) e métricas (Metrics).
+
+A tabela utiliza o padrão explícito do framework GQM (Analisar / com o propósito de / com respeito a / do ponto de vista de / no contexto de) e o relaciona diretamente às respectivas questões e métricas.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.070\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.470\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.250\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.210\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\caption{Quadro GQM de acompanhamento do projeto}\\
+\hline
+\textbf{ID} & \textbf{Objetivo Estruturado (Goal)} & \textbf{Questão (Question)} & \textbf{Métrica (Metric)} \\ \hline
+\endfirsthead
+\textbf{ID} & \textbf{Objetivo Estruturado (Goal)} & \textbf{Questão (Question)} & \textbf{Métrica (Metric)} \\ \hline
+\endhead
+G1 & Analisar o processo de desenvolvimento com o propósito de avaliar a cadência de entrega com respeito a produtividade da equipe do ponto de vista de gerenciamento de projeto no contexto das Sprints semanais do MotivaFit. & Q1: Qual a cadência de entrega da equipe por Sprint? & M1: Throughput (Vazão) de Issues. \\ \hline
+G2 & Analisar o produto gerado com o propósito de avaliar a estabilidade do software com respeito a ocorrência de falhas do ponto de vista de qualidade no contexto das entregas contínuas do MotivaFit. & Q2: Qual a estabilidade do software entregue na Sprint? & M2: Densidade de Defeitos. \\ \hline
+G3 & Analisar o código fonte com o propósito de garantir a blindagem contra regressões com respeito a testes automatizados do ponto de vista de engenharia de software no contexto da integração contínua do MotivaFit. & Q3: O código em produção está adequadamente coberto por testes? & M3: Percentual de Cobertura. \\ \hline
+G4 & Analisar a base de código com o propósito de controlar a manutenibilidade com respeito a débito técnico do ponto de vista de desenvolvimento no contexto do repositório do projeto. & Q4: Qual o nível de dívida técnica acumulada no código da aplicação? & M4: Dívida Técnica. \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\subsection{FICHAS DE DETALHAMENTO DAS MÉTRICAS (5W1H, ESCALAS E ANÁLISES)}
+
+5W1H reúne seis perguntas: What (o quê), Why (por quê), Who (quem), Where (onde), When (quando) e How (como).
+
+\textbf{MÉTRICA 1 (M1): THROUGHPUT (VAZÃO) DE ISSUES POR SPRINT}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.310\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.690\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\hline
+\textbf{Campo} & \textbf{Detalhamento} \\ \hline
+\endfirsthead
+\textbf{Campo} & \textbf{Detalhamento} \\ \hline
+\endhead
+Definição & Quantidade de histórias (issues) concluídas (Done) ao final de cada iteração. \\ \hline
+What (O quê) & Número de issues encerradas por Sprint. \\ \hline
+Why (Por quê) & Identificar a cadência de entrega para evitar sobrecarga ou ociosidade no time. \\ \hline
+Who (Quem) & Analista de Qualidade e Desenvolvedores. \\ \hline
+Where (Onde) & Board do GitHub Projects (Aba 'Done'). \\ \hline
+When (Quando) & Ao final de cada Sprint (durante a Review). \\ \hline
+Cálculo / How (Como) & Somatório simples absoluto das tarefas movidas para a coluna de finalizadas no período. \\ \hline
+Escala de unidade & issues / sprint (número inteiro). \\ \hline
+Valor esperado & 4 a 6 tarefas por Sprint. Justificativa: baseado na capacidade atual de horas da equipe (estimada via Planning Poker para as \mbox{aproximadamente 14 horas} disponíveis semanais por membro). \\ \hline
+Forma de análise & Gráfico de tendência (Controle de Vazão / Burn-up) analisado durante a Retrospectiva. Se o valor ficar abaixo da meta por duas Sprints, o escopo do backlog deve ser renegociado com o cliente. \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\textbf{MÉTRICA 2 (M2): DENSIDADE DE DEFEITOS}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.310\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.690\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\hline
+\textbf{Campo} & \textbf{Detalhamento} \\ \hline
+\endfirsthead
+\textbf{Campo} & \textbf{Detalhamento} \\ \hline
+\endhead
+Definição & Relação matemática entre os defeitos válidos registrados e o volume de entregas (issues fechadas). \\ \hline
+What (O quê) & Falhas de código ou de regras de negócio identificadas. \\ \hline
+Why (Por quê) & Avaliar se a velocidade de entrega não está gerando instabilidade na aplicação. \\ \hline
+Who (Quem) & Analista de Qualidade (registro) e Equipe (resolução). \\ \hline
+Where (Onde) & Issues do repositório no GitHub (filtradas pela label 'bug'). \\ \hline
+When (Quando) & Fechamento de cada Sprint e eventos de Release. \\ \hline
+Cálculo / How (Como) & D = (Nº de Bugs registrados na Sprint) / (Nº de Issues concluídas na Sprint). \\ \hline
+Escala de unidade & bugs / issue (número decimal). \\ \hline
+Valor esperado & $\leq$ 0,2 bugs/issue. \\ \hline
+Forma de análise & Comparação direta com o teto de 0,2. Se o indicador ultrapassar esse limite, a Sprint subsequente deve travar o desenvolvimento de novas features e focar obrigatoriamente na resolução de bugs (hardening). \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\textbf{MÉTRICA 3 (M3): PERCENTUAL DE COBERTURA DE TESTES (COVERAGE)}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.310\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.690\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\hline
+\textbf{Campo} & \textbf{Detalhamento} \\ \hline
+\endfirsthead
+\textbf{Campo} & \textbf{Detalhamento} \\ \hline
+\endhead
+Definição & Proporção de linhas úteis de código validadas e testadas pelos scripts automatizados na esteira de integração. \\ \hline
+What (O quê) & Métrica de Line Coverage da aplicação global. \\ \hline
+Why (Por quê) & Garantir que refatorações não quebrem as lógicas de gamificação e treinos existentes. \\ \hline
+Who (Quem) & Desenvolvedores responsáveis pelos testes e QA (Quality Assurance, garantia da qualidade) responsável pela auditoria. \\ \hline
+Where (Onde) & Logs do GitHub Actions e painel de validação de PR. \\ \hline
+When (Quando) & A cada abertura e atualização de Pull Request (PR) para as branches principais. \\ \hline
+Cálculo / How (Como) & C = [(Linhas Cobertas Backend + Linhas Cobertas Frontend) / (Total de Linhas Backend + Total de Linhas Frontend)] × 100. \\ \hline
+Escala de unidade & Porcentagem (\%). \\ \hline
+Valor esperado & $\geq$ 70\%. Justificativa: limiar de convenção interna para balancear estabilidade e agilidade na prototipagem inicial. \\ \hline
+Forma de análise & Ação automatizada bloqueante no CI. Pull Requests que reduzam o percentual global para baixo da meta de 70\% não poderão ser mesclados (merged) sob nenhuma hipótese. \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
+\textbf{MÉTRICA 4 (M4): DÍVIDA TÉCNICA (DÉBITO TÉCNICO)}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{\dimexpr 0.310\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr 0.690\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\hline
+\textbf{Campo} & \textbf{Detalhamento} \\ \hline
+\endfirsthead
+\textbf{Campo} & \textbf{Detalhamento} \\ \hline
+\endhead
+Definição & Medição contínua de violações de boas práticas de desenvolvimento e arquitetura, incluindo bad smells, código duplicado e alto acoplamento [7]. \\ \hline
+What (O quê) & Complexidade Ciclomática e Code Smells. \\ \hline
+Why (Por quê) & Prevenir o envelhecimento precoce e a insustentabilidade a longo prazo da base de código. \\ \hline
+Who (Quem) & Todos os membros da equipe de engenharia. \\ \hline
+Where (Onde) & Dashboard de monitoramento da ferramenta de análise estática (ex: SonarQube). \\ \hline
+When (Quando) & Escaneamento diário executado automaticamente pela pipeline. \\ \hline
+Cálculo / How (Como) & Varredura do AST (Abstract Syntax Tree, árvore de sintaxe abstrata) da aplicação identificando anti-patterns pré-configurados. \\ \hline
+Escala de unidade & Número absoluto de Code Smells e avaliação em letras (A, B, C, D) para manutenibilidade. \\ \hline
+Valor esperado & Zero (0) falhas críticas / Classificação 'A'. \\ \hline
+Forma de análise & Acompanhamento visual via badge no repositório. O aparecimento de qualquer defeito de nível 'Crítico' ou 'Blocker' instaura prioridade máxima de refatoração para a dupla de desenvolvimento (Pair Programming) do dia. \\ \hline
+\end{longtable}
+\noindent{\fontedez Fonte: elaborado pelos autores (2026).}
+\endgroup
+
