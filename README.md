@@ -1,28 +1,42 @@
-# template-repository - Branch Main
+# MotivaFit
 
-Template de Repositório para a matéria de Métodos de Desenvolvimento de Software lecionado pelo professor Ricardo Ajax.
+Aplicativo web para praticantes de exercícios físicos que buscam organização e constância. O MotivaFit simplifica a montagem de treinos e usa gamificação, com conquistas e recompensas, para dar visibilidade à evolução do usuário e combater a desmotivação.
 
-Essa Branch deve ser usada exclusivamente para a versão de produção dos softwares da equipe.
+Projeto do **Grupo Perlman — T03**, da disciplina de Métodos de Desenvolvimento de Software (MDS), Universidade de Brasília, 2026.2, com o professor Ricardo Ajax.
 
-O repositório conta com mais 3 branchs:
-* docs: Usada para armazenar a documentação do projeto.
-* developer: usada como um intermediário antes do código chegar realmente para produção. É o ambiente ideal para realizar os últimos testes antes das apresentações.
-* gh-pages: Local dos arquivos estáticos de deploy da documentação. (Para deploy da documentação, consultar seu monitor)
+**Documentação:** <https://fga0138-mds-ajax.github.io/2026.2-T03-Perlman/>
 
-## Especificações Técnicas do Repositório
+## Branches
 
-Este repositório é planejado e estruturado para que seja realizado documentações de software. Caso haja outra necessidades, deve-se consultar a professora.
+| Branch | Para que serve |
+| :-- | :-- |
+| `main` | Versão de produção do software. Ainda não recebeu código: o desenvolvimento está na `developer`. |
+| [`developer`](https://github.com/FGA0138-MDS-Ajax/2026.2-T03-Perlman/tree/developer) | Código em desenvolvimento: back-end (`backend/MotivaFIt`) e front-end (`frontend/MotivaFit`). |
+| [`docs`](https://github.com/FGA0138-MDS-Ajax/2026.2-T03-Perlman/tree/docs) | Fontes da documentação em Markdown (MkDocs). Cada push publica o site. |
+| `gh-pages` | Site gerado automaticamente a partir da `docs`. Não deve ser editada à mão. |
 
-Atualmente se usa a ferramenta MkDocs para gerar sua documentação baseado nos seus arquivos markdowns, vocês podem achar mais instruções sobre o MkDocs através do link da documentação da ferramenta: [https://www.mkdocs.org/](https://www.mkdocs.org/).
+Para rodar o software, siga o README da branch `developer`. Para editar a documentação, siga o README da branch `docs`.
 
-Também é usado uma "sub-ferramenta" do MkDocs para sua estilização, o Material Theme, que pode ser consultado através do link: [https://squidfunk.github.io/mkdocs-material/](https://squidfunk.github.io/mkdocs-material/).
+## Tecnologias
 
-Este repositório também conta com uma pipeline de automatização de deploy do seu conteúdo MkDocs, para que a cada commit feito na main, a pipeline gere uma versão atualizada da sua documentação em minutos. Vale ressaltar que é importante realizar uma configuração para que tudo funcione da forma correta, as instruções são as seguintes:
+| Camada | Tecnologias |
+| :-- | :-- |
+| Back-end | Java 25, Spring Boot 4, Spring Security com JWT, Flyway, PostgreSQL 16 |
+| Front-end | React 19, TypeScript, Vite, Tailwind CSS, shadcn/ui |
+| Testes | JUnit e JaCoCo (back-end), Vitest e Testing Library (front-end) |
+| Infraestrutura | Docker Compose, GitHub Actions (publicação da documentação), GitHub Pages |
+| Documentação | MkDocs com o tema Material |
 
-* Acesse as configurações do repositório;
-* Procure a aba de "Pages"
-* Em "Source" escolha a opção "Deploy from a branch";
-* Em "Branch" escolha "gh-pages";
-* Clique em salvar e pronto;
+## Equipe
 
-Após essas etapas de configuração, o seu GitPages deve funcionar normalmente.
+| Integrante | Função | GitHub |
+| :-- | :-- | :-- |
+| Mateus Fernandes Dantas | Front-end (líder) | [@teuszindls](https://github.com/teuszindls) |
+| Bernardo Campos Caxito Silveira | GQM / Analista de Qualidade | [@bernardoccs1](https://github.com/bernardoccs1) |
+| Bruno Cruvinel Barros da Silva | Documentação | [@brunocruvinell](https://github.com/brunocruvinell) |
+| Lucas Venâncio Pereira | Back-end | [@LucasVP2007](https://github.com/LucasVP2007) |
+| Luís Felipe Pontes Vieira Andrade | Back-end | [@andradluis](https://github.com/andradluis) |
+| Matheus Estevam Ferreira | Back-end | [@TheuxZn16](https://github.com/TheuxZn16) |
+| Rafael Souto Lopes Laube | Front-end | [@laube-developer](https://github.com/laube-developer) |
+
+Dono do Produto: monitor Daniel. Cliente: professor Ricardo Ajax.
