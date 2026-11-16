@@ -1,23 +1,48 @@
-# template-repository - Branch Developer
+# MotivaFit — branch `developer`
 
-Template de Repositório para a matéria de Métodos de Desenvolvimento de Software lecionado pelo professor Ricardo Ajax.
+Código em desenvolvimento do MotivaFit, aplicativo web de organização de treinos com gamificação. Esta branch reúne o back-end e o front-end antes de irem para a `main`.
 
-Essa Branch deve ser usada exclusivamente para a versão de desenvolvimento do software antes de ir para produção.
+**Documentação do projeto:** <https://fga0138-mds-ajax.github.io/2026.2-T03-Perlman/>
 
-## Especificações Técnicas do Repositório
+## Estrutura
 
-Este repositório é planejado e estruturado para que seja realizado documentações de software. Caso haja outra necessidades, deve-se consultar a professora.
+| Pasta | Conteúdo |
+| :-- | :-- |
+| [`backend/MotivaFIt`](backend/MotivaFIt) | API REST em Java 25 e Spring Boot 4, com PostgreSQL |
+| [`frontend/MotivaFit`](frontend/MotivaFit) | Aplicação web em React, TypeScript e Vite |
+| [`docs`](docs) | Plano de integração entre front-end e back-end e fontes da revisão dos documentos de visão e de arquitetura. A documentação publicada fica na branch `docs`. |
 
-Atualmente se usa a ferramenta MkDocs para gerar sua documentação baseado nos seus arquivos markdowns, vocês podem achar mais instruções sobre o MkDocs através do link da documentação da ferramenta: [https://www.mkdocs.org/](https://www.mkdocs.org/).
+## Como rodar
 
-Também é usado uma "sub-ferramenta" do MkDocs para sua estilização, o Material Theme, que pode ser consultado através do link: [https://squidfunk.github.io/mkdocs-material/](https://squidfunk.github.io/mkdocs-material/).
+Pré-requisitos: Docker com Docker Compose. Para rodar sem Docker, Java 25 com Maven e Node.js 22 ou superior.
 
-Este repositório também conta com uma pipeline de automatização de deploy do seu conteúdo MkDocs, para que a cada commit feito na main, a pipeline gere uma versão atualizada da sua documentação em minutos. Vale ressaltar que é importante realizar uma configuração para que tudo funcione da forma correta, as instruções são as seguintes:
+1. **Back-end** (porta 8080): crie o arquivo `.env` e suba a API e o banco, conforme o [README do back-end](backend/MotivaFIt/README.md).
 
-* Acesse as configurações do repositório;
-* Procure a aba de "Pages"
-* Em "Source" escolha a opção "Deploy from a branch";
-* Em "Branch" escolha "gh-pages";
-* Clique em salvar e pronto;
+    ```bash
+    cd backend/MotivaFIt
+    docker compose up
+    ```
 
-Após essas etapas de configuração, o seu GitPages deve funcionar normalmente.
+2. **Front-end** (porta 3000): em outro terminal, suba a aplicação, conforme o [README do front-end](frontend/MotivaFit/README.md).
+
+    ```bash
+    cd frontend/MotivaFit
+    docker compose -f docker-compose.dev.yml up
+    ```
+
+3. Abra <http://localhost:3000>. O front-end encaminha as chamadas de `/api` para o back-end em `http://localhost:8080`.
+
+| Serviço | Endereço |
+| :-- | :-- |
+| Aplicação web | <http://localhost:3000> |
+| API | <http://localhost:8080> |
+| Swagger UI | <http://localhost:8080/swagger-ui.html> |
+| PostgreSQL | `localhost:5432` |
+
+## Testes
+
+| Onde | Comando | O que roda |
+| :-- | :-- | :-- |
+| `backend/MotivaFIt` | `docker compose --profile testing run --rm test` | Testes do back-end (JUnit) |
+| `backend/MotivaFIt` | `mvn verify` | Testes e relatório de cobertura do JaCoCo, com mínimo de 70% das linhas |
+| `frontend/MotivaFit` | `npm test` | Testes do cliente HTTP e da interface (Vitest) |

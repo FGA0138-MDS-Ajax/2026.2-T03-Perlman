@@ -1,90 +1,91 @@
-# MotivaFit - Frontend
+# MotivaFit — Front-end
 
-Aplicação web do projeto **MotivaFit**, desenvolvida com **React**, **TypeScript**, **Vite**, **Tailwind CSS** e **Shadcn/UI**.
+Aplicação web do MotivaFit, em **React 19**, **TypeScript**, **Vite**, **Tailwind CSS** e **shadcn/ui**.
 
----
+A aplicação consome a API do back-end em `http://localhost:8080`. Suba o back-end antes, conforme o [README do back-end](../../backend/MotivaFIt/README.md).
 
-## 🚀 Como Executar o Projeto com Docker
+## Como executar com Docker
 
-O projeto possui configurações prontas para execução em contêineres Docker tanto para **desenvolvimento** quanto para **produção**.
+### Desenvolvimento
 
----
+O contêiner usa Node.js 22 e recarrega a página a cada alteração no código.
 
-### 🛠️ 1. Modo Desenvolvimento
-
-Neste modo, o contêiner utiliza a imagem do Node.js com mapeamento de volume para habilitar o **Hot Module Replacement (HMR)**. Qualquer alteração no código-fonte é refletida imediatamente no navegador.
-
-- **URL de acesso:** [http://localhost:5173](http://localhost:5173)
-
-#### Iniciar a aplicação:
 ```bash
 docker compose -f docker-compose.dev.yml up
 ```
-*(ou adicione a flag `-d` para rodar em segundo plano)*
 
-#### Parar a aplicação:
-- Se estiver rodando no terminal sem `-d`, pressione:
-  ```bash
-  Ctrl + C
-  ```
-- Para parar e remover os contêineres e a rede:
-  ```bash
-  docker compose -f docker-compose.dev.yml down
-  ```
+- **Endereço:** <http://localhost:3000>
+- **Parar:** `Ctrl + C`, ou `docker compose -f docker-compose.dev.yml down`
 
----
+### Produção
 
-### 🏭 2. Modo Produção
+A aplicação é compilada e servida pelo Nginx, com compressão Gzip e suporte às rotas da SPA.
 
-Neste modo, a aplicação passa por um processo de compilação (*multi-stage build*) com Node.js e os arquivos estáticos gerados são servidos através de um servidor **Nginx** otimizado, com compressão Gzip e suporte a rotas SPA (*Single Page Application*).
-
-- **URL de acesso:** [http://localhost:4173](http://localhost:4173)
-
-#### Iniciar a aplicação:
 ```bash
 docker compose up -d --build
 ```
 
-#### Parar a aplicação:
-```bash
-docker compose down
-```
+- **Endereço:** <http://localhost:4173>
+- **Parar:** `docker compose down`
 
----
+## Como executar sem Docker
 
-## 💻 Execução Local (sem Docker)
+Requer Node.js 22 ou superior.
 
-Caso prefira rodar diretamente na sua máquina via Node.js (necessário Node.js 22+):
-
-### Instalação das dependências:
 ```bash
 npm install
+npm run dev
 ```
 
-### Desenvolvimento:
-- **Iniciar:**
-  ```bash
-  npm run dev
-  ```
-- **Parar:** Pressione `Ctrl + C` no terminal.
+A aplicação fica em <http://localhost:3000>.
 
-### Produção:
-- **Build e Pré-visualização:**
-  ```bash
-  npm run build
-  npm run preview
-  ```
-- **Parar:** Pressione `Ctrl + C` no terminal.
+## Comunicação com a API
 
----
+As chamadas usam o caminho `/api` na mesma origem do front-end. Em desenvolvimento, o Vite encaminha `/api` para o back-end; em produção, o Nginx faz esse papel.
 
-## 🧭 Rotas Principais da Aplicação
+| Variável | Onde vale | Para que serve |
+| :-- | :-- | :-- |
+| `API_PROXY_TARGET` | Servidor do Vite | Endereço do back-end. Padrão: `http://localhost:8080` |
+| `VITE_API_BASE_URL` | Build | Endereço público da API. Vazio usa `/api` na mesma origem |
 
-| Rota | Descrição |
-| :--- | :--- |
-| `/` | Página inicial / Apresentação |
-| `/login` | Página de autenticação |
-| `/cadastro` | Formulário de registro |
-| `/principal` | Dashboard principal do usuário |
-| `/treinos` | Gestão de Treinos (CRUD, templates MotivaFit e exercícios do usuário) |
-| `/admin` | Painel administrativo e catálogo de exercícios |
+O arquivo `.env.example` traz as duas variáveis. O back-end aceita por padrão a origem `http://localhost:3000`; se o front-end rodar em outro endereço, ajuste `CORS_ALLOWED_ORIGIN` no back-end.
+
+## Scripts
+
+| Comando | O que faz |
+| :-- | :-- |
+| `npm run dev` | Servidor de desenvolvimento na porta 3000 |
+| `npm run build` | Verifica os tipos e gera a versão de produção |
+| `npm run preview` | Serve localmente a versão de produção |
+| `npm run lint` | Análise estática com o oxlint |
+| `npm test` | Testes do cliente HTTP e da interface |
+| `npm run test:ui` | Somente os testes de interface (Vitest) |
+
+## Rotas
+
+| Rota | Acesso | Descrição |
+| :-- | :-- | :-- |
+| `/` | Público | Página inicial |
+| `/login` | Público | Autenticação |
+| `/cadastro` | Público | Criação de conta |
+| `/termos-de-uso` | Público | Termos de uso |
+| `/principal` | Usuário logado | Página principal do usuário |
+| `/treinos` | Usuário logado | Gerenciamento de treinos |
+| `/realizar-treino` | Usuário logado | Página de treinos no modo de realização |
+| `/treinos/:treinoId/realizar` | Usuário logado | Realização de um treino |
+| `/historico` | Usuário logado | Histórico |
+| `/admin` | Administrador | Dashboard administrativo |
+| `/admin/treinos` | Administrador | Treinos (administração) |
+| `/admin/relatorios` | Administrador | Relatórios |
+| `/admin/superusuario` | Superusuário | Página do superusuário |
+
+## Estrutura do código
+
+| Pasta | Conteúdo |
+| :-- | :-- |
+| `src/pages-user` | Telas do usuário |
+| `src/pages-admin` | Telas administrativas |
+| `src/components` | Componentes compartilhados e de interface (`ui`) |
+| `src/lib/api` | Cliente HTTP e chamadas à API |
+| `src/lib` | Sessão do usuário e utilitários |
+| `tests` | Testes automatizados |
