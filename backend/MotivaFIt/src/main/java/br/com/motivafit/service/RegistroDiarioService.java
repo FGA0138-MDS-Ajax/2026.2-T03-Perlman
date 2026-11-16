@@ -78,6 +78,12 @@ public class RegistroDiarioService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public RegistroDiarioResponseDTO findById(Long usuarioId, Long id){
+        return RegistroDiarioMapper.toDto(registroRepository.findByIdAndUsuarioId(id, usuarioId)
+                .orElseThrow(() -> new NaoEncontradoException("NAO_ENCONTRADO", "Registro com id " + id + " não foi encontrado")));
+    }
+
     private String normalizarChave(String chave) {
         if (chave == null || chave.isBlank()) {
             return null;

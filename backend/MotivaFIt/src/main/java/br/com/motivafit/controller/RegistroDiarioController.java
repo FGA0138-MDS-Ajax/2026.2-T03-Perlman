@@ -66,4 +66,18 @@ public class RegistroDiarioController {
             @RequestParam(defaultValue = "50") int tamanho) {
         return ResponseEntity.ok(service.findAll(usuario.getId(), pagina, tamanho));
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Buscar registro por id", description = "Retorna um registro do histórico do usuário autenticado. Registros de outros usuários são tratados como inexistentes.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Registro encontrado", content = @Content(schema = @Schema(implementation = RegistroDiarioResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Registro não encontrado para o usuário autenticado", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<RegistroDiarioResponseDTO> findById(
+            @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario,
+            @Parameter(description = "Identificador do registro", example = "101") @PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(usuario.getId(), id));
+    }
 }

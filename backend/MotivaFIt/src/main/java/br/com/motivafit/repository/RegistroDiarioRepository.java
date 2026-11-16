@@ -12,4 +12,6 @@ public interface RegistroDiarioRepository extends JpaRepository<RegistroDiario, 
     Optional<RegistroDiario> findByUsuarioIdAndChaveIdempotencia(Long usuarioId, String chaveIdempotencia);
 
     List<RegistroDiario> findAllByUsuarioIdOrderByExecutadoEmDesc(Long usuarioId, Pageable pageable);
+
+    Optional<RegistroDiario> findByIdAndUsuarioId(Long id, Long usuarioId);
 }
