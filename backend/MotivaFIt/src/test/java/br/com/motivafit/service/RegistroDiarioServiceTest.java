@@ -153,4 +153,53 @@ class RegistroDiarioServiceTest {
 
         verify(registroRepository, never()).saveAndFlush(any());
     }
+
+    @Test
+    void deveAtualizarRegistroDoUsuario() {
+        RegistroDiario registro = new RegistroDiario();
+        ReflectionTestUtils.setField(registro, "id", 55L);
+        registro.setUsuarioId(USUARIO_ID);
+        registro.setCatalogoId(CATALOGO_ID);
+        registro.setExercicioNome("Supino Reto");
+        when(registroRepository.findByIdAndUsuarioId(55L, USUARIO_ID)).thenReturn(Optional.of(registro));
+        when(catalogoRepository.findByIdAndAtivoTrue(CATALOGO_ID)).thenReturn(Optional.of(catalogo));
+        when(registroRepository.saveAndFlush(registro)).thenReturn(registro);
+
+        RegistroDiarioResponseDTO response = service.update(USUARIO_ID, 55L,
+                new RegistroDiarioRequestDTO(CATALOGO_ID, null, null, new BigDecimal("90"), 8, 4,
+                        1500, null, OffsetDateTime.now(), null));
+
+        assertEquals(new BigDecimal("90"), response.cargaKg());
+        assertEquals(4, response.series());
+        verify(registroRepository).saveAndFlush(registro);
+    }
+
+    @Test
+    void naoDevePermitirAlterarCatalogoDoRegistro() {
+        RegistroDiario registro = new RegistroDiario();
+        registro.setCatalogoId(CATALOGO_ID);
+        when(registroRepository.findByIdAndUsuarioId(55L, USUARIO_ID)).thenReturn(Optional.of(registro));
+
+        assertThrows(br.com.motivafit.exception.RequisicaoInvalidaException.class, () -> service.update(USUARIO_ID, 55L,
+                new RegistroDiarioRequestDTO(999L, null, null, null, 8, 3, 100, null, null, null)));
+        verify(registroRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    void deveExcluirRegistroDoUsuario() {
+        RegistroDiario registro = new RegistroDiario();
+        when(registroRepository.findByIdAndUsuarioId(55L, USUARIO_ID)).thenReturn(Optional.of(registro));
+
+        service.delete(USUARIO_ID, 55L);
+
+        verify(registroRepository).delete(registro);
+    }
+
+    @Test
+    void naoDeveExcluirRegistroDeOutroUsuario() {
+        when(registroRepository.findByIdAndUsuarioId(55L, USUARIO_ID)).thenReturn(Optional.empty());
+
+        assertThrows(NaoEncontradoException.class, () -> service.delete(USUARIO_ID, 55L));
+        verify(registroRepository, never()).delete(any());
+    }
 }

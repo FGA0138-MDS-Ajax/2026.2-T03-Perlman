@@ -66,6 +66,28 @@ class RegistroDiarioControllerTest {
         verify(service).findById(USUARIO_ID, 103L);
     }
 
+    @Test
+    void atualizacaoRetorna200EUsaUsuarioAutenticado() {
+        var request = new RegistroDiarioRequestDTO(1L, null, null, new BigDecimal("90"), 8, 4, 1500, null, null, null);
+        RegistroDiarioResponseDTO dto = resposta(104L);
+        when(service.update(USUARIO_ID, 104L, request)).thenReturn(dto);
+
+        var response = controller.update(usuario, 104L, request);
+
+        assertEquals(200, response.getStatusCode().value());
+        assertSame(dto, response.getBody());
+        verify(service).update(USUARIO_ID, 104L, request);
+    }
+
+    @Test
+    void exclusaoRetorna204EUsaUsuarioAutenticado() {
+        var response = controller.delete(usuario, 105L);
+
+        assertEquals(204, response.getStatusCode().value());
+        assertNull(response.getBody());
+        verify(service).delete(USUARIO_ID, 105L);
+    }
+
     private RegistroDiarioResponseDTO resposta(Long id) {
         return new RegistroDiarioResponseDTO(id, 1L, null, null, null, "Supino reto",
                 new BigDecimal("80"), 8, 3, 1200, null, OffsetDateTime.now());
