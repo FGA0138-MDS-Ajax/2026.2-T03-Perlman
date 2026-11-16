@@ -106,6 +106,29 @@ class RegistroDiarioServiceTest {
     }
 
     @Test
+    void deveBuscarRegistroPorIdDoUsuario() {
+        RegistroDiario registro = new RegistroDiario();
+        ReflectionTestUtils.setField(registro, "id", 55L);
+        registro.setExercicioNome("Agachamento");
+        when(registroRepository.findByIdAndUsuarioId(55L, USUARIO_ID)).thenReturn(Optional.of(registro));
+
+        RegistroDiarioResponseDTO response = service.findById(USUARIO_ID, 55L);
+
+        assertEquals(55L, response.id());
+        assertEquals("Agachamento", response.exercicioNome());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoRegistroNaoPertenceAoUsuario() {
+        when(registroRepository.findByIdAndUsuarioId(55L, USUARIO_ID)).thenReturn(Optional.empty());
+
+        NaoEncontradoException erro = assertThrows(NaoEncontradoException.class,
+                () -> service.findById(USUARIO_ID, 55L));
+
+        assertEquals("NAO_ENCONTRADO", erro.getCodigo());
+    }
+
+    @Test
     void deveLancarExcecaoQuandoCatalogoNaoExiste() {
         when(catalogoRepository.findByIdAndAtivoTrue(CATALOGO_ID)).thenReturn(Optional.empty());
 

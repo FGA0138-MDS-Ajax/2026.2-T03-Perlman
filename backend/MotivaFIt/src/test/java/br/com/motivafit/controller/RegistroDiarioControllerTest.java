@@ -54,6 +54,18 @@ class RegistroDiarioControllerTest {
         verify(service).findAll(USUARIO_ID, 1, 20);
     }
 
+    @Test
+    void buscaPorIdRetorna200ComRegistroDoUsuarioAutenticado() {
+        RegistroDiarioResponseDTO dto = resposta(103L);
+        when(service.findById(USUARIO_ID, 103L)).thenReturn(dto);
+
+        var response = controller.findById(usuario, 103L);
+
+        assertEquals(200, response.getStatusCode().value());
+        assertSame(dto, response.getBody());
+        verify(service).findById(USUARIO_ID, 103L);
+    }
+
     private RegistroDiarioResponseDTO resposta(Long id) {
         return new RegistroDiarioResponseDTO(id, 1L, null, null, null, "Supino reto",
                 new BigDecimal("80"), 8, 3, 1200, null, OffsetDateTime.now());
