@@ -80,4 +80,35 @@ public class RegistroDiarioController {
             @Parameter(description = "Identificador do registro", example = "101") @PathVariable Long id) {
         return ResponseEntity.ok(service.findById(usuario.getId(), id));
     }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar registro", description = "Atualiza os dados da execução do registro do usuário autenticado. O exercício do catálogo não pode ser alterado; registros de outros usuários são tratados como inexistentes.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Registro atualizado", content = @Content(schema = @Schema(implementation = RegistroDiarioResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou exercício do catálogo alterado", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Registro, exercício, treino ou exercício do treino não encontrado", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<RegistroDiarioResponseDTO> update(
+            @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario,
+            @Parameter(description = "Identificador do registro", example = "101") @PathVariable Long id,
+            @Valid @RequestBody RegistroDiarioRequestDTO request) {
+        return ResponseEntity.ok(service.update(usuario.getId(), id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Excluir registro", description = "Exclui permanentemente um registro do histórico pertencente ao usuário autenticado.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Registro excluído"),
+            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Registro não encontrado para o usuário autenticado", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<Void> delete(
+            @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario,
+            @Parameter(description = "Identificador do registro", example = "101") @PathVariable Long id) {
+        service.delete(usuario.getId(), id);
+        return ResponseEntity.noContent().build();
+    }
 }

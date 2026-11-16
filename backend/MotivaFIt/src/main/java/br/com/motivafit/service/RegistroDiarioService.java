@@ -84,6 +84,48 @@ public class RegistroDiarioService {
                 .orElseThrow(() -> new NaoEncontradoException("NAO_ENCONTRADO", "Registro com id " + id + " não foi encontrado")));
     }
 
+    @Transactional
+    public RegistroDiarioResponseDTO update(Long usuarioId, Long id, RegistroDiarioRequestDTO request) {
+        RegistroDiario registro = buscarRegistroDoUsuario(usuarioId, id);
+        if (!registro.getCatalogoId().equals(request.catalogoId())) {
+            throw registroInvalido("O exercício do catálogo não pode ser alterado");
+        }
+
+        validarData(request.executadoEm());
+        CatalogoExercicio catalogo = buscarCatalogoAtivo(request.catalogoId());
+        validarMetricas(catalogo.getModalidade(), request);
+
+        registro.setCargaKg(request.cargaKg());
+        registro.setRepeticoes(request.repeticoes());
+        registro.setSeries(request.series());
+        registro.setTempoS(request.tempoS());
+        registro.setDistanciaM(request.distanciaM());
+        if (request.executadoEm() != null) {
+            registro.setExecutadoEm(request.executadoEm());
+        }
+        atualizarVinculoRotina(usuarioId, request, registro);
+
+        return RegistroDiarioMapper.toDto(registroRepository.saveAndFlush(registro));
+    }
+
+    @Transactional
+    public void delete(Long usuarioId, Long id) {
+        RegistroDiario registro = buscarRegistroDoUsuario(usuarioId, id);
+        registroRepository.delete(registro);
+    }
+
+    private RegistroDiario buscarRegistroDoUsuario(Long usuarioId, Long id) {
+        return registroRepository.findByIdAndUsuarioId(id, usuarioId)
+                .orElseThrow(() -> new NaoEncontradoException("NAO_ENCONTRADO", "Registro com id " + id + " não foi encontrado"));
+    }
+
+    private void atualizarVinculoRotina(Long usuarioId, RegistroDiarioRequestDTO request, RegistroDiario registro) {
+        registro.setTreinoId(null);
+        registro.setTreinoNome(null);
+        registro.setExercicioId(null);
+        vincularRotina(usuarioId, request, registro);
+    }
+
     private String normalizarChave(String chave) {
         if (chave == null || chave.isBlank()) {
             return null;
