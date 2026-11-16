@@ -49,24 +49,22 @@ class ContaControllerTest {
     void findByIdRetorna200EEncaminhaUsuarioAutenticado() {
         var usuario = new Usuario();
         var conta = new UsuarioResponseDTO(1L, "usuario@motivafit.com", Perfil.USUARIO, true);
-        when(service.findById(1L, usuario)).thenReturn(conta);
+        when(service.findById(1L)).thenReturn(conta);
 
-        var response = controller.findById(1L, usuario);
+        var response = controller.findById(1L);
 
         assertEquals(200, response.getStatusCode().value());
         assertSame(conta, response.getBody());
-        verify(service).findById(1L, usuario);
+        verify(service).findById(1L);
     }
 
     @Test
     void deleteRetorna204EEncaminhaUsuarioAutenticado() {
-        var usuario = new Usuario();
-
-        var response = controller.delete(1L, usuario);
+        var response = controller.delete(1L);
 
         assertEquals(204, response.getStatusCode().value());
         assertNull(response.getBody());
-        verify(service).delete(1L, usuario);
+        verify(service).delete(1L);
     }
 
     @Test
@@ -74,8 +72,8 @@ class ContaControllerTest {
         assertEquals("Conta", ContaController.class.getAnnotation(Tag.class).name());
         for (var method : List.of(
                 ContaController.class.getMethod("findAll"),
-                ContaController.class.getMethod("findById", Long.class, Usuario.class),
-                ContaController.class.getMethod("delete", Long.class, Usuario.class))) {
+                ContaController.class.getMethod("findById", Long.class),
+                ContaController.class.getMethod("delete", Long.class))) {
             assertNotNull(method.getAnnotation(Operation.class));
             assertNotNull(method.getAnnotation(ApiResponses.class));
             assertEquals("AccessToken", method.getAnnotation(SecurityRequirement.class).name());
