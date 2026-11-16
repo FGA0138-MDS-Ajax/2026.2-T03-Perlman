@@ -7,6 +7,9 @@ import br.com.motivafit.enums.Perfil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class UsuarioMapper {
     private final PasswordEncoder encoder;
@@ -26,5 +29,13 @@ public class UsuarioMapper {
 
     public UsuarioResponseDTO toDto(Usuario entity){
         return new UsuarioResponseDTO(entity.getId(), entity.getEmail(), entity.getPerfil(), entity.getAtivo());
+    }
+
+    public List<UsuarioResponseDTO> toDtos(List<Usuario> entities){
+        List<UsuarioResponseDTO> usuariosDto = new ArrayList<>();
+        for(Usuario entity : entities){
+            usuariosDto.add(toDto(entity));
+        }
+        return usuariosDto;
     }
 }
