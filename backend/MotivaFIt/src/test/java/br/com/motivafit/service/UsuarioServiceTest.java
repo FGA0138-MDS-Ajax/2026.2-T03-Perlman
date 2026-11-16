@@ -6,6 +6,7 @@ import br.com.motivafit.enums.Perfil;
 import br.com.motivafit.exception.ConflitoException;
 import br.com.motivafit.exception.NaoEncontradoException;
 import br.com.motivafit.repository.UsuarioRepository;
+import br.com.motivafit.repository.RefreshTokenRepository;
 import br.com.motivafit.dto.mapper.UsuarioMapper;
 import br.com.motivafit.dto.response.UsuarioResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,13 +21,15 @@ import java.util.Optional;
 
 class UsuarioServiceTest {
     private UsuarioRepository repository;
+    private RefreshTokenRepository refreshTokenRepository;
     private UsuarioService service;
 
     @BeforeEach
     void setup() {
         repository = mock(UsuarioRepository.class);
+        refreshTokenRepository = mock(RefreshTokenRepository.class);
         UsuarioMapper mapper = new UsuarioMapper(mock(PasswordEncoder.class));
-        service = new UsuarioService(repository, mapper);
+        service = new UsuarioService(repository, mapper, refreshTokenRepository);
     }
 
     @Test
@@ -97,6 +100,7 @@ class UsuarioServiceTest {
 
         service.delete(3L);
 
+        verify(refreshTokenRepository).deleteByUsuarioId(usuario);
         verify(repository).delete(usuario);
     }
 
