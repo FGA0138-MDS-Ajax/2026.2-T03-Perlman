@@ -46,7 +46,7 @@ public class ContaController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERUSUARIO') or #id == authentication.principal.id")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'SUPERUSUARIO') or #id == authentication.principal.id")
     @Operation(
             summary = "Consultar conta por ID",
             description = "Retorna os dados da conta identificada. O usuário autenticado só pode consultar a própria conta."
@@ -59,13 +59,13 @@ public class ContaController {
             @ApiResponse(responseCode = "404", description = "Conta não encontrada", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
             @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
     })
-    public ResponseEntity<UsuarioResponseDTO> findById(@Parameter(description = "Identificador da conta", example = "42") @PathVariable Long id, @AuthenticationPrincipal Usuario usuario){
-        UsuarioResponseDTO response = service.findById(id, usuario);
+    public ResponseEntity<UsuarioResponseDTO> findById(@Parameter(description = "Identificador da conta", example = "42") @PathVariable Long id){
+        UsuarioResponseDTO response = service.findById(id);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERUSUARIO') or #id == authentication.principal.id")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'SUPERUSUARIO') or #id == authentication.principal.id")
     @Operation(
             summary = "Excluir conta",
             description = "Exclui a conta identificada. A operação exige autenticação."
@@ -77,8 +77,8 @@ public class ContaController {
             @ApiResponse(responseCode = "404", description = "Conta não encontrada", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
             @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
     })
-    public ResponseEntity<?> delete(@Parameter(description = "Identificador da conta", example = "42") @PathVariable Long id, @AuthenticationPrincipal Usuario usuario){
-        service.delete(id, usuario);
+    public ResponseEntity<?> delete(@Parameter(description = "Identificador da conta", example = "42") @PathVariable Long id){
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
