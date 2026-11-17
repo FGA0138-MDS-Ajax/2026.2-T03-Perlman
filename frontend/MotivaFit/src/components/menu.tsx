@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Dumbbell, History, Home, LogOut, Play, Shield } from "lucide-react";
+import { Dumbbell, History, Home, LogOut, Play, Shield, Trophy } from "lucide-react";
 import { Separator } from "@base-ui/react";
 
 export default function HeaderMenu({ isAdmin, setMenuAberto, logout, saindo }: { isAdmin: boolean, setMenuAberto: (aberto: boolean) => void, logout: () => Promise<void>, saindo: boolean }) {
@@ -20,6 +20,9 @@ export default function HeaderMenu({ isAdmin, setMenuAberto, logout, saindo }: {
                 </Button>
                 <Button variant={pathname === "/historico" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
                     <Link to="/historico" aria-current={pathname === "/historico" ? "page" : undefined}><History className="h-4 w-4" />Histórico</Link>
+                </Button>
+                <Button variant={pathname === "/desafios" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
+                    <Link to="/desafios" aria-current={pathname === "/desafios" ? "page" : undefined}><Trophy className="h-4 w-4" />Desafios</Link>
                 </Button>
                 {isAdmin && (
                     <>

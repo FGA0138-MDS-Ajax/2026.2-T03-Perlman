@@ -13,6 +13,7 @@ import PaginaTreinos from "./pages-user/pagina-treinos";
 import PaginaRealizarTreino from "./pages-user/pagina-realizar-treino";
 import PaginaHistorico from "./pages-user/pagina-historico";
 import PaginaTermosDeUso from "@/pages-user/pagina-termos-de-uso";
+import PaginaDesafios from "@/pages-user/pagina-desafios";
 
 function App() {
     return (
@@ -77,6 +78,14 @@ function App() {
                             element={
                                 <RotaProtegida>
                                     <PaginaHistorico />
+                                </RotaProtegida>
+                            }
+                        />
+                        <Route
+                            path="/desafios"
+                            element={
+                                <RotaProtegida>
+                                    <PaginaDesafios />
                                 </RotaProtegida>
                             }
                         />
