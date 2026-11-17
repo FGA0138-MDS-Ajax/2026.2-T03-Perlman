@@ -41,6 +41,9 @@ public class Treino {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
+    @Column(name = "treino_origem_id")
+    private Long treinoOrigemId;
+
     public Treino() {
     }
 
@@ -95,4 +98,8 @@ public class Treino {
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    public Long getTreinoOrigemId() { return treinoOrigemId; }
+
+    public void setTreinoOrigemId(Long treinoOrigemId) { this.treinoOrigemId = treinoOrigemId; }
 }
