@@ -13,7 +13,7 @@ function preferenciasValidas(valor: unknown): valor is Preferencias {
     return tema === "light" || tema === "dark" || tema === "system";
 }
 
-export async function buscarPreferencias(signal?: AbortSignal): Promise<Preferencias> {
+export async function buscarPreferencias(_signal?: AbortSignal): Promise<Preferencias> {
     const padrao: Preferencias = { tema: "system" };
 
 
@@ -36,7 +36,7 @@ export async function buscarPreferencias(signal?: AbortSignal): Promise<Preferen
     return padrao;
 }
 
-export async function salvarTema(tema: Tema, signal?: AbortSignal): Promise<Preferencias> {
+export async function salvarTema(tema: Tema, _signal?: AbortSignal): Promise<Preferencias> {
     const preferencias: Preferencias = { tema };
 
     if (typeof window !== "undefined") {

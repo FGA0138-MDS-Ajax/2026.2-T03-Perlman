@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
+import ImagemExercicio from "@/components/imagem-exercicio";
 import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import type { RegistroDiarioResponseDTO } from "@/lib/api/contracts";
@@ -54,12 +55,15 @@ function detalhesDaExecucao(registro: RegistroDiarioResponseDTO): string {
 function ExecucaoItem({ registro }: { registro: RegistroDiarioResponseDTO }) {
     return (
         <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0 space-y-0.5">
-                <span className="text-sm font-medium">{registro.exercicioNome}</span>
-                <span className="block text-xs text-muted-foreground">
-                    {registro.treinoNome ?? "Sem treino vinculado"} · {formatarDataTreino(registro.executadoEm)}
-                </span>
-                <span className="block text-xs text-muted-foreground">{detalhesDaExecucao(registro)}</span>
+            <div className="flex items-center gap-3 min-w-0">
+                <ImagemExercicio nome={registro.exercicioNome} tamanho="thumb" />
+                <div className="min-w-0 space-y-0.5">
+                    <span className="text-sm font-medium">{registro.exercicioNome}</span>
+                    <span className="block text-xs text-muted-foreground">
+                        {registro.treinoNome ?? "Sem treino vinculado"} · {formatarDataTreino(registro.executadoEm)}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">{detalhesDaExecucao(registro)}</span>
+                </div>
             </div>
             <Badge variant="outline" className="shrink-0 text-xs">Execução</Badge>
         </div>

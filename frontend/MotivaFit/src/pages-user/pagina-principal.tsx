@@ -24,6 +24,7 @@ import { resumirExecucoes } from "@/lib/indicadores-execucao";
 import { formatarDataTreino } from "@/lib/treinos-apresentacao";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
+import ImagemExercicio from "@/components/imagem-exercicio";
 
 type EstadoFichas =
     | { status: "carregando" }
@@ -255,14 +256,17 @@ export default function PaginaPrincipal() {
                                     <div key={registro.id}>
                                         {index > 0 && <Separator className="mb-4" />}
                                         <div className="flex items-center justify-between gap-3">
-                                            <div className="space-y-0.5">
-                                                <span className="text-sm font-medium">{registro.exercicioNome}</span>
-                                                <span className="block text-xs text-muted-foreground">
-                                                    {registro.treinoNome ?? "Sem treino vinculado"} · {formatarDataTreino(registro.executadoEm)}
-                                                </span>
-                                                <span className="block text-xs text-muted-foreground">{detalhesDaExecucao(registro)}</span>
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <ImagemExercicio nome={registro.exercicioNome} tamanho="thumb" />
+                                                <div className="min-w-0 space-y-0.5">
+                                                    <span className="text-sm font-medium">{registro.exercicioNome}</span>
+                                                    <span className="block text-xs text-muted-foreground">
+                                                        {registro.treinoNome ?? "Sem treino vinculado"} · {formatarDataTreino(registro.executadoEm)}
+                                                    </span>
+                                                    <span className="block text-xs text-muted-foreground">{detalhesDaExecucao(registro)}</span>
+                                                </div>
                                             </div>
-                                            <Badge variant="outline" className="text-xs">Execução</Badge>
+                                            <Badge variant="outline" className="shrink-0 text-xs">Execução</Badge>
                                         </div>
                                     </div>
                                 ))}

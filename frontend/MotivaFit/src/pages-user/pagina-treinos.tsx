@@ -24,6 +24,7 @@ import {
 } from "@/lib/treinos-apresentacao";
 import Header from "@/components/header";
 import Aside from "@/components/aside";
+import ImagemExercicio from "@/components/imagem-exercicio";
 
 type Consulta<T> =
     | { status: "carregando" }
@@ -663,16 +664,22 @@ function ExerciciosVisiveis({
     if (apresentacao === "cards") {
         return (
             <div className="space-y-3">
-                {ficha.dados.map((item) => (
-                    <Card key={item.id}>
-                        <CardHeader className="p-4 pb-2">
-                            <CardTitle className="text-base">{nomeDe(item.catalogoExercicioId)}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="px-4 pb-4 text-sm text-muted-foreground">
-                            {formatarMetaVisivel(item.meta)}
-                        </CardContent>
-                    </Card>
-                ))}
+                {ficha.dados.map((item) => {
+                    const nome = nomeDe(item.catalogoExercicioId);
+                    return (
+                        <Card key={item.id} className="overflow-hidden">
+                            <div className="flex items-center gap-3 p-4">
+                                <ImagemExercicio nome={nome} tamanho="sm" />
+                                <div className="min-w-0 flex-1">
+                                    <CardTitle className="text-base">{nome}</CardTitle>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        {formatarMetaVisivel(item.meta)}
+                                    </p>
+                                </div>
+                            </div>
+                        </Card>
+                    );
+                })}
             </div>
         );
     }
@@ -709,8 +716,14 @@ function ExerciciosSelecionados({
                         const pace = paceDosCampos(item.campos);
                         const metaAnterior = item.metaOriginal && !lerMeta(item.modalidade, item.metaOriginal) ? item.metaOriginal : "";
                         return (
-                            <li key={item.chave} className="flex min-w-0 flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:flex-wrap sm:items-end">
-                                <p className="min-w-0 break-words text-sm font-medium sm:flex-1">{nome}</p>
+                            <li key={item.chave} className="flex min-w-0 flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:flex-wrap sm:items-center">
+                                <div className="flex items-center gap-3 min-w-0 sm:flex-1">
+                                    <ImagemExercicio nome={nome} tamanho="thumb" />
+                                    <div className="min-w-0">
+                                        <p className="min-w-0 break-words text-sm font-medium">{nome}</p>
+                                        {metaAnterior && <p className="text-xs text-muted-foreground">Meta anterior: {metaAnterior}</p>}
+                                    </div>
+                                </div>
                                 {item.removido ? (
                                     <>
                                         <p className="text-sm text-muted-foreground">{nome} será removido ao salvar.</p>
@@ -916,7 +929,8 @@ function PainelCatalogo({
                             : itens.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum exercício encontrado na busca.</p>
                                 : <ul className="space-y-2">
                                     {itens.map((item) => (
-                                        <li key={item.id} className="flex items-center gap-3 rounded-lg border p-3">
+                                        <li key={item.id} className="flex items-center gap-3 rounded-lg border p-3 hover:border-primary/40 transition-colors">
+                                            <ImagemExercicio nome={item.nome} tamanho="sm" />
                                             <div className="min-w-0 flex-1">
                                                 <p className="break-words text-sm font-medium">{item.nome}</p>
                                                 <p className="text-xs text-muted-foreground">{item.grupoMuscular} · {ROTULO_TIPO[item.modalidade]}</p>

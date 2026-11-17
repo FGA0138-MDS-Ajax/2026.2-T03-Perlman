@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ChangeEvent } from "react";
-import { Link } from "react-router-dom";
 import {
     Trophy, Plus, Trash2, Send, ImagePlus, Users, Globe, Lock,
     Calendar, MessageSquare, X, ChevronLeft,
@@ -10,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth } from "@/lib/auth-context";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
@@ -313,7 +311,7 @@ function FormularioDesafio({
             <CardHeader>
                 <CardTitle>Novo Desafio</CardTitle>
                 <CardDescription>
-                    Crie um desafio estilo Gym Rats e convide outros atletas a participar!
+                    Crie um desafio e convide outras pessoas para participar!
                 </CardDescription>
             </CardHeader>
             <form onSubmit={submit}>

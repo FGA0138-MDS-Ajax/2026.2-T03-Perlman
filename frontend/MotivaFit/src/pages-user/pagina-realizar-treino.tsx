@@ -2,10 +2,11 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
+import ImagemExercicio from "@/components/imagem-exercicio";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
@@ -185,12 +186,25 @@ export default function PaginaRealizarTreino() {
                                     const nome = catalogo?.nome ?? `Exercício ${exercicio.catalogoExercicioId}`;
                                     const atual = valores(exercicio.id);
                                     return (
-                                        <Card key={exercicio.id}>
-                                            <CardHeader>
-                                                <CardTitle className="text-lg">{nome}</CardTitle>
-                                                <CardDescription>Meta: {formatarMetaVisivel(exercicio.meta)}</CardDescription>
-                                            </CardHeader>
-                                            <CardContent className="space-y-3">
+                                        <Card key={exercicio.id} className="overflow-hidden border-border/80 shadow-sm">
+                                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-5 pb-3">
+                                                <ImagemExercicio
+                                                    nome={nome}
+                                                    tamanho="md"
+                                                    className="shadow-sm border-primary/20 bg-primary/5"
+                                                    comZoom={true}
+                                                />
+                                                <div className="min-w-0 flex-1 text-center sm:text-left space-y-1">
+                                                    <CardTitle className="text-xl font-heading font-bold">{nome}</CardTitle>
+                                                    <CardDescription>Meta: {formatarMetaVisivel(exercicio.meta)}</CardDescription>
+                                                    {catalogo && (
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {catalogo.grupoMuscular} · {ROTULO_TIPO[modalidade]}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <CardContent className="space-y-3 pt-0">
                                                 {atual.registrado && <p className="text-sm text-muted-foreground">Este exercício já foi salvo.</p>}
                                                 <fieldset disabled={enviando || atual.registrado} className="space-y-3">
                                                     {modalidade === "MUSCULACAO" ? (
