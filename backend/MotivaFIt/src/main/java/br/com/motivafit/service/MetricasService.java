@@ -50,11 +50,11 @@ public class MetricasService {
         PeriodoMetricas periodo = PeriodoMetricas.validar(de, ate, clock);
         Object[] resumo = repository.frequenciaResumo(periodo.inicio(), periodo.fim());
         List<FaixaDTO> distribuicao = repository.frequenciaDistribuicao(periodo.inicio(), periodo.fim()).stream()
-                .map(row -> new FaixaDTO((String) row[0], ((Number) row[1]).longValue())).toList();
+                .map(row -> new FaixaDTO((String) get(row, 0), longValue(get(row, 1)))).toList();
         List<SerieFrequenciaDTO> serie = repository.frequenciaSerie(periodo.inicio(), periodo.fim()).stream()
-                .map(row -> new SerieFrequenciaDTO((String) row[0], decimal(row[1]))).toList();
-        return new FrequenciaMediaDTO(periodo.de(), periodo.ate(), decimal(resumo[0]),
-                decimal(resumo[1]), distribuicao, serie);
+                .map(row -> new SerieFrequenciaDTO((String) get(row, 0), decimal(get(row, 1)))).toList();
+        return new FrequenciaMediaDTO(periodo.de(), periodo.ate(), decimal(get(resumo, 0)),
+                decimal(get(resumo, 1)), distribuicao, serie);
     }
 
     public RankingTempoDTO rankingTempo(LocalDate de, LocalDate ate, int limite) {
@@ -69,30 +69,55 @@ public class MetricasService {
         List<RankingTempoItemDTO> ranking = oculto ? List.of() : java.util.stream.IntStream.range(0, usuarios.size())
                 .mapToObj(i -> {
                     Object[] row = usuarios.get(i);
-                    return new RankingTempoItemDTO(i + 1, longValue(row[1]),
-                            longValue(row[2]), longValue(row[3]));
+                    return new RankingTempoItemDTO(i + 1, longValue(get(row, 1)),
+                            longValue(get(row, 2)), longValue(get(row, 3)));
                 }).toList();
-        return new RankingTempoDTO(periodo.de(), periodo.ate(), longValue(totais[0]),
-                longValue(totais[1]), decimal(totais[2]), oculto, ranking);
+        return new RankingTempoDTO(periodo.de(), periodo.ate(), longValue(get(totais, 0)),
+                longValue(get(totais, 1)), decimal(get(totais, 2)), oculto, ranking);
     }
 
     private EvolucaoPontoDTO mapearEvolucao(Object[] row) {
-        return new EvolucaoPontoDTO((String) row[0], longValue(row[1]), (String) row[2],
-                (String) row[3], longValue(row[4]), decimal(row[5]), integer(row[6]),
-                longValue(row[7]), decimal(row[8]), longValue(row[9]), decimal(row[10]),
-                decimal(row[11]));
+        return new EvolucaoPontoDTO((String) get(row, 0), longValue(get(row, 1)), (String) get(row, 2),
+                (String) get(row, 3), longValue(get(row, 4)), decimal(get(row, 5)), integer(get(row, 6)),
+                longValue(get(row, 7)), decimal(get(row, 8)), longValue(get(row, 9)), decimal(get(row, 10)),
+                decimal(get(row, 11)));
+    }
+
+    private static Object get(Object[] row, int index) {
+        if (row == null || index >= row.length) return null;
+        return row[index];
     }
 
     private static long longValue(Object value) {
-        return value == null ? 0 : ((Number) value).longValue();
+        if (value == null) return 0;
+        if (value instanceof Number) return ((Number) value).longValue();
+        if (value instanceof Object[]) {
+            Object[] arr = (Object[]) value;
+            if (arr.length == 0) return 0;
+            return longValue(arr[0]);
+        }
+        return Long.parseLong(value.toString());
     }
 
     private static Integer integer(Object value) {
-        return value == null ? null : ((Number) value).intValue();
+        if (value == null) return null;
+        if (value instanceof Number) return ((Number) value).intValue();
+        if (value instanceof Object[]) {
+            Object[] arr = (Object[]) value;
+            if (arr.length == 0) return null;
+            return integer(arr[0]);
+        }
+        return Integer.parseInt(value.toString());
     }
 
     private static BigDecimal decimal(Object value) {
-        return value == null ? null : new BigDecimal(value.toString());
+        if (value == null) return null;
+        if (value instanceof Object[]) {
+            Object[] arr = (Object[]) value;
+            if (arr.length == 0) return null;
+            return decimal(arr[0]);
+        }
+        return new BigDecimal(value.toString());
     }
 
     private static double arredondar(double value, int casas) {
@@ -116,8 +141,8 @@ public class MetricasService {
         PeriodoMetricas periodo = PeriodoMetricas.validar(de, ate, clock);
         List<ExercicioItemDTO> itens = repository.exerciciosMaisRealizados(
                         periodo.inicio(), periodo.fim(), limite).stream()
-                .map(row -> new ExercicioItemDTO(0, longValue(row[0]), (String) row[1],
-                        (String) row[2], (String) row[3], longValue(row[4]), longValue(row[5])))
+                .map(row -> new ExercicioItemDTO(0, longValue(get(row, 0)), (String) get(row, 1),
+                        (String) get(row, 2), (String) get(row, 3), longValue(get(row, 4)), longValue(get(row, 5))))
                 .filter(item -> item.usuariosDistintos() >= kMinimo)
                 .toList();
         List<ExercicioItemDTO> ranking = java.util.stream.IntStream.range(0, itens.size())
@@ -130,13 +155,13 @@ public class MetricasService {
         PeriodoMetricas periodo = PeriodoMetricas.validar(de, ate, clock);
         Object[] resumo = repository.rotinasResumo(periodo.inicio(), periodo.fim());
         List<TipoRotinaDTO> tipos = repository.rotinasPorTipo().stream()
-                .map(row -> new TipoRotinaDTO((String) row[0], longValue(row[1]))).toList();
+                .map(row -> new TipoRotinaDTO((String) get(row, 0), longValue(get(row, 1)))).toList();
         List<AdicaoRotinaDTO> adicoes = repository.rotinasMaisAdicionadas(
                         periodo.inicio(), periodo.fim(), limite).stream()
-                .map(row -> new AdicaoRotinaDTO(0, longValue(row[0]), (String) row[1],
-                        longValue(row[2]), longValue(row[3]))).toList();
-        return new RotinasDTO(periodo.de(), periodo.ate(), longValue(resumo[0]), tipos,
-                percentual(resumo[1], resumo[0]), BigDecimal.ZERO, adicoes);
+                .map(row -> new AdicaoRotinaDTO(0, longValue(get(row, 0)), (String) get(row, 1),
+                        longValue(get(row, 2)), longValue(get(row, 3)))).toList();
+        return new RotinasDTO(periodo.de(), periodo.ate(), longValue(get(resumo, 0)), tipos,
+                percentual(get(resumo, 1), get(resumo, 0)), BigDecimal.ZERO, adicoes);
     }
 
     public RetencaoDTO retencao(LocalDate ate, int coortes) {
