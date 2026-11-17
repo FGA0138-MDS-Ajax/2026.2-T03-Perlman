@@ -82,6 +82,7 @@ public class TreinoService {
         copia.setNome(origem.getNome());
         copia.setTipo(origem.getTipo());
         copia.setVisibilidade(Visibilidade.PRIVADO);
+        copia.setTreinoOrigemId(origem.getId());
         return copia;
     }
 
