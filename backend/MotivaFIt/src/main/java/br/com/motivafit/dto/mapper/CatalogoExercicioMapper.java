@@ -14,23 +14,27 @@ public final class CatalogoExercicioMapper {
                 exercicio.getId(),
                 exercicio.getNome(),
                 exercicio.getModalidade(),
-                exercicio.getGrupoMuscular()
+                exercicio.getGrupoMuscular(),
+                exercicio.getImagemUrl()
         );
     }
 
     public static CatalogoExercicio toEntity(CatalogoExercicioRequestDTO dto) {
-        return new CatalogoExercicio(
+        CatalogoExercicio entity = new CatalogoExercicio(
                 dto.nome().trim(),
                 dto.modalidade(),
                 dto.grupoMuscular().trim()
         );
+        entity.definirImagem(dto.imagemUrl());
+        return entity;
     }
 
     public static void updateEntity(CatalogoExercicio entity, CatalogoExercicioRequestDTO dto) {
         entity.atualizar(
                 dto.nome().trim(),
                 dto.modalidade(),
-                dto.grupoMuscular().trim()
+                dto.grupoMuscular().trim(),
+                dto.imagemUrl()
         );
     }
 }

@@ -13,7 +13,8 @@ function exercicioValido(item: unknown): item is CatalogoExercicioResponseDTO {
     return typeof exercicio.id === "number"
         && typeof exercicio.nome === "string"
         && MODALIDADES.includes(exercicio.modalidade)
-        && typeof exercicio.grupoMuscular === "string";
+        && typeof exercicio.grupoMuscular === "string"
+        && (exercicio.imagemUrl === undefined || exercicio.imagemUrl === null || typeof exercicio.imagemUrl === "string");
 }
 
 export async function listarCatalogoExercicios(signal?: AbortSignal): Promise<CatalogoExercicioResponseDTO[]> {

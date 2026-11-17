@@ -71,6 +71,7 @@ export interface CatalogoExercicioRequestDTO {
     nome: string;
     modalidade: ModalidadeBackend;
     grupoMuscular: string;
+    imagemUrl?: string;
 }
 
 export interface CatalogoExercicioResponseDTO {
@@ -78,6 +79,7 @@ export interface CatalogoExercicioResponseDTO {
     nome: string;
     modalidade: ModalidadeBackend;
     grupoMuscular: string;
+    imagemUrl?: string | null;
 }
 
 export interface RegistroDiarioRequestDTO {

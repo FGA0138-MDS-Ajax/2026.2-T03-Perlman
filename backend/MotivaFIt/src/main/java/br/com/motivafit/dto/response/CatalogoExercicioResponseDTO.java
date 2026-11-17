@@ -12,6 +12,11 @@ public record CatalogoExercicioResponseDTO(
         @Schema(description = "Modalidade do exercício", example = "MUSCULACAO")
         Modalidade modalidade,
         @Schema(description = "Grupo muscular trabalhado", example = "Peito")
-        String grupoMuscular
+        String grupoMuscular,
+        @Schema(description = "Imagem do exercício em formato data URL", nullable = true)
+        String imagemUrl
 ) {
+    public CatalogoExercicioResponseDTO(Long id, String nome, Modalidade modalidade, String grupoMuscular) {
+        this(id, nome, modalidade, grupoMuscular, null);
+    }
 }

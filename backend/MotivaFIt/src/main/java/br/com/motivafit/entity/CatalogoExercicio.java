@@ -24,6 +24,9 @@ public class CatalogoExercicio {
     @Column(nullable = false)
     private Boolean ativo = true;
 
+    @Column(name = "imagem_url", columnDefinition = "TEXT")
+    private String imagemUrl;
+
     protected CatalogoExercicio() {
     }
 
@@ -33,10 +36,19 @@ public class CatalogoExercicio {
         this.grupoMuscular = grupoMuscular;
     }
 
-    public void atualizar(String nome, Modalidade modalidade, String grupoMuscular) {
+    public void definirImagem(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
+    }
+
+    public void atualizar(String nome, Modalidade modalidade, String grupoMuscular, String imagemUrl) {
         this.nome = nome;
         this.modalidade = modalidade;
         this.grupoMuscular = grupoMuscular;
+        if (imagemUrl != null && !imagemUrl.isBlank()) this.imagemUrl = imagemUrl;
+    }
+
+    public void atualizar(String nome, Modalidade modalidade, String grupoMuscular) {
+        atualizar(nome, modalidade, grupoMuscular, null);
     }
 
     public void desativar() {
@@ -61,5 +73,9 @@ public class CatalogoExercicio {
 
     public Boolean getAtivo() {
         return ativo;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
     }
 }

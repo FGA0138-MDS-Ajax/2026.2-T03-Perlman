@@ -20,6 +20,12 @@ public record CatalogoExercicioRequestDTO(
         @NotBlank(message = "O grupo muscular é obrigatório")
         @Size(max = 50, message = "O grupo muscular deve ter no máximo 50 caracteres")
         @Schema(description = "Grupo muscular trabalhado (máximo de 50 caracteres)", example = "Costas")
-        String grupoMuscular
+        String grupoMuscular,
+        @Size(max = 1_500_000, message = "A imagem é muito grande")
+        @Schema(description = "Imagem do exercício em formato data URL", nullable = true)
+        String imagemUrl
 ) {
+    public CatalogoExercicioRequestDTO(String nome, Modalidade modalidade, String grupoMuscular) {
+        this(nome, modalidade, grupoMuscular, null);
+    }
 }

@@ -37,6 +37,23 @@ export async function registrarExecucao(request: RegistroDiarioRequestDTO): Prom
     return exigirValor(dados, registroValido);
 }
 
+export async function buscarRegistro(id: number, signal?: AbortSignal): Promise<RegistroDiarioResponseDTO> {
+    const dados = await apiRequest<unknown>(`/api/registros/${id}`, { signal });
+    return exigirValor(dados, registroValido);
+}
+
+export async function atualizarRegistro(id: number, request: RegistroDiarioRequestDTO): Promise<RegistroDiarioResponseDTO> {
+    const dados = await apiRequest<unknown>(`/api/registros/${id}`, {
+        method: "PUT",
+        body: request,
+    });
+    return exigirValor(dados, registroValido);
+}
+
+export async function excluirRegistro(id: number): Promise<void> {
+    await apiRequest<void>(`/api/registros/${id}`, { method: "DELETE" });
+}
+
 export async function listarRegistros(
     pagina = 0,
     tamanho = TAMANHO_PAGINA_HISTORICO,

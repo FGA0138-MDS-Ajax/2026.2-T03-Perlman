@@ -6,6 +6,7 @@ import br.com.motivafit.dto.response.CatalogoExercicioResponseDTO;
 import br.com.motivafit.entity.CatalogoExercicio;
 import br.com.motivafit.exception.ConflitoException;
 import br.com.motivafit.exception.NaoEncontradoException;
+import br.com.motivafit.exception.RequisicaoInvalidaException;
 import br.com.motivafit.repository.CatalogoExercicioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,9 @@ public class CatalogoExercicioAdminService {
     }
 
     public CatalogoExercicioResponseDTO create(CatalogoExercicioRequestDTO request) {
+        if (request.imagemUrl() == null || request.imagemUrl().isBlank()) {
+            throw new RequisicaoInvalidaException("IMAGEM_OBRIGATORIA", "É obrigatório adicionar uma imagem ao exercício");
+        }
         if (repository.existsByNomeIgnoreCase(request.nome().trim())) {
             throw nomeJaExiste();
         }
@@ -30,6 +34,9 @@ public class CatalogoExercicioAdminService {
 
     public CatalogoExercicioResponseDTO update(Long id, CatalogoExercicioRequestDTO request) {
         CatalogoExercicio entity = buscar(id);
+        if ((request.imagemUrl() == null || request.imagemUrl().isBlank()) && entity.getImagemUrl() == null) {
+            throw new RequisicaoInvalidaException("IMAGEM_OBRIGATORIA", "É obrigatório adicionar uma imagem ao exercício");
+        }
         if (repository.existsByNomeIgnoreCaseAndIdNot(request.nome().trim(), id)) {
             throw nomeJaExiste();
         }

@@ -14,6 +14,8 @@ import PaginaRealizarTreino from "./pages-user/pagina-realizar-treino";
 import PaginaHistorico from "./pages-user/pagina-historico";
 import PaginaTermosDeUso from "@/pages-user/pagina-termos-de-uso";
 import PaginaDesafios from "@/pages-user/pagina-desafios";
+import PaginaConta from "@/pages-user/pagina-conta";
+import PaginaCatalogoAdmin from "@/pages-admin/pagina-catalogo-admin";
 
 function App() {
     return (
@@ -89,6 +91,14 @@ function App() {
                                 </RotaProtegida>
                             }
                         />
+                        <Route
+                            path="/conta"
+                            element={
+                                <RotaProtegida>
+                                    <PaginaConta />
+                                </RotaProtegida>
+                            }
+                        />
 
                         {/* Páginas administrativas exigem sessão autenticada e perfil administrativo */}
                         <Route
@@ -104,6 +114,14 @@ function App() {
                             element={
                                 <RotaAdmin>
                                     <PaginaTreinosAdmin />
+                                </RotaAdmin>
+                            }
+                        />
+                        <Route
+                            path="/admin/catalogo"
+                            element={
+                                <RotaAdmin>
+                                    <PaginaCatalogoAdmin />
                                 </RotaAdmin>
                             }
                         />

@@ -4,13 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
 import ImagemExercicio from "@/components/imagem-exercicio";
 import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import type { RegistroDiarioResponseDTO } from "@/lib/api/contracts";
-import { listarTodasAsExecucoes } from "@/lib/api/registros-api";
+import { atualizarRegistro, excluirRegistro, listarTodasAsExecucoes } from "@/lib/api/registros-api";
 import { chaveDiaNegocio } from "@/lib/indicadores-execucao";
 import {
     agruparPorDia,
@@ -52,7 +55,7 @@ function detalhesDaExecucao(registro: RegistroDiarioResponseDTO): string {
     return partes.join(" · ");
 }
 
-function ExecucaoItem({ registro }: { registro: RegistroDiarioResponseDTO }) {
+function ExecucaoItem({ registro, editar, excluir }: { registro: RegistroDiarioResponseDTO; editar: (registro: RegistroDiarioResponseDTO) => void; excluir: (registro: RegistroDiarioResponseDTO) => void }) {
     return (
         <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
@@ -65,7 +68,11 @@ function ExecucaoItem({ registro }: { registro: RegistroDiarioResponseDTO }) {
                     <span className="block text-xs text-muted-foreground">{detalhesDaExecucao(registro)}</span>
                 </div>
             </div>
-            <Badge variant="outline" className="shrink-0 text-xs">Execução</Badge>
+            <div className="flex shrink-0 items-center gap-2">
+                <Badge variant="outline" className="text-xs">Execução</Badge>
+                <Button type="button" variant="outline" size="sm" onClick={() => editar(registro)}>Editar</Button>
+                <Button type="button" variant="ghost" size="sm" className="text-destructive" onClick={() => excluir(registro)}>Excluir</Button>
+            </div>
         </div>
     );
 }
@@ -74,6 +81,11 @@ export default function PaginaHistorico() {
     const { user, logout, isAdmin, enviando } = useAuth();
     const [menuAberto, setMenuAberto] = useState(false);
     const [visao, setVisao] = useState<VisaoHistorico>("lista");
+    const [registroEditando, setRegistroEditando] = useState<RegistroDiarioResponseDTO | null>(null);
+    const [registroExcluindo, setRegistroExcluindo] = useState<RegistroDiarioResponseDTO | null>(null);
+    const [dadosEdicao, setDadosEdicao] = useState({ cargaKg: "", repeticoes: "", series: "", tempoS: "", distanciaM: "" });
+    const [acaoEmAndamento, setAcaoEmAndamento] = useState(false);
+    const [erroAcao, setErroAcao] = useState("");
     const [ancora, setAncora] = useState(() => chaveDiaNegocio(new Date()));
     const [historico, setHistorico] = useState<EstadoHistorico>({ status: "carregando" });
     const [tentativa, setTentativa] = useState(0);
@@ -112,6 +124,58 @@ export default function PaginaHistorico() {
     function avancarPeriodo() {
         if (!podeAvancar) return;
         setAncora(inicioProximo);
+    }
+
+    function abrirEdicao(registro: RegistroDiarioResponseDTO) {
+        setErroAcao("");
+        setDadosEdicao({
+            cargaKg: registro.cargaKg?.toString() ?? "",
+            repeticoes: registro.repeticoes?.toString() ?? "",
+            series: registro.series?.toString() ?? "",
+            tempoS: registro.tempoS.toString(),
+            distanciaM: registro.distanciaM?.toString() ?? "",
+        });
+        setRegistroEditando(registro);
+    }
+
+    async function salvarEdicao() {
+        if (!registroEditando) return;
+        setAcaoEmAndamento(true);
+        setErroAcao("");
+        const numero = (valor: string) => valor.trim() === "" ? undefined : Number(valor);
+        try {
+            await atualizarRegistro(registroEditando.id, {
+                catalogoId: registroEditando.catalogoId,
+                treinoId: registroEditando.treinoId ?? undefined,
+                exercicioId: registroEditando.exercicioId ?? undefined,
+                cargaKg: numero(dadosEdicao.cargaKg),
+                repeticoes: numero(dadosEdicao.repeticoes),
+                series: numero(dadosEdicao.series),
+                tempoS: Number(dadosEdicao.tempoS),
+                distanciaM: numero(dadosEdicao.distanciaM),
+            });
+            setRegistroEditando(null);
+            setTentativa((valor) => valor + 1);
+        } catch (error) {
+            setErroAcao(mensagemAutenticacao(error));
+        } finally {
+            setAcaoEmAndamento(false);
+        }
+    }
+
+    async function confirmarExclusao() {
+        if (!registroExcluindo) return;
+        setAcaoEmAndamento(true);
+        setErroAcao("");
+        try {
+            await excluirRegistro(registroExcluindo.id);
+            setRegistroExcluindo(null);
+            setTentativa((valor) => valor + 1);
+        } catch (error) {
+            setErroAcao(mensagemAutenticacao(error));
+        } finally {
+            setAcaoEmAndamento(false);
+        }
     }
 
     const rotuloAnterior = visao === "mes" ? "Mês anterior" : "Semana anterior";
@@ -187,7 +251,7 @@ export default function PaginaHistorico() {
                             {visao === "lista" && itens.map((registro, index) => (
                                 <div key={registro.id}>
                                     {index > 0 && <Separator className="mb-4" />}
-                                    <ExecucaoItem registro={registro} />
+                                    <ExecucaoItem registro={registro} editar={abrirEdicao} excluir={(item) => { setErroAcao(""); setRegistroExcluindo(item); }} />
                                 </div>
                             ))}
                             {visao !== "lista" && grupos.map((grupo) => (
@@ -196,13 +260,55 @@ export default function PaginaHistorico() {
                                     {grupo.itens.map((registro, index) => (
                                         <div key={registro.id}>
                                             {index > 0 && <Separator className="mb-3" />}
-                                            <ExecucaoItem registro={registro} />
+                                            <ExecucaoItem registro={registro} editar={abrirEdicao} excluir={(item) => { setErroAcao(""); setRegistroExcluindo(item); }} />
                                         </div>
                                     ))}
                                 </section>
                             ))}
                         </CardContent>
                     </Card>
+
+                    <Dialog open={registroEditando !== null} onOpenChange={(aberto) => { if (!aberto) setRegistroEditando(null); }}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Editar execução</DialogTitle>
+                                <DialogDescription>{registroEditando?.exercicioNome}</DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {([
+                                    ["cargaKg", "Carga (kg)"],
+                                    ["repeticoes", "Repetições"],
+                                    ["series", "Séries"],
+                                    ["tempoS", "Tempo (s)"],
+                                    ["distanciaM", "Distância (m)"],
+                                ] as const).map(([campo, rotulo]) => (
+                                    <div key={campo} className="space-y-1.5">
+                                        <Label htmlFor={`registro-${campo}`}>{rotulo}</Label>
+                                        <Input id={`registro-${campo}`} type="number" min="0" step={campo === "tempoS" || campo === "distanciaM" ? "1" : "0.1"} value={dadosEdicao[campo]} onChange={(event) => setDadosEdicao((atual) => ({ ...atual, [campo]: event.target.value }))} />
+                                    </div>
+                                ))}
+                            </div>
+                            {erroAcao && <p role="alert" className="text-sm text-destructive">{erroAcao}</p>}
+                            <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => setRegistroEditando(null)} disabled={acaoEmAndamento}>Cancelar</Button>
+                                <Button type="button" onClick={() => void salvarEdicao()} disabled={acaoEmAndamento}>{acaoEmAndamento ? "Salvando…" : "Salvar"}</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={registroExcluindo !== null} onOpenChange={(aberto) => { if (!aberto) setRegistroExcluindo(null); }}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Excluir execução</DialogTitle>
+                                <DialogDescription>Esta ação remove permanentemente o registro de {registroExcluindo?.exercicioNome}.</DialogDescription>
+                            </DialogHeader>
+                            {erroAcao && <p role="alert" className="text-sm text-destructive">{erroAcao}</p>}
+                            <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => setRegistroExcluindo(null)} disabled={acaoEmAndamento}>Cancelar</Button>
+                                <Button type="button" variant="destructive" onClick={() => void confirmarExclusao()} disabled={acaoEmAndamento}>{acaoEmAndamento ? "Excluindo…" : "Excluir"}</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </main>
             </div>
         </div>

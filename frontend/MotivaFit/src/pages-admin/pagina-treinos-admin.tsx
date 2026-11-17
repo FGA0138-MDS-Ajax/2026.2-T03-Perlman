@@ -13,7 +13,7 @@ export default function PaginaTreinosAdmin() {
                 {estado.dados.itens.length === 0 && <p>Nenhuma ficha encontrada.</p>}
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {estado.dados.itens.map((ficha) => <Card key={ficha.id}>
-                        <CardHeader><CardTitle>{ficha.nome}</CardTitle><CardDescription>{ficha.usuarioEmail}</CardDescription></CardHeader>
+                        <CardHeader><CardTitle>{ficha.nome}</CardTitle><CardDescription>Fichas disponíveis nesta sessão</CardDescription></CardHeader>
                         <CardContent className="space-y-2 text-sm">
                             <p>Modalidade: {ficha.tipo === "MUSCULACAO" ? "Musculação" : "Aeróbico"}</p>
                             <p>Visibilidade: {ficha.visibilidade === "PUBLICO" ? "Pública" : "Privada"}</p>
