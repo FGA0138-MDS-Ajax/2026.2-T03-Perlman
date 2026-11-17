@@ -39,6 +39,7 @@ const sinonimos: Record<string, string> = {
     supino: "supino_reto",
     triceps: "triceps_pulley",
     agachamento: "agachamento_livre",
+    desenvolvimento_de_ombros: "desenvolvimento_ombros",
     panturrilha: "panturrilha_em_pe",
     panturrilhas: "panturrilha_em_pe",
     bike: "bicicleta_ergometrica",
