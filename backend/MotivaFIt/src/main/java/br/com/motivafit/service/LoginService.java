@@ -37,6 +37,10 @@ public class LoginService {
                 .filter(u -> passwordEncoder.matches(body.senha(), u.getSenhaHash()))
                 .orElseThrow(() -> new NaoAutorizadoException("CREDENCIAIS_INVALIDAS", "E-mail ou senha incorretos"));
 
+        return loginComUsuario(usuario);
+    }
+
+    public LoginResult loginComUsuario(Usuario usuario) {
         String refreshToken = jwtService.gerarRefreshToken();
         salvarRefresh(refreshToken, usuario, UUID.randomUUID().toString());
         return new LoginResult(resposta(usuario), refreshToken);
