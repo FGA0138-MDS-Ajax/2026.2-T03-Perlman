@@ -36,7 +36,7 @@ import br.com.motivafit.exception.ApiErroResponse;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Autenticação", description = "Cadastro, login, renovação rotativa e encerramento de sessão")
+@Tag(name = "Autenticação", description = "Cadastro, login (local e Google), renovação rotativa e encerramento de sessão")
 public class AuthController {
     private final UsuarioService usuarioService;
     private final LoginService loginService;
