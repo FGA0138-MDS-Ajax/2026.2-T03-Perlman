@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import br.com.motivafit.exception.NaoAutorizadoException;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 @Service
@@ -58,7 +60,12 @@ public class GoogleAuthService {
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
 
-        GoogleIdToken token = verifier.verify(idTokenString);
+        GoogleIdToken token;
+        try {
+            token = verifier.verify(idTokenString);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new NaoAutorizadoException("GOOGLE_TOKEN_INVALIDO", "Token do Google inválido");
+        }
         if (token == null) {
             throw new NaoAutorizadoException("GOOGLE_TOKEN_INVALIDO", "Token do Google inválido");
         }
