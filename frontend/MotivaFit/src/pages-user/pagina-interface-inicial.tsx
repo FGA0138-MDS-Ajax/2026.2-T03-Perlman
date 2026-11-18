@@ -1,0 +1,122 @@
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { Dumbbell, BarChart3, Flame, ArrowRight, Sparkles } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+
+export default function PaginaInterfaceInicial() {
+    return (
+        <div className="flex min-h-screen flex-col bg-background selection:bg-primary/20 selection:text-primary">
+            {/* Header */}
+            <header className="sticky top-0 z-40 border-b bg-background/80 px-3 py-3 backdrop-blur-md sm:px-6 sm:py-4">
+                <div className="mx-auto flex max-w-6xl items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-sm">
+                            <Dumbbell className="h-5 w-5" />
+                        </div>
+                        <h1 className="text-xl font-heading font-black tracking-tight text-foreground">
+                            Motiva<span className="text-primary">Fit</span>
+                        </h1>
+                    </div>
+
+                    <nav className="flex shrink-0 items-center gap-1 sm:gap-2">
+                        <ThemeToggle variant="outline" className="h-9 w-9" />
+                        <Button variant="ghost" className="px-2 sm:px-4" asChild>
+                            <Link to="/login">Entrar</Link>
+                        </Button>
+                        <Button className="px-2 text-sm sm:px-4" asChild>
+                            <Link to="/cadastro">Criar Conta</Link>
+                        </Button>
+                    </nav>
+                </div>
+            </header>
+
+            {/* Hero Section */}
+            <main className="flex flex-1 flex-col items-center justify-center px-4 py-16 text-center">
+                <div className="mx-auto max-w-3xl space-y-6">
+                    <Badge variant="outline" className="gap-1.5 py-1 px-3 text-xs font-medium border-primary/30 text-primary bg-primary/5">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Plataforma Inteligente de Treinos
+                    </Badge>
+
+                    <h2 className="text-3xl font-heading font-extrabold tracking-tight text-balance sm:text-6xl">
+                        Transforme sua rotina e conquiste sua <span className="text-primary decoration-wavy decoration-2">melhor versão</span>
+                    </h2>
+
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
+                        O MotivaFit é o ecossistema definitivo para você planejar, monitorar seu progresso e se manter motivado a cada dia, para buscar suas metas fitness.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
+                        <Button size="lg" className="h-12 px-8 font-medium gap-2 shadow-md shadow-primary/20" asChild>
+                            <Link to="/cadastro">
+                                Comece agora gratuitamente
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                        <Button size="lg" variant="outline" className="h-12 px-8" asChild>
+                            <Link to="/login">Já sou aluno</Link>
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Features Grid */}
+                <section className="grid w-full max-w-5xl gap-6 pt-16 sm:grid-cols-3 text-left">
+                    <Card className="hover:border-primary/50 transition-colors shadow-sm">
+                        <CardHeader className="space-y-2">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <BarChart3 className="h-5 w-5" />
+                            </div>
+                            <CardTitle className="text-lg font-heading">Acompanhamento Métrico</CardTitle>
+                            <CardDescription>
+                                Visualize evolução de cargas e frequência com métricas detalhadas e claras.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+
+                    <Card className="hover:border-primary/50 transition-colors shadow-sm">
+                        <CardHeader className="space-y-2">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Dumbbell className="h-5 w-5" />
+                            </div>
+                            <CardTitle className="text-lg font-heading">Treinos Personalizados</CardTitle>
+                            <CardDescription>
+                                Fichas divididas por grupamento e adaptadas aos seus objetivos.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+
+                    <Card className="hover:border-primary/50 transition-colors shadow-sm">
+                        <CardHeader className="space-y-2">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Flame className="h-5 w-5" />
+                            </div>
+                            <CardTitle className="text-lg font-heading">Motivação Diária</CardTitle>
+                            <CardDescription>
+                                Sequências de dias ativos, metas batidas e lembretes para você nunca perder um treino.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                </section>
+            </main>
+
+            {/* Footer */}
+            <footer className="border-t bg-muted/20 px-4 py-6 text-center text-sm text-muted-foreground sm:px-6">
+                <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <span>© 2026 MotivaFit — Grupo Perlman & UnB. Todos os direitos reservados.</span>
+                    <div className="flex items-center gap-4 text-xs">
+                        <Link to="/termos-de-uso" className="hover:text-foreground">Termos de Uso</Link>
+                        <Link to="/login" className="hover:text-foreground">Login</Link>
+                        <Link to="/cadastro" className="hover:text-foreground">Cadastro</Link>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+}
