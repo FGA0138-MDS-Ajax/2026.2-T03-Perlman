@@ -1,9 +1,11 @@
 package br.com.motivafit.controller;
 
+import br.com.motivafit.dto.request.GoogleLoginRequestDTO;
 import br.com.motivafit.dto.request.LoginRequestDTO;
 import br.com.motivafit.dto.request.UsuarioRequestDTO;
 import br.com.motivafit.dto.response.LoginResponseDTO;
 import br.com.motivafit.dto.response.UsuarioResponseDTO;
+import br.com.motivafit.service.GoogleAuthService;
 import br.com.motivafit.service.LoginService;
 import br.com.motivafit.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -34,21 +36,23 @@ import br.com.motivafit.exception.ApiErroResponse;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Autenticação", description = "Cadastro, login, renovação rotativa e encerramento de sessão")
+@Tag(name = "Autenticação", description = "Cadastro, login (local e Google), renovação rotativa e encerramento de sessão")
 public class AuthController {
     private final UsuarioService usuarioService;
     private final LoginService loginService;
+    private final GoogleAuthService googleAuthService;
     private final long refreshCookieMaxAge;
     private final String allowedOrigin;
     private final boolean secureCookies;
     private final SecureRandom random = new SecureRandom();
 
-    public AuthController(UsuarioService usuarioService, LoginService loginService,
+    public AuthController(UsuarioService usuarioService, LoginService loginService, GoogleAuthService googleAuthService,
                           @Value("${security.jwt.refresh-expiration-days:7}") long refreshDays,
                           @Value("${security.cors.allowed-origin:http://localhost:3000}") String allowedOrigin,
                           @Value("${security.cookies.secure:true}") boolean secureCookies) {
         this.usuarioService = usuarioService;
         this.loginService = loginService;
+        this.googleAuthService = googleAuthService;
         this.refreshCookieMaxAge = refreshDays * 86400;
         this.allowedOrigin = allowedOrigin;
         this.secureCookies = secureCookies;
@@ -77,6 +81,23 @@ public class AuthController {
     })
     public ResponseEntity<LoginResponseDTO> login (@RequestBody @Valid LoginRequestDTO body){
         LoginService.LoginResult result = loginService.login(body);
+        String csrf = csrfToken();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie(result.refreshToken()).toString())
+                .header(HttpHeaders.SET_COOKIE, csrfCookie(csrf).toString())
+                .body(result.response());
+    }
+
+    @PostMapping("/google")
+    @Operation(summary = "Autenticar com Google", description = "Valida o ID Token do Google OAuth 2.0. Se o e-mail não estiver cadastrado, cria uma conta automaticamente com perfil USUARIO. Retorna o JWT de acesso no corpo e define os cookies refreshToken e csrfToken.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Autenticação realizada; cookies de sessão definidos", headers = @Header(name = "Set-Cookie", description = "Define os cookies refreshToken (HttpOnly) e csrfToken (legível pelo cliente)."), content = @Content(schema = @Schema(implementation = LoginResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Token do Google inválido", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Token do Google inválido ou conta inativa", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<LoginResponseDTO> googleLogin(@RequestBody @Valid GoogleLoginRequestDTO body){
+        LoginService.LoginResult result = googleAuthService.login(body);
         String csrf = csrfToken();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie(result.refreshToken()).toString())

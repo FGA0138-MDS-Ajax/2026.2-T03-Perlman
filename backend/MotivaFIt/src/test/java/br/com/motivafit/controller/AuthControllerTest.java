@@ -1,11 +1,13 @@
 package br.com.motivafit.controller;
 
+import br.com.motivafit.dto.request.GoogleLoginRequestDTO;
 import br.com.motivafit.dto.request.LoginRequestDTO;
 import br.com.motivafit.dto.request.UsuarioRequestDTO;
 import br.com.motivafit.dto.response.LoginResponseDTO;
 import br.com.motivafit.dto.response.UsuarioResponseDTO;
 import br.com.motivafit.enums.Perfil;
 import br.com.motivafit.exception.AcessoNegadoException;
+import br.com.motivafit.service.GoogleAuthService;
 import br.com.motivafit.service.LoginService;
 import br.com.motivafit.service.UsuarioService;
 import jakarta.servlet.http.Cookie;
@@ -21,13 +23,15 @@ import static org.mockito.Mockito.*;
 class AuthControllerTest {
     private UsuarioService usuarios;
     private LoginService login;
+    private GoogleAuthService googleAuth;
     private AuthController controller;
 
     @BeforeEach
     void setup() {
         usuarios = mock(UsuarioService.class);
         login = mock(LoginService.class);
-        controller = new AuthController(usuarios, login, 7, "https://frontend.test", true);
+        googleAuth = mock(GoogleAuthService.class);
+        controller = new AuthController(usuarios, login, googleAuth, 7, "https://frontend.test", true);
     }
 
     @Test
@@ -97,8 +101,24 @@ class AuthControllerTest {
     }
 
     @Test
+    void googleLoginRetornaAccessTokenECookiesSeguros() {
+        LoginResponseDTO dto = new LoginResponseDTO("google-access", new Date());
+        when(googleAuth.login(any(GoogleLoginRequestDTO.class))).thenReturn(new LoginService.LoginResult(dto, "google-refresh"));
+
+        var response = controller.googleLogin(new GoogleLoginRequestDTO("google-id-token"));
+
+        assertEquals(200, response.getStatusCode().value());
+        assertSame(dto, response.getBody());
+        var cookies = response.getHeaders().get("Set-Cookie");
+        assertEquals(2, cookies.size());
+        assertTrue(cookies.stream().anyMatch(cookie -> cookie.contains("refreshToken=google-refresh")
+                && cookie.contains("Path=/api/auth") && cookie.contains("HttpOnly") && cookie.contains("Secure") && cookie.contains("SameSite=Lax")));
+        assertTrue(cookies.stream().anyMatch(cookie -> cookie.contains("csrfToken=") && cookie.contains("Path=/;") && !cookie.contains("HttpOnly")));
+    }
+
+    @Test
     void ambienteLocalPodeDesabilitarSecureExplicitamente() {
-        controller = new AuthController(usuarios, login, 7, "http://localhost:3000", false);
+        controller = new AuthController(usuarios, login, googleAuth, 7, "http://localhost:3000", false);
         when(login.login(any(LoginRequestDTO.class))).thenReturn(
                 new LoginService.LoginResult(new LoginResponseDTO("access", new Date()), "refresh"));
         var response = controller.login(new LoginRequestDTO("user@test.com", "senha"));

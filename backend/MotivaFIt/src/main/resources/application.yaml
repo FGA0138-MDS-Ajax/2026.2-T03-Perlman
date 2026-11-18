@@ -26,6 +26,8 @@ security:
     refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:7}
   cors:
     allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:3000}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
 
 openapi:
   server-url: ${OPENAPI_SERVER_URL:http://localhost:8080}
