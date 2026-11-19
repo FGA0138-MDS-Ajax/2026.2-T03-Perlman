@@ -51,15 +51,46 @@ public class DesafioController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar desafios", description = "Lista os desafios ativos em que o usuário autenticado participa, do prazo mais próximo para o mais distante.")
+    @Operation(summary = "Listar desafios", description = "Lista os desafios ativos criados pelo usuário autenticado e os desafios públicos ativos, do prazo mais próximo para o mais distante.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Desafios do usuário (lista vazia se não houver)", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DesafioResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Desafios visíveis (lista vazia se não houver)", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DesafioResponseDTO.class)))),
             @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
             @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
     })
     public ResponseEntity<List<DesafioResponseDTO>> findAll(
             @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario) {
         return ResponseEntity.ok(service.findAll(usuario.getId()));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Obter desafio", description = "Retorna um desafio específico se for criado pelo usuário autenticado ou for público.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Desafio encontrado", content = @Content(schema = @Schema(implementation = DesafioResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Desafio não encontrado ou não visível", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<DesafioResponseDTO> findById(
+            @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario,
+            @Parameter(description = "Identificador do desafio", example = "7") @PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(usuario.getId(), id));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar desafio", description = "Atualiza um desafio criado pelo usuário autenticado. Somente o criador pode atualizar.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Desafio atualizado", content = @Content(schema = @Schema(implementation = DesafioResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "403", description = "O usuário não é o criador do desafio", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Desafio não encontrado", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<DesafioResponseDTO> update(
+            @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario,
+            @Parameter(description = "Identificador do desafio", example = "7") @PathVariable Long id,
+            @Valid @RequestBody DesafioRequestDTO request) {
+        return ResponseEntity.ok(service.update(usuario.getId(), id, request));
     }
 
     @DeleteMapping("/{id}")

@@ -11,6 +11,7 @@ import br.com.motivafit.entity.DesafioParticipante;
 import br.com.motivafit.enums.EstadoDesafio;
 import br.com.motivafit.enums.EstadoParticipante;
 import br.com.motivafit.enums.Modalidade;
+import br.com.motivafit.enums.Visibilidade;
 import br.com.motivafit.exception.AcessoNegadoException;
 import br.com.motivafit.exception.NaoEncontradoException;
 import br.com.motivafit.exception.RequisicaoInvalidaException;
@@ -66,8 +67,9 @@ public class DesafioService {
             catalogos.put(catalogo.getId(), catalogo);
         }
 
+        Visibilidade visibilidade = request.visibilidade() != null ? request.visibilidade() : Visibilidade.PRIVADO;
         Desafio desafio = desafioRepository.saveAndFlush(
-                new Desafio(usuarioId, request.titulo().trim(), request.prazo()));
+                new Desafio(usuarioId, request.titulo().trim(), request.prazo(), request.descricao(), visibilidade));
         List<DesafioItem> itens = itemRepository.saveAll(request.itens().stream()
                 .map(item -> DesafioMapper.toItemEntity(desafio.getId(), item))
                 .toList());
@@ -78,12 +80,56 @@ public class DesafioService {
 
     @Transactional(readOnly = true)
     public List<DesafioResponseDTO> findAll(Long usuarioId) {
-        List<Desafio> desafios = desafioRepository.findVisiveisDoUsuario(
-                usuarioId, EstadoDesafio.ATIVO, EstadoParticipante.RECUSADO);
+        List<Desafio> desafios = desafioRepository.findCriadosOuPublicos(
+                usuarioId, EstadoDesafio.ATIVO, Visibilidade.PUBLICO);
         if (desafios.isEmpty()) {
             return List.of();
         }
 
+        return montarRespostas(desafios, usuarioId);
+    }
+
+    @Transactional(readOnly = true)
+    public DesafioResponseDTO findById(Long usuarioId, Long id) {
+        Desafio desafio = desafioRepository.findCriadoOuPublicoPorId(
+                id, usuarioId, EstadoDesafio.ATIVO, Visibilidade.PUBLICO)
+                .orElseThrow(this::desafioNaoEncontrado);
+
+        List<DesafioItem> itens = itemRepository.findAllByDesafioIdIn(List.of(id));
+        Map<Long, List<DesafioItem>> itensPorDesafio = itens.stream()
+                .collect(Collectors.groupingBy(DesafioItem::getDesafioId));
+
+        Set<Long> catalogoIds = itens.stream().map(DesafioItem::getCatalogoId).collect(Collectors.toSet());
+        Map<Long, CatalogoExercicio> catalogos = catalogoRepository.findAllById(catalogoIds).stream()
+                .collect(Collectors.toMap(CatalogoExercicio::getId, Function.identity()));
+
+        return DesafioMapper.toResponse(
+                desafio, itensPorDesafio.getOrDefault(id, List.of()), catalogos, usuarioId);
+    }
+
+    @Transactional
+    public DesafioResponseDTO update(Long usuarioId, Long id, DesafioRequestDTO request) {
+        Desafio desafio = desafioRepository.findByIdAndEstado(id, EstadoDesafio.ATIVO)
+                .orElseThrow(this::desafioNaoEncontrado);
+
+        if (!usuarioId.equals(desafio.getCriadorId())) {
+            throw new AcessoNegadoException(
+                    "DESAFIO_SOMENTE_CRIADOR", "Somente o criador pode atualizar o desafio");
+        }
+
+        validarPrazo(request.prazo());
+        desafio.atualizar(request.titulo().trim(), request.prazo(), request.descricao(), request.visibilidade());
+        desafioRepository.save(desafio);
+
+        List<DesafioItem> itens = itemRepository.findAllByDesafioIdIn(List.of(id));
+        Set<Long> catalogoIds = itens.stream().map(DesafioItem::getCatalogoId).collect(Collectors.toSet());
+        Map<Long, CatalogoExercicio> catalogos = catalogoRepository.findAllById(catalogoIds).stream()
+                .collect(Collectors.toMap(CatalogoExercicio::getId, Function.identity()));
+
+        return DesafioMapper.toResponse(desafio, itens, catalogos, usuarioId);
+    }
+
+    private List<DesafioResponseDTO> montarRespostas(List<Desafio> desafios, Long usuarioId) {
         List<Long> desafioIds = desafios.stream().map(Desafio::getId).toList();
         List<DesafioItem> todosItens = itemRepository.findAllByDesafioIdIn(desafioIds);
         Map<Long, List<DesafioItem>> itensPorDesafio = todosItens.stream()
