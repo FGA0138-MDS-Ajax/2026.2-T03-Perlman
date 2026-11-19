@@ -21,7 +21,6 @@ public class Desafio {
     @Column(nullable = false, length = 100)
     private String titulo;
 
-    // Último dia do desafio (inclusive), no fuso America/Sao_Paulo.
     @Column(nullable = false)
     private LocalDate prazo;
 
@@ -33,7 +32,6 @@ public class Desafio {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    // Só o Hibernate usa este construtor, por isso protected.
     protected Desafio() {
     }
 
