@@ -1,4 +1,4 @@
-CREATE TABLE desafio (
+CREATE TABLE IF NOT EXISTS desafio (
                          id BIGSERIAL PRIMARY KEY,
                          criador_id BIGINT REFERENCES usuario(id) ON DELETE SET NULL,
                          titulo VARCHAR(100) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE desafio (
                              CHECK (estado IN ('ATIVO', 'CANCELADO'))
 );
 
-CREATE TABLE desafio_item (
+CREATE TABLE IF NOT EXISTS desafio_item (
                               id BIGSERIAL PRIMARY KEY,
                               desafio_id BIGINT NOT NULL REFERENCES desafio(id) ON DELETE CASCADE,
                               catalogo_id BIGINT NOT NULL REFERENCES catalogo_exercicio(id),
@@ -37,7 +37,7 @@ CREATE TABLE desafio_item (
                                       OR meta_tempo_s IS NOT NULL OR meta_distancia_m IS NOT NULL)
 );
 
-CREATE TABLE desafio_participante (
+CREATE TABLE IF NOT EXISTS desafio_participante (
                                       id BIGSERIAL PRIMARY KEY,
                                       desafio_id BIGINT NOT NULL REFERENCES desafio(id) ON DELETE CASCADE,
                                       usuario_id BIGINT NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
@@ -50,5 +50,6 @@ CREATE TABLE desafio_participante (
                                           CHECK (estado IN ('CONVIDADO', 'ACEITO', 'RECUSADO'))
 );
 
-CREATE INDEX idx_desafio_participante_usuario
+CREATE INDEX IF NOT EXISTS idx_desafio_participante_usuario
     ON desafio_participante (usuario_id);
+
