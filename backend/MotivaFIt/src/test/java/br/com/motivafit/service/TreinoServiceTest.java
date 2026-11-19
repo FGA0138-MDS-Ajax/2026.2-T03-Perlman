@@ -188,7 +188,6 @@ class TreinoServiceTest {
         verify(repository, never()).save(any());
     }
 
-    // ---------- permissão: leitura = dono ou público | escrita = somente o dono ----------
 
     @Test
     void usuarioPodeVerTreinoPublicoDeOutroUsuario() {
@@ -202,7 +201,6 @@ class TreinoServiceTest {
     @Test
     void usuarioNaoAlteraTreinoPublicoDeOutroUsuario() {
         Treino publico = treinoPublicoDeOutroUsuario(TREINO_ID);
-        // A busca "dono OU público" encontraria o treino; a alteração não pode usá-la.
         stubOrigem(TREINO_ID, publico);
 
         assertThrows(NaoEncontradoException.class, () -> service.update(USUARIO_ID, TREINO_ID,
@@ -224,7 +222,6 @@ class TreinoServiceTest {
         verify(repository, never()).save(any());
     }
 
-    // ---------- adicionar (RF-04) ----------
 
     @Test
     void adicionaCopiaPrivadaDoTreinoPublicoDeOutroUsuarioComSeusExercicios() {
@@ -332,8 +329,6 @@ class TreinoServiceTest {
         verify(repository, never()).saveAndFlush(any());
         verifyNoInteractions(exercicioRepository);
     }
-
-    // ---------- auxiliares dos testes de permissão e de adicionar ----------
 
     private void stubOrigem(Long id, Treino treino) {
         when(repository.findByIdEUsuarioOuPublico(id, USUARIO_ID, Visibilidade.PUBLICO))
