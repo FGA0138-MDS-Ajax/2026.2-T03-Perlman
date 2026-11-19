@@ -36,6 +36,8 @@ Variáveis opcionais, com valor padrão no `docker-compose.yml`:
 | `COOKIE_SECURE` | Envio dos cookies somente por HTTPS | `false` |
 | `SUPERUSUARIO_EMAIL`, `SUPERUSUARIO_SENHA` | Conta de superusuário criada na inicialização | Definido no `docker-compose.yml` |
 
+`GOOGLE_CLIENT_ID`, sem valor padrão, é o ID do cliente OAuth do Google e só é necessária para o login com Google.
+
 ## Como executar
 
 ```bash
@@ -72,12 +74,15 @@ O `mvn verify` gera o relatório de cobertura em `target/site/jacoco/index.html`
 
 | Grupo | Rotas |
 | :-- | :-- |
-| Autenticação | `POST /api/auth/cadastro`, `/login`, `/refresh`, `/logout` |
+| Autenticação | `POST /api/auth/cadastro`, `/login`, `/google`, `/refresh`, `/logout` |
+| Conta | `GET /api/conta/exportacao`, `GET /api/conta/{id}`, `DELETE /api/conta/{id}` |
 | Catálogo de exercícios | `GET /api/catalogo-exercicios`, `GET /api/catalogo-exercicios/{id}` |
 | Catálogo (administração) | `POST`, `PUT /{id}` e `DELETE /{id}` em `/api/admin/catalogo-exercicios` |
 | Treinos | `GET`, `POST`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}` e `POST /{id}/adicionar` em `/api/treinos` |
 | Exercícios do treino | `GET`, `POST`, `PUT /{id}` e `DELETE /{id}` em `/api/treinos/{treinoId}/exercicios` |
-| Registros de execução | `GET` e `POST` em `/api/registros` |
+| Registros de execução | `GET`, `POST`, `GET /{id}`, `PUT /{id}` e `DELETE /{id}` em `/api/registros` |
+| Evolução pessoal | `GET /api/metricas/evolucao` |
+| Métricas administrativas | `GET` em `/api/admin/metricas/usuarios-ativos`, `/frequencia-media`, `/ranking-tempo-treino`, `/exercicios-mais-realizados`, `/rotinas` e `/retencao` |
 | Convites de administrador | `POST /api/admin/convites`, `POST /api/admin/convites/aceite` |
 
 Os detalhes de cada rota estão no Swagger UI. O guia de uso para o front-end está na [documentação do projeto](https://fga0138-mds-ajax.github.io/2026.2-T03-Perlman/produto/guia-api/).
@@ -95,4 +100,5 @@ Os detalhes de cada rota estão no Swagger UI. O guia de uso para o front-end es
 | `dto` | Objetos de requisição e resposta e seus mapeadores |
 | `security`, `config` | Autenticação, JWT, CORS e OpenAPI |
 | `exception` | Erros padronizados da API |
+| `metricas` | Período e agrupamento usados nas métricas |
 | `bootstrap` | Criação do superusuário e dos dados de demonstração |

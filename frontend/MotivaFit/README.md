@@ -74,8 +74,11 @@ O arquivo `.env.example` traz as duas variáveis. O back-end aceita por padrão 
 | `/realizar-treino` | Usuário logado | Página de treinos no modo de realização |
 | `/treinos/:treinoId/realizar` | Usuário logado | Realização de um treino |
 | `/historico` | Usuário logado | Histórico |
+| `/desafios` | Usuário logado | Desafios |
+| `/conta` | Usuário logado | Conta do usuário |
 | `/admin` | Administrador | Dashboard administrativo |
 | `/admin/treinos` | Administrador | Treinos (administração) |
+| `/admin/catalogo` | Administrador | Catálogo de exercícios |
 | `/admin/relatorios` | Administrador | Relatórios |
 | `/admin/superusuario` | Superusuário | Página do superusuário |
 
