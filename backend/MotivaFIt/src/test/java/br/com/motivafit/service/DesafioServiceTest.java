@@ -1,23 +1,30 @@
 package br.com.motivafit.service;
 
+import br.com.motivafit.dto.request.AdicionarParticipanteRequestDTO;
 import br.com.motivafit.dto.request.DesafioItemRequestDTO;
 import br.com.motivafit.dto.request.DesafioRequestDTO;
+import br.com.motivafit.dto.request.ParticipanteUpdateRequestDTO;
 import br.com.motivafit.dto.response.DesafioItemResponseDTO;
+import br.com.motivafit.dto.response.DesafioParticipanteResponseDTO;
 import br.com.motivafit.dto.response.DesafioResponseDTO;
 import br.com.motivafit.entity.CatalogoExercicio;
 import br.com.motivafit.entity.Desafio;
 import br.com.motivafit.entity.DesafioItem;
 import br.com.motivafit.entity.DesafioParticipante;
+import br.com.motivafit.entity.Usuario;
 import br.com.motivafit.enums.EstadoDesafio;
 import br.com.motivafit.enums.EstadoParticipante;
 import br.com.motivafit.enums.Modalidade;
+import br.com.motivafit.enums.Visibilidade;
 import br.com.motivafit.exception.AcessoNegadoException;
+import br.com.motivafit.exception.ConflitoException;
 import br.com.motivafit.exception.NaoEncontradoException;
 import br.com.motivafit.exception.RequisicaoInvalidaException;
 import br.com.motivafit.repository.CatalogoExercicioRepository;
 import br.com.motivafit.repository.DesafioItemRepository;
 import br.com.motivafit.repository.DesafioParticipanteRepository;
 import br.com.motivafit.repository.DesafioRepository;
+import br.com.motivafit.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,6 +51,7 @@ class DesafioServiceTest {
     private DesafioItemRepository itemRepository;
     private DesafioParticipanteRepository participanteRepository;
     private CatalogoExercicioRepository catalogoRepository;
+    private UsuarioRepository usuarioRepository;
     private DesafioService service;
 
     @BeforeEach
@@ -52,7 +60,8 @@ class DesafioServiceTest {
         itemRepository = mock(DesafioItemRepository.class);
         participanteRepository = mock(DesafioParticipanteRepository.class);
         catalogoRepository = mock(CatalogoExercicioRepository.class);
-        service = new DesafioService(desafioRepository, itemRepository, participanteRepository, catalogoRepository);
+        usuarioRepository = mock(UsuarioRepository.class);
+        service = new DesafioService(desafioRepository, itemRepository, participanteRepository, catalogoRepository, usuarioRepository);
     }
 
     @Test
@@ -190,14 +199,16 @@ class DesafioServiceTest {
     }
 
     @Test
-    void listaOsDesafiosDoUsuarioComSeusExercicios() {
+    void listaDesafiosCriadosPeloUsuarioEosPublicos() {
         CatalogoExercicio supino = catalogo(SUPINO_ID, "Supino reto", Modalidade.MUSCULACAO);
         CatalogoExercicio corrida = catalogo(CORRIDA_ID, "Corrida", Modalidade.AEROBICO);
         Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
-        Desafio deOutro = desafio(101L, OUTRO_USUARIO_ID);
-        Desafio semItens = desafio(102L, USUARIO_ID);
-        when(desafioRepository.findVisiveisDoUsuario(USUARIO_ID, EstadoDesafio.ATIVO, EstadoParticipante.RECUSADO))
-                .thenReturn(List.of(proprio, deOutro, semItens));
+        Desafio publicoDeOutro = desafioPublico(101L, OUTRO_USUARIO_ID);
+        Desafio privadoDeOutro = desafio(102L, OUTRO_USUARIO_ID);
+        Desafio semItens = desafio(103L, USUARIO_ID);
+
+        when(desafioRepository.findCriadosOuPublicos(USUARIO_ID, EstadoDesafio.ATIVO, Visibilidade.PUBLICO))
+                .thenReturn(List.of(proprio, publicoDeOutro, semItens));
         when(itemRepository.findAllByDesafioIdIn(any())).thenReturn(List.of(
                 item(1L, DESAFIO_ID, SUPINO_ID), item(2L, DESAFIO_ID, CORRIDA_ID), item(3L, 101L, SUPINO_ID)));
         when(catalogoRepository.findAllById(any())).thenReturn(List.of(supino, corrida));
@@ -213,17 +224,112 @@ class DesafioServiceTest {
         assertEquals(101L, response.get(1).id());
         assertFalse(response.get(1).souCriador());
         assertEquals(1, response.get(1).itens().size());
-        assertEquals(102L, response.get(2).id());
+        assertEquals(103L, response.get(2).id());
         assertTrue(response.get(2).itens().isEmpty());
     }
 
     @Test
-    void listaVaziaQuandoOUsuarioNaoParticipaDeNenhumDesafio() {
-        when(desafioRepository.findVisiveisDoUsuario(USUARIO_ID, EstadoDesafio.ATIVO, EstadoParticipante.RECUSADO))
+    void listaVaziaQuandoNaoHaDesafioVisivel() {
+        when(desafioRepository.findCriadosOuPublicos(USUARIO_ID, EstadoDesafio.ATIVO, Visibilidade.PUBLICO))
                 .thenReturn(List.of());
 
         assertTrue(service.findAll(USUARIO_ID).isEmpty());
         verifyNoInteractions(itemRepository, catalogoRepository);
+    }
+
+    @Test
+    void retornaDesafioPorIdQuandoCriadoPeloUsuario() {
+        CatalogoExercicio supino = catalogo(SUPINO_ID, "Supino reto", Modalidade.MUSCULACAO);
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+
+        when(desafioRepository.findCriadoOuPublicoPorId(DESAFIO_ID, USUARIO_ID, EstadoDesafio.ATIVO, Visibilidade.PUBLICO))
+                .thenReturn(Optional.of(proprio));
+        when(itemRepository.findAllByDesafioIdIn(List.of(DESAFIO_ID)))
+                .thenReturn(List.of(item(1L, DESAFIO_ID, SUPINO_ID)));
+        when(catalogoRepository.findAllById(any())).thenReturn(List.of(supino));
+
+        DesafioResponseDTO response = service.findById(USUARIO_ID, DESAFIO_ID);
+
+        assertEquals(DESAFIO_ID, response.id());
+        assertTrue(response.souCriador());
+        assertEquals(1, response.itens().size());
+    }
+
+    @Test
+    void retornaDesafioPublicoPorIdMesmoQueNaoSejaCriador() {
+        CatalogoExercicio supino = catalogo(SUPINO_ID, "Supino reto", Modalidade.MUSCULACAO);
+        Desafio publico = desafioPublico(DESAFIO_ID, OUTRO_USUARIO_ID);
+
+        when(desafioRepository.findCriadoOuPublicoPorId(DESAFIO_ID, USUARIO_ID, EstadoDesafio.ATIVO, Visibilidade.PUBLICO))
+                .thenReturn(Optional.of(publico));
+        when(itemRepository.findAllByDesafioIdIn(List.of(DESAFIO_ID)))
+                .thenReturn(List.of(item(1L, DESAFIO_ID, SUPINO_ID)));
+        when(catalogoRepository.findAllById(any())).thenReturn(List.of(supino));
+
+        DesafioResponseDTO response = service.findById(USUARIO_ID, DESAFIO_ID);
+
+        assertEquals(DESAFIO_ID, response.id());
+        assertFalse(response.souCriador());
+    }
+
+    @Test
+    void desafioPrivadoDeOutroUsuarioNaoEEncontrado() {
+        when(desafioRepository.findCriadoOuPublicoPorId(DESAFIO_ID, USUARIO_ID, EstadoDesafio.ATIVO, Visibilidade.PUBLICO))
+                .thenReturn(Optional.empty());
+
+        NaoEncontradoException erro = assertThrows(NaoEncontradoException.class,
+                () -> service.findById(USUARIO_ID, DESAFIO_ID));
+
+        assertEquals("DESAFIO_NAO_ENCONTRADO", erro.getCodigo());
+    }
+
+    @Test
+    void criadorAtualizaODesafio() {
+        CatalogoExercicio supino = catalogo(SUPINO_ID, "Supino reto", Modalidade.MUSCULACAO);
+        Desafio desafio = desafio(DESAFIO_ID, USUARIO_ID);
+        LocalDate novoPrazo = hoje().plusDays(20);
+
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(desafio));
+        when(desafioRepository.save(any())).thenReturn(desafio);
+        when(itemRepository.findAllByDesafioIdIn(List.of(DESAFIO_ID)))
+                .thenReturn(List.of(item(1L, DESAFIO_ID, SUPINO_ID)));
+        when(catalogoRepository.findAllById(any())).thenReturn(List.of(supino));
+
+        DesafioResponseDTO response = service.update(USUARIO_ID, DESAFIO_ID,
+                new DesafioRequestDTO("Novo título", novoPrazo, "Nova descrição", Visibilidade.PUBLICO, List.of()));
+
+        assertEquals("Novo título", response.titulo());
+        assertEquals(novoPrazo, response.prazo());
+        assertEquals("Nova descrição", response.descricao());
+        assertEquals(Visibilidade.PUBLICO, response.visibilidade());
+        assertEquals("Novo título", desafio.getTitulo());
+        assertEquals(novoPrazo, desafio.getPrazo());
+        assertEquals("Nova descrição", desafio.getDescricao());
+        assertEquals(Visibilidade.PUBLICO, desafio.getVisibilidade());
+    }
+
+    @Test
+    void naoCriadorNaoPodeAtualizar() {
+        Desafio desafio = desafio(DESAFIO_ID, OUTRO_USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(desafio));
+
+        AcessoNegadoException erro = assertThrows(AcessoNegadoException.class, () -> service.update(
+                USUARIO_ID, DESAFIO_ID,
+                new DesafioRequestDTO("Novo título", hoje().plusDays(5), List.of())));
+
+        assertEquals("DESAFIO_SOMENTE_CRIADOR", erro.getCodigo());
+        assertEquals(HttpStatus.FORBIDDEN, erro.getStatus());
+    }
+
+    @Test
+    void atualizarDesafioInexistenteGeraNaoEncontrado() {
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.empty());
+
+        NaoEncontradoException erro = assertThrows(NaoEncontradoException.class, () -> service.update(
+                USUARIO_ID, DESAFIO_ID,
+                new DesafioRequestDTO("Novo título", hoje().plusDays(5), List.of())));
+
+        assertEquals("DESAFIO_NAO_ENCONTRADO", erro.getCodigo());
     }
 
     @Test
@@ -353,6 +459,12 @@ class DesafioServiceTest {
         return desafio;
     }
 
+    private Desafio desafioPublico(Long id, Long criadorId) {
+        Desafio desafio = new Desafio(criadorId, "Desafio público", LocalDate.of(2026, 12, 15), "Descrição pública", Visibilidade.PUBLICO);
+        ReflectionTestUtils.setField(desafio, "id", id);
+        return desafio;
+    }
+
     private DesafioItem item(Long id, Long desafioId, Long catalogoId) {
         DesafioItem item = new DesafioItem();
         ReflectionTestUtils.setField(item, "id", id);
@@ -360,5 +472,224 @@ class DesafioServiceTest {
         item.setCatalogoId(catalogoId);
         item.setMetaRepeticoes(100);
         return item;
+    }
+
+    private DesafioParticipante participante(Long desafioId, Long usuarioId, EstadoParticipante estado) {
+        DesafioParticipante p = new DesafioParticipante();
+        p.setDesafioId(desafioId);
+        p.setUsuarioId(usuarioId);
+        p.setEstado(estado);
+        return p;
+    }
+
+    private Usuario usuario(Long id, String email) {
+        Usuario u = new Usuario();
+        ReflectionTestUtils.setField(u, "id", id);
+        u.setEmail(email);
+        return u;
+    }
+
+    // --- Testes de participantes ---
+
+    @Test
+    void listaParticipantesDoDesafio() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findCriadoOuPublicoPorId(DESAFIO_ID, USUARIO_ID, EstadoDesafio.ATIVO, Visibilidade.PUBLICO))
+                .thenReturn(Optional.of(proprio));
+
+        List<DesafioParticipante> participantes = List.of(
+                participante(DESAFIO_ID, USUARIO_ID, EstadoParticipante.ACEITO),
+                participante(DESAFIO_ID, OUTRO_USUARIO_ID, EstadoParticipante.CONVIDADO));
+        when(participanteRepository.findAllByDesafioId(DESAFIO_ID)).thenReturn(participantes);
+
+        when(usuarioRepository.findAllById(List.of(USUARIO_ID, OUTRO_USUARIO_ID)))
+                .thenReturn(List.of(usuario(USUARIO_ID, "eu@motivafit.com"), usuario(OUTRO_USUARIO_ID, "amigo@motivafit.com")));
+
+        List<DesafioParticipanteResponseDTO> response = service.findParticipantes(USUARIO_ID, DESAFIO_ID);
+
+        assertEquals(2, response.size());
+        assertEquals(USUARIO_ID, response.get(0).usuarioId());
+        assertEquals("eu@motivafit.com", response.get(0).email());
+        assertEquals(EstadoParticipante.ACEITO, response.get(0).estado());
+        assertEquals(OUTRO_USUARIO_ID, response.get(1).usuarioId());
+        assertEquals(EstadoParticipante.CONVIDADO, response.get(1).estado());
+    }
+
+    @Test
+    void listarParticipantesDesafioNaoVisivelGeraNaoEncontrado() {
+        when(desafioRepository.findCriadoOuPublicoPorId(DESAFIO_ID, USUARIO_ID, EstadoDesafio.ATIVO, Visibilidade.PUBLICO))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NaoEncontradoException.class, () -> service.findParticipantes(USUARIO_ID, DESAFIO_ID));
+    }
+
+    @Test
+    void criadorAdicionaParticipante() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, OUTRO_USUARIO_ID))
+                .thenReturn(Optional.empty());
+        when(usuarioRepository.findById(OUTRO_USUARIO_ID)).thenReturn(Optional.of(usuario(OUTRO_USUARIO_ID, "amigo@motivafit.com")));
+
+        DesafioParticipante salvo = participante(DESAFIO_ID, OUTRO_USUARIO_ID, EstadoParticipante.CONVIDADO);
+        when(participanteRepository.save(any(DesafioParticipante.class))).thenReturn(salvo);
+
+        DesafioParticipanteResponseDTO response = service.addParticipante(USUARIO_ID, DESAFIO_ID,
+                new AdicionarParticipanteRequestDTO(OUTRO_USUARIO_ID));
+
+        assertEquals(OUTRO_USUARIO_ID, response.usuarioId());
+        assertEquals("amigo@motivafit.com", response.email());
+        assertEquals(EstadoParticipante.CONVIDADO, response.estado());
+    }
+
+    @Test
+    void naoCriadorNaoPodeAdicionarParticipante() {
+        Desafio deOutro = desafio(DESAFIO_ID, OUTRO_USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(deOutro));
+
+        AcessoNegadoException erro = assertThrows(AcessoNegadoException.class, () -> service.addParticipante(
+                USUARIO_ID, DESAFIO_ID, new AdicionarParticipanteRequestDTO(99L)));
+
+        assertEquals("DESAFIO_SOMENTE_CRIADOR", erro.getCodigo());
+    }
+
+    @Test
+    void criadorNaoPodeSeAdicionar() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+
+        ConflitoException erro = assertThrows(ConflitoException.class, () -> service.addParticipante(
+                USUARIO_ID, DESAFIO_ID, new AdicionarParticipanteRequestDTO(USUARIO_ID)));
+
+        assertEquals("CRIADOR_JA_PARTICIPANTE", erro.getCodigo());
+    }
+
+    @Test
+    void participanteJaConvidadoGeraConflito() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, OUTRO_USUARIO_ID))
+                .thenReturn(Optional.of(participante(DESAFIO_ID, OUTRO_USUARIO_ID, EstadoParticipante.CONVIDADO)));
+
+        ConflitoException erro = assertThrows(ConflitoException.class, () -> service.addParticipante(
+                USUARIO_ID, DESAFIO_ID, new AdicionarParticipanteRequestDTO(OUTRO_USUARIO_ID)));
+
+        assertEquals("PARTICIPANTE_JA_EXISTE", erro.getCodigo());
+    }
+
+    @Test
+    void usuarioNaoEncontradoGeraNaoEncontrado() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, OUTRO_USUARIO_ID))
+                .thenReturn(Optional.empty());
+        when(usuarioRepository.findById(OUTRO_USUARIO_ID)).thenReturn(Optional.empty());
+
+        NaoEncontradoException erro = assertThrows(NaoEncontradoException.class, () -> service.addParticipante(
+                USUARIO_ID, DESAFIO_ID, new AdicionarParticipanteRequestDTO(OUTRO_USUARIO_ID)));
+
+        assertEquals("USUARIO_NAO_ENCONTRADO", erro.getCodigo());
+    }
+
+    @Test
+    void usuarioAceitaParticipacao() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+
+        DesafioParticipante participanteExistente = participante(DESAFIO_ID, USUARIO_ID, EstadoParticipante.CONVIDADO);
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, USUARIO_ID))
+                .thenReturn(Optional.of(participanteExistente));
+        when(participanteRepository.save(any(DesafioParticipante.class))).thenReturn(participanteExistente);
+        when(usuarioRepository.findById(USUARIO_ID)).thenReturn(Optional.of(usuario(USUARIO_ID, "eu@motivafit.com")));
+
+        DesafioParticipanteResponseDTO response = service.updateMinhaParticipacao(USUARIO_ID, DESAFIO_ID,
+                new ParticipanteUpdateRequestDTO(EstadoParticipante.ACEITO));
+
+        assertEquals(EstadoParticipante.ACEITO, response.estado());
+        assertEquals(EstadoParticipante.ACEITO, participanteExistente.getEstado());
+        assertNotNull(participanteExistente.getAceitoEm());
+    }
+
+    @Test
+    void usuarioRecusaParticipacao() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+
+        DesafioParticipante participanteExistente = participante(DESAFIO_ID, USUARIO_ID, EstadoParticipante.CONVIDADO);
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, USUARIO_ID))
+                .thenReturn(Optional.of(participanteExistente));
+        when(participanteRepository.save(any(DesafioParticipante.class))).thenReturn(participanteExistente);
+        when(usuarioRepository.findById(USUARIO_ID)).thenReturn(Optional.of(usuario(USUARIO_ID, "eu@motivafit.com")));
+
+        DesafioParticipanteResponseDTO response = service.updateMinhaParticipacao(USUARIO_ID, DESAFIO_ID,
+                new ParticipanteUpdateRequestDTO(EstadoParticipante.RECUSADO));
+
+        assertEquals(EstadoParticipante.RECUSADO, response.estado());
+    }
+
+    @Test
+    void naoParticipanteNaoPodeAtualizar() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, USUARIO_ID))
+                .thenReturn(Optional.empty());
+
+        NaoEncontradoException erro = assertThrows(NaoEncontradoException.class, () -> service.updateMinhaParticipacao(
+                USUARIO_ID, DESAFIO_ID, new ParticipanteUpdateRequestDTO(EstadoParticipante.ACEITO)));
+
+        assertEquals("NAO_PARTICIPANTE", erro.getCodigo());
+    }
+
+    @Test
+    void estadoInvalidoGeraRequisicaoInvalida() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, USUARIO_ID))
+                .thenReturn(Optional.of(participante(DESAFIO_ID, USUARIO_ID, EstadoParticipante.CONVIDADO)));
+
+        // CONVIDADO não é um estado válido para update — só ACEITO ou RECUSADO
+        RequisicaoInvalidaException erro = assertThrows(RequisicaoInvalidaException.class, () -> service.updateMinhaParticipacao(
+                USUARIO_ID, DESAFIO_ID, new ParticipanteUpdateRequestDTO(EstadoParticipante.CONVIDADO)));
+
+        assertEquals("ESTADO_INVALIDO", erro.getCodigo());
+    }
+
+    @Test
+    void participanteSaiDoDesafio() {
+        Desafio deOutro = desafio(DESAFIO_ID, OUTRO_USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(deOutro));
+
+        DesafioParticipante participanteExistente = participante(DESAFIO_ID, USUARIO_ID, EstadoParticipante.ACEITO);
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, USUARIO_ID))
+                .thenReturn(Optional.of(participanteExistente));
+
+        service.deleteMinhaParticipacao(USUARIO_ID, DESAFIO_ID);
+
+        verify(participanteRepository).delete(participanteExistente);
+    }
+
+    @Test
+    void criadorNaoPodeSairDoDesafio() {
+        Desafio proprio = desafio(DESAFIO_ID, USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(proprio));
+
+        AcessoNegadoException erro = assertThrows(AcessoNegadoException.class,
+                () -> service.deleteMinhaParticipacao(USUARIO_ID, DESAFIO_ID));
+
+        assertEquals("CRIADOR_NAO_SAI", erro.getCodigo());
+        verify(participanteRepository, never()).delete(any());
+    }
+
+    @Test
+    void naoParticipanteNaoPodeSair() {
+        Desafio deOutro = desafio(DESAFIO_ID, OUTRO_USUARIO_ID);
+        when(desafioRepository.findByIdAndEstado(DESAFIO_ID, EstadoDesafio.ATIVO)).thenReturn(Optional.of(deOutro));
+        when(participanteRepository.findByDesafioIdAndUsuarioId(DESAFIO_ID, USUARIO_ID))
+                .thenReturn(Optional.empty());
+
+        NaoEncontradoException erro = assertThrows(NaoEncontradoException.class,
+                () -> service.deleteMinhaParticipacao(USUARIO_ID, DESAFIO_ID));
+
+        assertEquals("NAO_PARTICIPANTE", erro.getCodigo());
     }
 }
