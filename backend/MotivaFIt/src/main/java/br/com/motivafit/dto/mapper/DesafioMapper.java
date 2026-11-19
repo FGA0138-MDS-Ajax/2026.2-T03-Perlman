@@ -21,6 +21,8 @@ public final class DesafioMapper {
                 desafio.getId(),
                 desafio.getTitulo(),
                 desafio.getPrazo(),
+                desafio.getDescricao(),
+                desafio.getVisibilidade(),
                 desafio.getEstado(),
                 usuarioId.equals(desafio.getCriadorId()),
                 itens.stream().map(item -> toItemResponse(item, catalogos.get(item.getCatalogoId()))).toList()
