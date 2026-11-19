@@ -14,6 +14,7 @@ import PaginaRealizarTreino from "./pages-user/pagina-realizar-treino";
 import PaginaHistorico from "./pages-user/pagina-historico";
 import PaginaTermosDeUso from "@/pages-user/pagina-termos-de-uso";
 import PaginaDesafios from "@/pages-user/pagina-desafios";
+import PaginaComunidade from "@/pages-user/pagina-comunidade";
 import PaginaConta from "@/pages-user/pagina-conta";
 import PaginaCatalogoAdmin from "@/pages-admin/pagina-catalogo-admin";
 
@@ -90,6 +91,10 @@ function App() {
                                     <PaginaDesafios />
                                 </RotaProtegida>
                             }
+                        />
+                        <Route
+                            path="/comunidade"
+                            element={<RotaProtegida><PaginaComunidade /></RotaProtegida>}
                         />
                         <Route
                             path="/conta"
