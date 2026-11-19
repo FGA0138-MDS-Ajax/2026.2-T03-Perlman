@@ -1,6 +1,7 @@
 package br.com.motivafit.entity;
 
 import br.com.motivafit.enums.EstadoDesafio;
+import br.com.motivafit.enums.Visibilidade;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -24,6 +25,13 @@ public class Desafio {
     @Column(nullable = false)
     private LocalDate prazo;
 
+    @Column(length = 1000)
+    private String descricao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Visibilidade visibilidade = Visibilidade.PRIVADO;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoDesafio estado = EstadoDesafio.ATIVO;
@@ -36,13 +44,26 @@ public class Desafio {
     }
 
     public Desafio(Long criadorId, String titulo, LocalDate prazo) {
+        this(criadorId, titulo, prazo, null, Visibilidade.PRIVADO);
+    }
+
+    public Desafio(Long criadorId, String titulo, LocalDate prazo, String descricao, Visibilidade visibilidade) {
         this.criadorId = criadorId;
         this.titulo = titulo;
         this.prazo = prazo;
+        this.descricao = descricao;
+        this.visibilidade = visibilidade;
     }
 
     public void cancelar() {
         this.estado = EstadoDesafio.CANCELADO;
+    }
+
+    public void atualizar(String titulo, LocalDate prazo, String descricao, Visibilidade visibilidade) {
+        this.titulo = titulo;
+        this.prazo = prazo;
+        this.descricao = descricao;
+        this.visibilidade = visibilidade;
     }
 
     public Long getId() {
@@ -59,6 +80,14 @@ public class Desafio {
 
     public LocalDate getPrazo() {
         return prazo;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public Visibilidade getVisibilidade() {
+        return visibilidade;
     }
 
     public EstadoDesafio getEstado() {
