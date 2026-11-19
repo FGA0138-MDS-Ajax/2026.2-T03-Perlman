@@ -21,7 +21,7 @@ O diagrama de Ishikawa organiza possíveis causas de um problema em categorias, 
 - **Ausência de engajamento:** treinos monótonos, tédio e falta de incentivo social. Origina as conquistas (RF-22) e a submissão de desafios (RF-18).
 - **Falta de percepção de evolução:** dificuldade em perceber resultados rápidos. Origina o acompanhamento de métricas (RF-12).
 
-![Figura 2 – Diagrama de Ishikawa: efeito ](../assets/img/visao-fig2-ishikawa.png)
+![Figura 2 – Diagrama de Ishikawa: efeito ](../produto/imgs/ishkawa.jpeg)
 
 *Figura 2 – Diagrama de Ishikawa. Fonte: elaborado pelos autores (2026), utilizando a técnica de causa e efeito descrita pela ASQ [12].*
 

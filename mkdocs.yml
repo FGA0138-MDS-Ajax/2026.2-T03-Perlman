@@ -100,6 +100,7 @@ nav:
   - Arquitetura:
       - Documento de Arquitetura: produto/arquitetura.md
       - Guia da API: produto/guia-api.md
+      - Como Rodar o Projeto: produto/como-rodar.md
   - Produto:
       - Sobre o Documento: produto/sobre-documento.md
       - Visão Geral: produto/visao-geral.md
@@ -115,4 +116,6 @@ nav:
       - Estratégia de Testes: testes/estrategia.md
       - Roteiro de Teste: testes/roteiro.md
       - Relatório de Testes da API: testes/relatorio-testes-api.md
+      - Relatório Detalhado dos Testes da API: testes/Relatório de feedback — testes da API MotivaFit.md
+      - Registro de Testes de Fumaça: testes/Registro de testes de fumaça da API.md
   - Referências: referencias.md

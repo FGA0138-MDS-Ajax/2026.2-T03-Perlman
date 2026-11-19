@@ -8,7 +8,7 @@ A Figura 3 mostra o fluxo de trabalho no nível de gestão das entregas. Os requ
 
 A etapa Review & Retro reúne a avaliação da entrega e a reflexão sobre o processo. A Review verifica o resultado com os interessados; a Retrospectiva orienta ajustes para o próximo ciclo. O incremento corresponde à parte concluída do produto. Os itens pendentes ou as novas necessidades retornam ao planejamento das próximas Sprints [5].
 
-![Figura 3 – Fluxo de trabalho: Product Backlog, Sprint Planning, Sprint Backlog, Sprint (1 semana), Review & Retro, Incremento](../assets/img/visao-fig3-fluxo-de-trabalho.png)
+![Figura 3 – Fluxo de trabalho: Product Backlog, Sprint Planning, Sprint Backlog, Sprint (1 semana), Review & Retro, Incremento](../produto/imgs/fluxo_de_trabalho.jpeg)
 
 *Figura 3 – Fluxo de trabalho do projeto. Fonte: elaborado pelos autores (2026), com base no Guia do Scrum [5].*
 

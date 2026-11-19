@@ -2,7 +2,7 @@
 
 Métricas de acompanhamento do processo da equipe, calculadas a partir das atas de reunião e conferidas com o repositório (commits, Pull Requests e branches).
 
-**Data da medição:** 09/11/2026 · **Período:** Sprints 1 a 7 (22/09 a 08/11/2026)
+**Data da medição:** P1 a P5 em 09/11/2026, com base nas atas nº 1 a 7 (a última é de 04/11); P6 atualizado em 18/11/2026 com o repositório · **Período:** Sprints 1 a 9 (22/09 a 18/11/2026)
 
 ## Resumo
 
@@ -13,8 +13,7 @@ Métricas de acompanhamento do processo da equipe, calculadas a partir das atas 
 | Confiabilidade dos status registrados | **57%** das conclusões declaradas tinham evidência na data |
 | Encaminhamentos com prazo definido | **59%** (19 de 32) |
 | Sprints com reunião registrada | **5 de 7** |
-| Atraso médio das entregas em relação ao cronograma | **2,6 sprints** |
-| Pull Requests com revisão de código | **0%** (0 de 13) |
+| Atraso médio das entregas em relação ao cronograma | **2,6 sprints** (9 entregas) |
 
 ## P1 — Taxa de conclusão dos encaminhamentos
 
@@ -102,10 +101,12 @@ Sem prazo, não é possível medir atraso. A ata nº 6 não definiu prazo para n
 | Gerenciamento e registro de exercícios | 4 | 05/11 | 7 | +3 |
 | MVP integrado (back-end e front-end) | 4 | 06/11 | 7 | +3 |
 | Métricas do usuário (indicadores no front-end) | 5 | 06/11 | 7 | +2 |
-| Painel administrativo (frequência média e ranking) | 5 e 6 | — | Não iniciado no back-end | ≥ +2 |
-| Exercícios mais realizados e desafios | 7 | — | Não iniciado | — |
+| Painel administrativo (frequência média e ranking) | 6 | 17/11 | 9 | +3 |
+| Exercícios mais realizados | 7 | 17/11 | 9 | +2 |
+| Desafios | 7 | 16/11 | — | Somente no front-end, sem back-end |
+| Login com Google (opcional) | 9 | 18/11 | — | Somente no back-end; a tela ainda não chama a API |
 
-**Resultado:** entre as 7 entregas concluídas, o desvio médio é de 18 ÷ 7 = **2,6 sprints**. Restam 3 sprints (8 a 10) para as entregas das Sprints 5 a 9 que ainda não começaram.
+**Resultado:** entre as 9 entregas concluídas, o desvio médio é de 23 ÷ 9 = **2,6 sprints**. O endpoint de evolução pessoal (`GET /api/metricas/evolucao`) existe no back-end desde 17/11, mas nenhuma tela do usuário o consome ainda. Restam a Sprint 9 (em andamento) e a Sprint 10 para recorde pessoal, feed, streak e conquistas, que ainda não foram iniciados.
 
 
 

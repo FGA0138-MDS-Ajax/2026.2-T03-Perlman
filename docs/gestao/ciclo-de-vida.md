@@ -8,7 +8,7 @@ O projeto adotará metodologias ágeis baseadas no framework Scrum, com iteraç�
 
 A Figura 1 apresenta a sequência adotada: o Product Backlog reúne as necessidades do produto; na Sprint Planning, a equipe seleciona os itens e define o Sprint Backlog. A execução ocorre em uma Sprint de uma semana. Ao final, a Review avalia a entrega com os interessados e a Retrospectiva identifica melhorias no processo. O incremento representa a funcionalidade concluída que amplia o produto. Embora a imagem apresente uma sequência linear, o processo é repetido a cada Sprint, com atualização do backlog e incorporação das melhorias identificadas [5].
 
-![Figura 1 – Ciclo de vida do projeto: Pair Programming, Commit, Code Review (PR), Merge e Deploy](../assets/img/visao-fig1-ciclo-de-vida.png)
+![Figura 1 – Ciclo de vida do projeto: Pair Programming, Commit, Code Review (PR), Merge e Deploy](../produto/imgs/ciclo_de_vida.jpeg)
 
 *Figura 1 – Ciclo de vida do projeto. Fonte: elaborado pelos autores (2026), com base no Guia do Scrum [5].*
 

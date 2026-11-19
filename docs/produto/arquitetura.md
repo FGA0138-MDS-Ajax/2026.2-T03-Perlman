@@ -3,6 +3,8 @@
 **Universidade de Brasília · Grupo Perlman — T03**  
 **Versão 1.7 — Revisada · Brasília, 2026**
 
+Versão em PDF: [documento_de_arquitetura_v1.7.pdf](versoes/documento_de_arquitetura_v1.7.pdf)
+
 > Documento de arquitetura do produto MotivaFit, elaborado pelo Grupo Perlman — T03, Universidade de Brasília, na disciplina de Métodos de Desenvolvimento de Software (MDS).
 
 ## Integrantes da equipe
