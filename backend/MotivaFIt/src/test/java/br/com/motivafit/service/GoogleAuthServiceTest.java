@@ -30,7 +30,7 @@ class GoogleAuthServiceTest {
         repository = mock(UsuarioRepository.class);
         encoder = mock(PasswordEncoder.class);
         loginService = mock(LoginService.class);
-        service = new GoogleAuthService(repository, encoder, loginService, "test-client-id");
+        service = spy(new GoogleAuthService(repository, encoder, loginService, "test-client-id"));
     }
 
     @Test
@@ -38,7 +38,7 @@ class GoogleAuthServiceTest {
         GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
         when(payload.getEmail()).thenReturn("novo@gmail.com");
         when(payload.getEmailVerified()).thenReturn(true);
-        when(service.validarGoogleIdToken(anyString())).thenReturn(payload);
+        doReturn(payload).when(service).validarGoogleIdToken("token");
 
         Usuario novo = new Usuario();
         novo.setId(2L);
@@ -64,7 +64,7 @@ class GoogleAuthServiceTest {
     void loginRetornaExistente() {
         GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
         when(payload.getEmail()).thenReturn("existente@gmail.com");
-        when(service.validarGoogleIdToken(anyString())).thenReturn(payload);
+        doReturn(payload).when(service).validarGoogleIdToken("token");
 
         Usuario existente = new Usuario();
         existente.setId(1L);
@@ -88,7 +88,7 @@ class GoogleAuthServiceTest {
     void loginRejeitaContaInativa() {
         GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
         when(payload.getEmail()).thenReturn("inativo@gmail.com");
-        when(service.validarGoogleIdToken(anyString())).thenReturn(payload);
+        doReturn(payload).when(service).validarGoogleIdToken("token");
 
         Usuario inativo = new Usuario();
         inativo.setId(1L);
@@ -103,7 +103,7 @@ class GoogleAuthServiceTest {
     void loginRejeitaEmailNulo() {
         GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
         when(payload.getEmail()).thenReturn(null);
-        when(service.validarGoogleIdToken(anyString())).thenReturn(payload);
+        doReturn(payload).when(service).validarGoogleIdToken("token");
 
         assertThrows(NaoAutorizadoException.class, () -> service.login(new GoogleLoginRequestDTO("token")));
     }

@@ -37,7 +37,7 @@ class CatalogoExercicioAdminServiceTest {
         when(repository.save(any(CatalogoExercicio.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         CatalogoExercicioResponseDTO response = service.create(
-                new CatalogoExercicioRequestDTO("  Remada cavalinho ", Modalidade.MUSCULACAO, " Costas "));
+                new CatalogoExercicioRequestDTO("  Remada cavalinho ", Modalidade.MUSCULACAO, " Costas ", "data:image/png;base64,remada"));
 
         ArgumentCaptor<CatalogoExercicio> captor = ArgumentCaptor.forClass(CatalogoExercicio.class);
         verify(repository).save(captor.capture());
@@ -54,7 +54,7 @@ class CatalogoExercicioAdminServiceTest {
         when(repository.existsByNomeIgnoreCase("Supino reto")).thenReturn(true);
 
         ConflitoException erro = assertThrows(ConflitoException.class, () -> service.create(
-                new CatalogoExercicioRequestDTO("Supino reto", Modalidade.MUSCULACAO, "Peito")));
+                new CatalogoExercicioRequestDTO("Supino reto", Modalidade.MUSCULACAO, "Peito", "data:image/png;base64,supino")));
 
         assertEquals("EXERCICIO_JA_CADASTRADO", erro.getCodigo());
         assertEquals("Já existe um exercício com esse nome", erro.getMessage());
@@ -70,7 +70,7 @@ class CatalogoExercicioAdminServiceTest {
         when(repository.save(existente)).thenReturn(existente);
 
         CatalogoExercicioResponseDTO response = service.update(ID,
-                new CatalogoExercicioRequestDTO(" Stiff ", Modalidade.MUSCULACAO, "Posterior de coxa"));
+                new CatalogoExercicioRequestDTO(" Stiff ", Modalidade.MUSCULACAO, "Posterior de coxa", "data:image/png;base64,stiff"));
 
         assertEquals(ID, response.id());
         assertEquals("Stiff", response.nome());
@@ -97,7 +97,7 @@ class CatalogoExercicioAdminServiceTest {
         when(repository.existsByNomeIgnoreCaseAndIdNot("Supino reto", ID)).thenReturn(true);
 
         assertThrows(ConflitoException.class, () -> service.update(ID,
-                new CatalogoExercicioRequestDTO("Supino reto", Modalidade.MUSCULACAO, "Peito")));
+                new CatalogoExercicioRequestDTO("Supino reto", Modalidade.MUSCULACAO, "Peito", "data:image/png;base64,supino")));
 
         assertEquals("Corrida", existente.getNome());
         verify(repository, never()).save(any());
