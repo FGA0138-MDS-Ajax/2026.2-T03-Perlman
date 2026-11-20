@@ -23,7 +23,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("MotivaFit API")
                         .version("1.0.0")
-                        .description("API REST do MotivaFit. Atualmente estão disponíveis cadastro e autenticação por e-mail e senha, renovação rotativa de sessão e logout. "
+                        .description("API REST do MotivaFit. Atualmente estão disponíveis cadastro e autenticação por e-mail e senha, renovação rotativa de sessão, amizades, desafios, grupos e logout. "
                                 + "O token de acesso JWT é retornado no corpo da resposta e tem validade configurável por JWT_EXPIRATION_MINUTES (15 minutos por padrão). "
                                 + "O refresh token opaco é entregue em cookie HttpOnly, Secure e SameSite=Lax, com validade configurável por JWT_REFRESH_EXPIRATION_DAYS (7 dias por padrão). "
                                 + "Refresh e logout exigem o cookie csrfToken, o cabeçalho X-CSRF-TOKEN com o mesmo valor e o cabeçalho Origin correspondente a CORS_ALLOWED_ORIGIN.")
