@@ -63,7 +63,7 @@ public class GoogleAuthService {
         GoogleIdToken token;
         try {
             token = verifier.verify(idTokenString);
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (GeneralSecurityException | IOException | IllegalArgumentException e) {
             throw new NaoAutorizadoException("GOOGLE_TOKEN_INVALIDO", "Token do Google inválido");
         }
         if (token == null) {
