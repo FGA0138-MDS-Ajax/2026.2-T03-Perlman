@@ -70,5 +70,5 @@ O site fica disponível em `http://127.0.0.1:8000/`.
 - [Arquitetura](produto/arquitetura.md): representação arquitetural, visões, decisões técnicas, guia da API para o front-end e como rodar o projeto.
 - [Produto](produto/visao-geral.md): visão do produto, escopo, perfis, cenários, backlog e rastreabilidade.
 - [Métricas](metricas/gqm.md): quadro GQM, valores medidos e métricas do processo.
-- [Testes](testes/estrategia.md): estratégia de testes, roteiro de teste, relatórios dos testes da API e registro de testes de fumaça.
+- [Testes](testes/estrategia.md): estratégia de testes, roteiro de teste, relatórios dos testes da API, registro de testes de fumaça e relatório de integração do Painel Admin.
 - [Referências](referencias.md): fontes citadas nos documentos.

@@ -70,7 +70,7 @@ O defeito do ponto 1 foi o único identificado nesta rodada e está corrigido.
 
 ## Próximos passos
 
-1. Repetir o fluxo de cadastro, login e criação de treino **pela tela do front-end**, conferindo as requisições na aba Network.
+1. Repetir o fluxo de cadastro, login e criação de treino **pela tela do front-end**, conferindo as requisições na aba Network. O login e as telas administrativas já foram testados pela interface em 19/11 ([Relatório de Integração do Painel Admin](relatorio-integracao-admin.md)); falta o fluxo do usuário comum.
 2. Executar os casos de fumaça ainda não cobertos (`SMK-03`, `SMK-07`, `SMK-08` e `SMK-09`) e preencher o resultado do registro.
 3. Comprovar o cadastro duplicado (esperado 409) e a listagem de treinos depois da criação.
 4. Registrar os resultados no [Roteiro de Teste](roteiro.md), associando-os aos casos T1 a T22.

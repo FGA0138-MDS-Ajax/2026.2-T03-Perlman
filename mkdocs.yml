@@ -120,4 +120,5 @@ nav:
       - Relatório de Testes da API: testes/relatorio-testes-api.md
       - Relatório Detalhado dos Testes da API: testes/Relatório de feedback — testes da API MotivaFit.md
       - Registro de Testes de Fumaça: testes/Registro de testes de fumaça da API.md
+      - Relatório de Integração do Painel Admin: testes/relatorio-integracao-admin.md
   - Referências: referencias.md
