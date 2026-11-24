@@ -1,11 +1,12 @@
 # MotivaFit — API para o front-end
 
-O que já está pronto no back-end e como usar cada endpoint. Atualizado em 18/11/2026 a partir das anotações OpenAPI do código (branch `developer`, commit `8d27ae3`). A primeira versão deste guia é de 27/10/2026 (API v1.0.0).
+O que já está pronto no back-end e como usar cada endpoint. Atualizado em 23/11/2026 a partir das anotações OpenAPI do código (branches `feature/backend/integracao-front` e `feature/frontend/integracao-backend`, a serem integradas à `developer`). A primeira versão deste guia é de 27/10/2026 (API v1.0.0).
 
 ## Resumo
 
-- **Já funciona:** cadastro, login com e-mail e senha ou com Google, logout e renovação de sessão; catálogo de exercícios; treinos próprios e públicos, com cópia de treino público; exercícios dentro do treino; registro de execução e histórico; evolução pessoal; métricas administrativas; consulta, exportação e exclusão de conta; convites de administrador.
-- **Ainda não existe no back-end:** desafios, recordes calculados, conquistas e streak.
+- **Já funciona:** cadastro, login com e-mail e senha ou com Google, logout e renovação de sessão; preferências de tema da conta; busca de conta por e-mail; catálogo de exercícios; treinos próprios e públicos, com cópia de treino público; exercícios dentro do treino; registro de execução e histórico; evolução pessoal; amizades; desafios com metas, convites, participação e progresso; grupos com membros, convites e feed; métricas administrativas agregadas; consulta e exclusão da própria conta; convites de administrador.
+- **Ainda não existe no back-end:** recordes calculados, conquistas, streak e chat de desafios (fora do escopo).
+- **Privacidade:** nenhuma rota lista contas ou dados de outras pessoas para a administração. A antiga `GET /api/conta/exportacao` foi removida; o painel administrativo usa apenas métricas agregadas.
 - **Base URL local:** `http://localhost:8080`. Todo corpo é JSON (`Content-Type: application/json`).
 - IDs são números; datas vêm em ISO 8601; valores fixos (enums) são em maiúsculas, como `MUSCULACAO`, `AEROBICO`, `PRIVADO` e `PUBLICO`.
 - A documentação interativa fica em `http://localhost:8080/swagger-ui.html`, e a especificação OpenAPI, em `http://localhost:8080/v3/api-docs`.
@@ -39,8 +40,8 @@ const { token, expirationAt } = await res.json();
 
 | Perfil | Pode acessar |
 | :-- | :-- |
-| `USUARIO` | Rotas autenticadas do próprio usuário: treinos, exercícios do treino, registros, evolução e a própria conta |
-| `ADMINISTRADOR` | Tudo do usuário, mais a manutenção do catálogo, as métricas administrativas e a exportação e consulta de contas |
+| `USUARIO` | Rotas autenticadas do próprio usuário: treinos, exercícios do treino, registros, evolução, preferências, amizades, desafios, grupos e a própria conta |
+| `ADMINISTRADOR` | Tudo do usuário, mais a manutenção do catálogo, as métricas administrativas agregadas e a consulta de conta por id |
 | `SUPERUSUARIO` | Tudo do administrador, mais a criação de convites de administrador |
 
 ## Formato dos erros
@@ -60,9 +61,12 @@ Todo erro vem neste formato, e o `codigo` é estável (dá para tratar no front)
 | 400 | Dados ou parâmetros inválidos. |
 | 401 | Sem token, token expirado/inválido, login errado ou refresh inválido. |
 | 403 | Perfil sem permissão ou Origin/CSRF errado (refresh e logout). |
-| 404 | Não encontrado. Recursos de outro usuário são tratados como inexistentes. |
-| 409 | Conflito: e-mail já cadastrado, nome de exercício repetido, treino que já é do usuário ou convite pendente para o mesmo e-mail. |
-| 500 | Erro interno. |
+| 404 | Não encontrado, inclusive rota inexistente (`ROTA_NAO_ENCONTRADA`). Recursos de outro usuário são tratados como inexistentes. |
+| 405 | Método HTTP não suportado na rota (`METODO_NAO_SUPORTADO`). |
+| 409 | Conflito: e-mail já cadastrado, nome de exercício repetido, treino que já é do usuário, participante ou membro repetido ou convite pendente. |
+| 500 | Erro interno inesperado. A resposta não traz detalhes; a causa fica registrada no log do back-end. |
+
+Parâmetro obrigatório ausente na URL responde 400 com `PARAMETRO_OBRIGATORIO`.
 
 ## Autenticação
 
@@ -135,7 +139,7 @@ Faz login com o ID Token do Google OAuth 2.0. Se o e-mail ainda não estiver cad
 
 **Erros:** 400 (token do Google inválido), 401 (token do Google inválido ou conta inativa).
 
-**Dica:** o back-end precisa da variável `GOOGLE_CLIENT_ID` configurada.
+**Dica:** o back-end precisa da variável `GOOGLE_CLIENT_ID`, e o front, de `VITE_GOOGLE_CLIENT_ID` com o mesmo valor (no build). Sem ela, o front não mostra o botão do Google.
 
 ### `POST /api/auth/refresh`
 
@@ -178,11 +182,25 @@ Precisa do header `Authorization: Bearer <token>`.
 
 | Rota | O que faz | Acesso | Sucesso | Erros |
 | :-- | :-- | :-- | :-: | :-- |
-| `GET /api/conta/exportacao` | Lista todas as contas cadastradas | `ADMINISTRADOR` ou `SUPERUSUARIO` | 200 | 401, 403 |
 | `GET /api/conta/{id}` | Retorna os dados de uma conta | A própria conta, ou `ADMINISTRADOR` e `SUPERUSUARIO` | 200 | 401, 403, 404 |
 | `DELETE /api/conta/{id}` | Exclui a conta | A própria conta, ou `ADMINISTRADOR` e `SUPERUSUARIO` | 204 | 401, 403, 404 |
 
 As respostas usam o mesmo formato do cadastro: `id`, `email`, `perfil` e `ativo`.
+
+## Usuários: preferências e busca
+
+Precisa do header `Authorization: Bearer <token>`.
+
+| Rota | O que faz | Sucesso | Erros |
+| :-- | :-- | :-: | :-- |
+| `GET /api/usuarios/me/preferencias` | Tema da conta logada (`light`, `dark` ou `system`; padrão `system`) | 200 | 401 |
+| `PUT /api/usuarios/me/preferencias` | Grava o tema. Corpo: `{ "tema": "dark" }` | 200 | 400, 401 |
+| `GET /api/usuarios/busca?email=` | Localiza outra conta ativa pelo e-mail **exato** (sem diferenciar maiúsculas). Resposta: `{ "id": 15, "email": "amigo@motivafit.com" }` | 200 | 400, 401, 404 |
+
+**Dicas:**
+
+- A busca não é parcial, para não expor a lista de e-mails, e não retorna a própria conta (404). Use-a antes de enviar amizade ou convites, que exigem o `id`.
+- O tema fica na conta, não no navegador: o front não usa `localStorage` para isso.
 
 ## Catálogo de exercícios
 
@@ -457,24 +475,105 @@ Agrupa os registros do usuário logado em uma série ao longo do tempo.
 
 **Dica:** o pace é calculado em segundos por quilômetro. O período pode ter no máximo 366 dias.
 
+## Amizades
+
+Precisa do header `Authorization: Bearer <token>`.
+
+| Rota | O que faz | Sucesso | Erros |
+| :-- | :-- | :-: | :-- |
+| `GET /api/amizades` | Lista as amizades do usuário (pendentes, aceitas e recusadas) | 200 | 401 |
+| `POST /api/amizades` | Envia uma solicitação. Corpo: `{ "destinatarioId": 15 }` | 201 | 400, 401, 404, 409 |
+| `PATCH /api/amizades/{id}` | O destinatário aceita ou recusa. Corpo: `{ "estado": "ACEITA" }` ou `"RECUSADA"` | 200 | 400, 401, 403, 404 |
+| `DELETE /api/amizades/{id}` | Cancela uma solicitação enviada ou desfaz uma amizade | 204 | 401, 403, 404 |
+
+**Resposta:** `id`, `solicitanteId`, `solicitanteEmail`, `destinatarioId`, `destinatarioEmail`, `estado`, `criadoEm` e `atualizadoEm`.
+
+**Dica:** para saber quem é o amigo, compare `solicitanteId` com o id do usuário logado; a outra ponta é o amigo.
+
+## Desafios
+
+Precisa do header `Authorization: Bearer <token>`. Um desafio tem título, prazo (último dia, inclusive, no fuso `America/Sao_Paulo`), visibilidade e de 1 a 20 exercícios do catálogo, cada um com metas.
+
+| Rota | O que faz | Sucesso | Erros |
+| :-- | :-- | :-: | :-- |
+| `GET /api/desafios` | Desafios ativos visíveis: criados pelo usuário, públicos e aqueles em que ele participa ou foi convidado (exceto convites recusados), do prazo mais próximo ao mais distante | 200 | 401 |
+| `POST /api/desafios` | Cria o desafio; o criador já participa | 201 | 400, 401, 404 |
+| `GET /api/desafios/{id}` | Um desafio visível | 200 | 401, 404 |
+| `PUT /api/desafios/{id}` | Altera título, descrição, prazo, visibilidade e itens. Os itens enviados substituem os anteriores; sem `visibilidade`, ela não muda | 200 | 400, 401, 403, 404 |
+| `DELETE /api/desafios/{id}` | Cancela (só o criador). Registros de execução são preservados | 204 | 401, 403, 404 |
+| `GET /api/desafios/{id}/participantes` | Participantes com `usuarioId`, `email`, `estado` (`CONVIDADO`, `ACEITO`, `RECUSADO`) e `aceitoEm` | 200 | 401, 404 |
+| `POST /api/desafios/{id}/participantes` | O criador convida. Corpo: `{ "usuarioId": 15 }` | 201 | 400, 401, 403, 404, 409 |
+| `POST /api/desafios/{id}/participantes/me` | Entra em um desafio **público**. Um convite pendente ou recusado vira participação aceita | 201 | 401, 404 (desafio privado ou inexistente), 409 (já participa) |
+| `PATCH /api/desafios/{id}/participantes/me` | O convidado aceita ou recusa. Corpo: `{ "estado": "ACEITO" }` ou `"RECUSADO"` | 200 | 400, 401, 404 |
+| `DELETE /api/desafios/{id}/participantes/me` | Sai do desafio (o criador não pode sair; deve cancelar) | 204 | 401, 403, 404 |
+| `GET /api/desafios/{id}/progresso` | Progresso de quem aceitou, do maior para o menor percentual | 200 | 401, 404 |
+
+**Corpo de `POST` e `PUT` (JSON)**
+
+```json
+{
+  "titulo": "Desafio das 100 repetições",
+  "descricao": "Complete as metas até o fim do mês",
+  "prazo": "2026-12-15",
+  "visibilidade": "PUBLICO",
+  "itens": [
+    { "catalogoId": 1, "metaRepeticoes": 100, "metaCargaKg": 50 },
+    { "catalogoId": 2, "metaDistanciaM": 5000 }
+  ]
+}
+```
+
+**Regras das metas:** cada exercício precisa de ao menos uma meta. Musculação aceita `metaCargaKg`, `metaRepeticoes`, `metaSeries` e `metaTempoS`; aeróbico aceita `metaTempoS` e `metaDistanciaM`. A carga pode ser zero; as demais metas precisam ser maiores que zero. O prazo não pode estar no passado e o mesmo exercício não pode se repetir.
+
+**Progresso:** cada linha traz `usuarioId`, `email`, `percentual` (0 a 100), `concluido` e `itens`. Cada item soma os registros feitos desde a criação do desafio até o fim do prazo: `cargaMaxKg` (maior carga), `repeticoes` (repetições × séries), `series`, `tempoS` e `distanciaM`, além do `percentual` e de `concluido` do exercício.
+
+**Não há chat nos desafios:** a interação acontece pelo progresso e, em grupos, pelo feed.
+
+## Grupos
+
+Precisa do header `Authorization: Bearer <token>`. Quem cria o grupo é `ADMIN` dele; os demais são `MEMBRO`.
+
+| Rota | O que faz | Sucesso | Erros |
+| :-- | :-- | :-: | :-- |
+| `GET /api/grupos` | Grupos do usuário, com o `papel` dele em cada um | 200 | 401 |
+| `POST /api/grupos` | Cria. Corpo: `{ "nome": "Corredores", "descricao": "..." }` | 201 | 400, 401 |
+| `GET /api/grupos/{id}` | Consulta um grupo do qual participa | 200 | 401, 403, 404 |
+| `PUT /api/grupos/{id}` | Altera nome e descrição (só `ADMIN`) | 200 | 400, 401, 403, 404 |
+| `DELETE /api/grupos/{id}` | Exclui o grupo (só `ADMIN`) | 204 | 401, 403, 404 |
+| `GET /api/grupos/{id}/membros` | Membros com `usuarioId`, `email`, `papel` e `entradaEm` | 200 | 401, 403, 404 |
+| `DELETE /api/grupos/{id}/membros/{usuarioId}` | `ADMIN` remove membros; qualquer membro remove a si mesmo (sair). O último `ADMIN` não sai | 204 | 401, 403, 404, 409 |
+| `POST /api/grupos/{id}/convites` | `ADMIN` convida. Corpo: `{ "usuarioId": 15 }`. Resposta com `token` e `expiraEm` (7 dias) | 201 | 400, 401, 403, 404, 409 |
+| `GET /api/grupos/convites` | Convites pendentes recebidos, com `grupoNome`, `convidanteEmail`, `token` e `expiraEm` | 200 | 401 |
+| `POST /api/grupos/convites/aceite` | Aceita um convite destinado ao usuário. Corpo: `{ "token": "..." }` | 204 | 400, 401, 403, 404 |
+| `GET /api/grupos/{id}/feed` | Publicações e eventos do grupo, do mais recente ao mais antigo | 200 | 401, 403, 404 |
+| `POST /api/grupos/{id}/feed` | Publica um texto (até 1000 caracteres). Corpo: `{ "conteudo": "..." }` | 201 | 400, 401, 403, 404 |
+
+**Feed:** cada item traz `id`, `usuarioId`, `tipo` (`PUBLICACAO` ou `MEMBRO_ENTROU`), `conteudo` e `criadoEm`.
+
+**Dica:** o front gera o link `/grupos?convite=<token>` para a pessoa convidada, que também vê o convite em `GET /api/grupos/convites`.
+
 ## Métricas administrativas
 
 Só para perfis **ADMINISTRADOR** e **SUPERUSUARIO**. Todas as rotas ficam em `/api/admin/metricas` e retornam apenas valores agregados.
 
 | Rota | O que retorna | Parâmetros |
 | :-- | :-- | :-- |
-| `GET /usuarios-ativos` | Contas cadastradas, usuários com ao menos um registro no período e o percentual de ativos | `de`, `ate`, `agrupamento` |
+| `GET /usuarios-ativos` | Contas cadastradas, usuários com ao menos um registro no período, o percentual de ativos e a `serie` de ativos por período (`periodo`, `ativos`) | `de`, `ate`, `agrupamento` |
 | `GET /frequencia-media` | Média e mediana de dias ativos por semana, com a distribuição por faixa | `de`, `ate` |
-| `GET /ranking-tempo-treino` | Tempo total de treino e ranking por posição, sem identificar usuários | `de`, `ate`, `limite` |
-| `GET /exercicios-mais-realizados` | Exercícios do catálogo com mais execuções e usuários distintos | `de`, `ate`, `limite` |
-| `GET /rotinas` | Treinos ativos por tipo, percentual de treinos públicos e treinos públicos mais adicionados | `de`, `ate`, `limite` |
-| `GET /retencao` | Retenção por coorte semanal e taxa de ativação em 7 dias | `ate`, `coortes` |
+| `GET /ranking-tempo-treino` | Tempo total de treino, média e mediana por usuário ativo e ranking por posição, sem identificar usuários | `de`, `ate`, `limite` |
+| `GET /exercicios-mais-realizados` | Exercícios do catálogo com mais execuções e usuários distintos; `suprimidos` conta os omitidos por privacidade | `de`, `ate`, `limite` |
+| `GET /rotinas` | Treinos ativos por tipo, percentual de treinos públicos, percentual de registros vinculados a um treino e treinos públicos mais adicionados (cópias feitas no período) | `de`, `ate`, `limite` |
+| `GET /retencao` | Taxa de ativação em 7 dias, mediana de dias até o primeiro registro e `coortes` semanais (`semana`, `cadastrados`, `ativados7Dias`, `retidosSemana2`, `retidosSemana5`) | `ate`, `coortes` |
 
 **Regras dos parâmetros:** `de` e `ate` seguem as mesmas regras da evolução pessoal; `limite` vai de 1 a 50 (padrão 10); `coortes` vai de 1 a 26 (padrão 8).
 
 **Erros:** 400 (parâmetros inválidos), 401, 403.
 
-**Dica:** o ranking de tempo é ocultado (`ocultoPorPrivacidade`) quando há menos de cinco usuários ativos.
+**Dicas:**
+
+- O ranking de tempo é ocultado (`ocultoPorPrivacidade`) quando há menos de cinco usuários ativos, e exercícios praticados por menos de cinco pessoas são omitidos do ranking.
+- O painel administrativo do front mostra apenas totais, percentuais e rankings de exercícios e treinos públicos. Ele não exibe o ranking de tempo por posição nem qualquer dado de uma pessoa.
+- Na retenção, semanas que ainda não terminaram aparecem com zero retidos.
 
 ## Convites de administrador
 
@@ -515,7 +614,12 @@ Aceita o convite e promove o usuário informado a administrador.
 | Campo | Valores |
 | :---- | :------ |
 | `tipo` (treino) e `modalidade` (exercício) | `MUSCULACAO`, `AEROBICO` |
-| `visibilidade` (treino) | `PRIVADO`, `PUBLICO` |
+| `visibilidade` (treino e desafio) | `PRIVADO`, `PUBLICO` |
+| `estado` (amizade) | `PENDENTE`, `ACEITA`, `RECUSADA` |
+| `estado` (participação em desafio) | `CONVIDADO`, `ACEITO`, `RECUSADO` |
+| `estado` (desafio) | `ATIVO`, `CANCELADO` |
+| `papel` (grupo) | `ADMIN`, `MEMBRO` |
+| `tema` (preferências) | `light`, `dark`, `system` |
 | `perfil` (usuário) | `USUARIO`, `ADMINISTRADOR`, `SUPERUSUARIO` |
 | `agrupamento` (métricas) | `DIA`, `SEMANA`, `MES` |
 

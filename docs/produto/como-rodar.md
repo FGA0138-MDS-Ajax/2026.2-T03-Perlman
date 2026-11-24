@@ -38,7 +38,7 @@ JWT_REFRESH_EXPIRATION_DAYS=
 | :-- | :-- |
 | `DB_USER`, `DB_PASSWORD`, `DB_DATABASE` | Usuário, senha e nome do banco criado pelo contêiner do PostgreSQL |
 | `DB_URL_CONTEINER` | URL JDBC do banco usada pela API dentro do Docker. No Compose, o serviço do PostgreSQL se chama `db` e usa a porta 5432 |
-| `JWT_SECRET`, `JWT_ISSUER` | Chave de assinatura e emissor dos tokens |
+| `JWT_SECRET`, `JWT_ISSUER` | Chave de assinatura e emissor dos tokens. A chave deve estar em **Base64** e ter pelo menos 32 bytes depois de decodificada; gere com `openssl rand -base64 48`. Com uma chave inválida, a API não inicia e informa o motivo |
 | `JWT_EXPIRATION_MINUTES` | Validade do token de acesso, em minutos |
 | `JWT_REFRESH_EXPIRATION_DAYS` | Validade do refresh token, em dias |
 
@@ -50,6 +50,8 @@ Variáveis opcionais:
 | `COOKIE_SECURE` | Envio dos cookies somente por HTTPS | `false` |
 | `SUPERUSUARIO_EMAIL`, `SUPERUSUARIO_SENHA` | Conta de superusuário criada na inicialização | Definido no `docker-compose.yml` |
 | `GOOGLE_CLIENT_ID` | ID do cliente OAuth do Google, usado pelo login com Google | Vazio |
+
+No front-end, o login com Google também precisa de `VITE_GOOGLE_CLIENT_ID` (o mesmo valor de `GOOGLE_CLIENT_ID`), definida no `.env.local` ou passada no build do Docker. Sem ela, o botão "Entrar com Google" não aparece.
 
 ## 3. Subir o back-end
 
@@ -96,7 +98,7 @@ O front-end encaminha as chamadas de `/api` para o back-end em `http://localhost
 | :-- | :-- | :-- |
 | `backend/MotivaFIt` | `docker compose --profile testing run --rm test` | Testes do back-end (JUnit) |
 | `backend/MotivaFIt` | `mvn verify` | Testes e relatório de cobertura do JaCoCo, com mínimo de 70% das linhas. Requer Java 25, Maven e Docker |
-| `frontend/MotivaFit` | `npm test` | Testes do cliente HTTP e da interface (Vitest) |
+| `frontend/MotivaFit` | `npm test` | Testes do cliente HTTP (Node 22.18+ ou 24) e da interface (Vitest). Em máquinas com pouca memória, use `npx vitest run --maxWorkers=2` |
 
 ## Parar
 

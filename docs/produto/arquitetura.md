@@ -159,7 +159,7 @@ A Tabela 5 apresenta a proposta inicial dos recursos expostos pela API, associad
 | `/api/conquistas` | GET | RF-22 | Usuário autenticado |
 | `/api/grupos` | GET, POST | RF-23 | Autenticado: criar grupo e listar grupos próprios |
 | `/api/auth/refresh`; `/api/auth/logout` | POST | RF-02 / transversal | Cookie seguro + proteção CSRF; rotação/revogação |
-| `/api/conta`; `/api/conta/exportacao` | DELETE; GET | Privacidade / transversal | Titular; DELETE com autenticação recente |
+| `/api/conta/{id}` | GET, DELETE | Privacidade / transversal | Titular; DELETE com autenticação recente. Não há exportação de todas as contas (removida em 23/11/2026) |
 | `/api/catalogo-exercicios`; `/api/catalogo-exercicios/{id}` | GET | RF-07 | Todos os perfis autenticados; somente ativos |
 | `/api/admin/catalogo-exercicios`; `/api/admin/catalogo-exercicios/{id}` | POST; PUT, DELETE | Suporte RF-07 | Administrador ou superusuário; DELETE desativa |
 | `/api/admin/convites/aceite` | POST | RF-13 | Token de convite válido + e-mail convidado verificado |
@@ -168,6 +168,8 @@ A Tabela 5 apresenta a proposta inicial dos recursos expostos pela API, associad
 | `/api/grupos/{id}` | GET, PUT, DELETE | RF-23 | Membro consulta; proprietário altera/exclui |
 | `/api/grupos/{id}/membros`; `/api/grupos/{id}/membros/{usuarioId}` | GET; DELETE | RF-23 | Membro lista; próprio membro sai ou proprietário remove |
 | `/api/grupos/{id}/convites`; `/api/grupos/convites/aceite` | POST; POST | RF-23 | Proprietário convida; destinatário aceita token válido |
+
+O contrato implementado (inclusive rotas criadas depois desta proposta, como preferências, busca de conta por e-mail, progresso de desafios, convites recebidos e feed de grupos) está no [guia da API](guia-api.md).
 | `/api/grupos/{id}/feed` | GET | RF-23 | Somente membro |
 | `/api/publicacoes/{id}` | GET, DELETE | RF-21, RF-23 | Leitura conforme visibilidade; exclusão pelo autor |
 | `/api/publicacoes/{id}/curtidas/me` | PUT, DELETE | RF-21, RF-23 | Autenticado com acesso à publicação; operação idempotente |

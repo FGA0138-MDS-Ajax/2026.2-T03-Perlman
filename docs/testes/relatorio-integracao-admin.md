@@ -5,6 +5,9 @@
 **Ambiente:** sandbox Linux, PostgreSQL local, backend na porta `8080` e frontend Vite na porta `3000`.  
 **Usuário de teste:** superusuário criado para homologação; a senha e os tokens não são registrados neste documento.
 
+!!! note "Atualizado em 23/11/2026"
+    As seções 1 a 8 registram o teste de 19/11/2026 e foram mantidas como evidência. Desde então, o Painel Admin passou a exibir **apenas métricas gerais**: Dashboard, Relatórios e Treinos não mostram mais contas, e-mails nem treinos individuais, e a rota de exportação de contas foi removida. As capturas das seções 2.1, 2.3 e 2.5 mostram a versão anterior. O comportamento atual e os novos casos estão na [seção 9](#9-atualizacao-de-23112026-painel-com-metricas-gerais).
+
 ## 1. Resumo executivo
 
 A integração foi validada com sucesso pelo fluxo real do navegador: o frontend exibiu a tela de login, enviou as credenciais ao backend, recebeu o JWT e redirecionou para `/admin`. A partir do painel, as rotas administrativas carregaram dados provenientes da API e uma operação de catálogo foi executada com sucesso.
@@ -29,7 +32,7 @@ A tela `/admin/catalogo` carregou exercícios persistidos no backend e exibiu os
 
 ### 2.3 Relatórios
 
-A tela `/admin/relatorios` carregou as métricas e a relação de contas cadastradas pela API. Foram exibidos seis usuários ativos no banco de teste, além dos totais de execuções e fichas.
+A tela `/admin/relatorios` carregou as métricas e a relação de contas cadastradas pela API (comportamento substituído em 23/11/2026; ver seção 9). Foram exibidos seis usuários ativos no banco de teste, além dos totais de execuções e fichas.
 
 ![Relatórios administrativos](../assets/img/testes-integracao-admin/04-relatorios-admin.jpg)
 
@@ -41,7 +44,7 @@ A tela `/admin/superusuario` foi acessada com autorização de superusuário e e
 
 ### 2.5 Gerenciamento de treinos
 
-A tela `/admin/treinos` foi carregada e consultou a API. Neste estado do banco de homologação não havia fichas vinculadas para listar; a mensagem “Nenhuma ficha encontrada” foi apresentada corretamente.
+A tela `/admin/treinos` foi carregada e consultou a API (na época, listava fichas; hoje mostra apenas totais, ver seção 9). Neste estado do banco de homologação não havia fichas vinculadas para listar; a mensagem “Nenhuma ficha encontrada” foi apresentada corretamente.
 
 ![Gerenciamento de treinos](../assets/img/testes-integracao-admin/06-treinos-admin.jpg)
 
@@ -105,3 +108,44 @@ Não publicar no GitHub senhas, JWTs, cookies `refreshToken`/`csrfToken`, dumps 
 ## 8. Conclusão
 
 A comunicação frontend–backend e o acesso ao Painel Admin foram comprovados. O login administrativo, a autorização por perfil, o carregamento de dados do dashboard, catálogo, relatórios, superusuário e treinos, além da desativação de exercício, funcionaram no ambiente de teste. O único bloqueio encontrado foi a configuração de CORS específica do domínio encaminhado; depois de corrigida no ambiente, o fluxo foi aprovado.
+
+## 9. Atualização de 23/11/2026: painel com métricas gerais
+
+### 9.1 O que mudou
+
+O Painel Admin deixou de exibir dados associados a pessoas e passou a mostrar somente valores agregados, vindos das rotas `/api/admin/metricas/*`.
+
+| Tela | Antes (19/11/2026) | Agora |
+| :-- | :-- | :-- |
+| Dashboard (`/admin`) | Totais calculados a partir da lista completa de contas | Contas cadastradas, usuários ativos no período, treinos ativos e execuções dos exercícios mais realizados, sem consultar contas |
+| Relatórios (`/admin/relatorios`) | Métricas e tabela de contas (e-mail, perfil e status), com exportação de contas em CSV | Indicadores gerais, exercícios mais realizados e exportação CSV apenas com indicadores agregados |
+| Treinos (`/admin/treinos`) | Lista de fichas | Treinos ativos, treinos por tipo, percentuais de treinos públicos e de registros com treino e treinos públicos mais adicionados |
+| Métricas (`/admin/metricas`, nova) | Não existia | Por período: usuários ativos com série, frequência média, tempo total, média e mediana por usuário ativo, exercícios mais realizados, rotinas e retenção por coorte semanal |
+| SuperUsuário (`/admin/superusuario`) | Criação e aceite de convite | Somente criação. O aceite passou para "Minha conta", porque quem recebe o convite ainda não é superusuário |
+
+No back-end, a rota `GET /api/conta/exportacao` foi removida. Exercícios praticados por menos de cinco pessoas continuam omitidos do ranking, e o ranking de tempo por posição não é exibido no painel.
+
+### 9.2 Correções no back-end que afetam os números do painel
+
+- O percentual de treinos públicos, a mediana de frequência e os totais de tempo vinham zerados ou nulos. A leitura de consultas de linha única foi corrigida.
+- "Treinos públicos mais adicionados" sempre vinha vazio, porque procurava cópias públicas, e toda cópia é privada. Agora conta as cópias por treino de origem.
+- Média e mediana de tempo "por usuário ativo" eram ponderadas pelo número de registros. Agora são calculadas com um valor por usuário.
+- `suprimidos` (exercícios omitidos por privacidade) passou a ser calculado.
+- A série de usuários ativos, a retenção por coorte e o percentual de registros com treino deixaram de retornar valores fixos.
+
+### 9.3 Casos executados
+
+| ID | Caso | Procedimento | Resultado | Situação |
+|---|---|---|---|---|
+| INT-11 | Painel sem dados individuais | Testes de interface de Dashboard, Relatórios e Treinos (`tests/admin-api.test.tsx`) | Apenas rotas `/api/admin/metricas/*` são chamadas; nenhuma célula de tabela exibe e-mail | Aprovado |
+| INT-12 | Exportação agregada | Gerar o CSV do relatório | Somente pares indicador/valor, sem e-mails | Aprovado |
+| INT-13 | Rota de exportação removida | `GET /api/conta/exportacao` como superusuário | Sem rota própria; recusado como id inválido (400) | Aprovado |
+| INT-14 | Contrato front-back real | Back-end com PostgreSQL real; módulos de API do front chamando conta, tema, amizade, desafios, grupos, cópia de treino, evolução, métricas e convite de administrador | Todas as respostas aceitas pelos validadores do front | Aprovado |
+| INT-15 | Chave JWT inválida | Iniciar o back-end com `JWT_SECRET` que não decodifica para 32 bytes | A aplicação não inicia e informa como gerar a chave | Aprovado |
+
+Suítes automatizadas na mesma data: 80 testes de interface do front-end e 336 testes do back-end, todos aprovados.
+
+### 9.4 Pendente
+
+Refazer as capturas das seções 2.1, 2.3 e 2.5 no navegador com a versão atual do painel.
+

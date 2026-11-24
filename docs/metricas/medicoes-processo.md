@@ -106,6 +106,9 @@ Sem prazo, não é possível medir atraso. A ata nº 6 não definiu prazo para n
 | Desafios | 7 | 16/11 | — | Somente no front-end, sem back-end |
 | Login com Google (opcional) | 9 | 18/11 | — | Somente no back-end; a tela ainda não chama a API |
 
+!!! note "Atualização de 23/11/2026"
+    Desafios com back-end (metas, convites, participação e progresso), o login com Google na tela, a evolução pessoal no front-end, amizades e grupos foram integrados nas branches `feature/backend/integracao-front` e `feature/frontend/integracao-backend`. Como esta medição usa a data de entrega na `developer`, a tabela será atualizada quando essas branches forem mescladas.
+
 **Resultado:** entre as 9 entregas concluídas, o desvio médio é de 23 ÷ 9 = **2,6 sprints**. O endpoint de evolução pessoal (`GET /api/metricas/evolucao`) existe no back-end desde 17/11, mas nenhuma tela do usuário o consome ainda. Restam a Sprint 9 (em andamento) e a Sprint 10 para recorde pessoal, feed, streak e conquistas, que ainda não foram iniciados.
 
 
