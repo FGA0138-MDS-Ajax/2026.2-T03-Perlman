@@ -14,6 +14,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Dumbbell, ArrowLeft, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth, mensagemAutenticacao } from "@/lib/auth-context";
+import BotaoGoogle from "@/components/botao-google";
+import { googleConfigurado } from "@/lib/google";
 
 export default function PaginaCadastro() {
     const [email, setEmail] = useState("");
@@ -23,7 +25,16 @@ export default function PaginaCadastro() {
     const [mostrarSenha, setMostrarSenha] = useState(false);
     const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
     const navigate = useNavigate();
-    const { cadastro, enviando, limparAviso } = useAuth();
+    const { cadastro, loginGoogle, enviando, limparAviso } = useAuth();
+
+    // O backend cria a conta com perfil USUARIO quando o e-mail do Google ainda não existe.
+    async function cadastrarComGoogle(idToken: string) {
+        if (enviando) return;
+        setErro("");
+        limparAviso();
+        try { await loginGoogle(idToken); }
+        catch (error) { setErro(mensagemAutenticacao(error)); }
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -156,6 +167,22 @@ export default function PaginaCadastro() {
                         <Button type="submit" className="w-full h-11 font-medium shadow-sm">
                             {enviando ? "Criando conta…" : "Criar minha conta"}
                         </Button>
+                        {googleConfigurado() && <>
+                            <div className="relative w-full">
+                                <div className="absolute inset-0 flex items-center">
+                                    <span className="w-full border-t" />
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                    <span className="bg-card px-2 text-muted-foreground">ou</span>
+                                </div>
+                            </div>
+                            <BotaoGoogle
+                                texto="signup_with"
+                                desabilitado={enviando}
+                                onCredencial={(idToken) => { void cadastrarComGoogle(idToken); }}
+                                onErro={setErro}
+                            />
+                        </>}
                         <p className="text-center text-xs text-muted-foreground">
                             Ao criar sua conta, você concorda com nossos{" "}
                             <Link to="/termos-de-uso" className="font-semibold text-primary underline-offset-4 hover:underline">

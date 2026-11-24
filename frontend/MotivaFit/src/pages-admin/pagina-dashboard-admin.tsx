@@ -13,9 +13,9 @@ export default function PaginaDashboardAdmin() {
         <EstadoConsultaAdmin estado={estado} atualizar={atualizar}>
             {estado.status === "sucesso" && <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {[
-                    ["Execuções registradas", estado.dados.resumo.totalExecucoes, "Exercícios executados em toda a plataforma, não sessões de treino."],
-                    ["Usuários ativos no período", estado.dados.resumo.usuariosAtivos30Dias, "Usuários com registros no período analisado."],
-                    ["Fichas vinculadas", estado.dados.resumo.totalFichas, "Treinos não excluídos salvos nas contas."],
+                    ["Execuções nos exercícios mais realizados", estado.dados.resumo.execucoesTopExercicios, "Soma das execuções dos exercícios do ranking no período (não é o total da plataforma)."],
+                    ["Usuários ativos no período", estado.dados.resumo.usuariosAtivos, estado.dados.resumo.percentualAtivos === null ? "Usuários com registros no período analisado." : `${estado.dados.resumo.percentualAtivos}% das contas tiveram registros no período.`],
+                    ["Treinos ativos", estado.dados.resumo.treinosAtivos, "Treinos não excluídos salvos nas contas."],
                     ["Usuários cadastrados", estado.dados.resumo.totalUsuarios, "Contas registradas na plataforma."],
                 ].map(([titulo, valor, descricao]) => <Card key={titulo}>
                     <CardHeader><CardDescription>{titulo}</CardDescription></CardHeader>
@@ -27,7 +27,8 @@ export default function PaginaDashboardAdmin() {
             {[
                 { titulo: "Treinos", descricao: "Consulte as fichas vinculadas aos usuários.", to: "/admin/treinos" },
                 { titulo: "Catálogo", descricao: "Cadastre e mantenha os exercícios disponíveis.", to: "/admin/catalogo" },
-                { titulo: "Relatórios", descricao: "Consulte a atividade dos usuários e os totais da plataforma.", to: "/admin/relatorios" },
+                { titulo: "Relatórios", descricao: "Consulte as contas e os totais da plataforma.", to: "/admin/relatorios" },
+                { titulo: "Métricas", descricao: "Frequência, retenção, tempo de treino e rankings por período.", to: "/admin/metricas" },
                 ...(isSuperusuario ? [{ titulo: "SuperUsuário", descricao: "Gerencie convites para administradores.", to: "/admin/superusuario" }] : []),
             ].map((item) => <Link key={item.to} to={item.to}><Card className="h-full"><CardHeader><CardTitle>{item.titulo}</CardTitle><CardDescription>{item.descricao}</CardDescription></CardHeader></Card></Link>)}
         </section>

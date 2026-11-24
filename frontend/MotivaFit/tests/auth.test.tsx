@@ -62,7 +62,7 @@ describe('autenticação integrada', () => {
         await screen.findByRole('button', { name: 'Entrar na conta' });
         expect(screen.getByTestId('path').textContent).toBe('/login');
         await fillLogin();
-        await screen.findByText('Gerenciamento e montagem de treinos');
+        await screen.findByText('Gerencie seus treinos e explore os treinos públicos.');
         expect(screen.getByTestId('path').textContent).toBe('/treinos');
     });
 
@@ -70,7 +70,7 @@ describe('autenticação integrada', () => {
         document.cookie = 'csrfToken=csrf; Path=/';
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(session()));
         mount('/treinos');
-        await screen.findByText('Gerenciamento e montagem de treinos');
+        await screen.findByText('Gerencie seus treinos e explore os treinos públicos.');
         expect(screen.getByTestId('path').textContent).toBe('/treinos');
         expect(screen.queryByRole('button', { name: 'Entrar na conta' })).toBeNull();
     });

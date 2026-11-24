@@ -2,22 +2,20 @@ import { apiRequest, exigirValor } from "@/lib/api/http-client";
 
 export interface ResumoAdmin {
     totalUsuarios: number;
-    totalFichas: number;
-    totalExecucoes: number;
-    usuariosComFichas: number;
-    usuariosAtivos30Dias: number;
+    usuariosAtivos: number;
+    percentualAtivos: number | null;
+    treinosAtivos: number;
+    execucoesTopExercicios: number;
 }
-export interface AtividadeUsuarioAdmin {
+export interface ContaAdmin {
     id: number;
     email: string;
+    perfil: string;
     ativo: boolean;
-    fichas: number;
-    execucoes: number;
-    ultimaExecucao: string | null;
 }
 export interface RelatorioAdmin {
     resumo: ResumoAdmin;
-    usuarios: AtividadeUsuarioAdmin[];
+    usuarios: ContaAdmin[];
 }
 export interface TreinoAdmin {
     id: number;
@@ -43,33 +41,24 @@ export async function buscarRelatorioAdmin(pagina: number, signal?: AbortSignal)
         apiRequest<unknown>(`/api/admin/metricas/exercicios-mais-realizados?limite=${TAMANHO_PAGINA_ADMIN}`, { signal }),
     ]);
     if (!Array.isArray(contas)) throw new Error("O servidor retornou contas inválidas.");
-    const contasValidas = contas.filter((item): item is { id: number; email: string; ativo: boolean } =>
-        objeto(item) && contagem(item.id) && typeof item.email === "string" && typeof item.ativo === "boolean");
+    const contasValidas = contas.filter((item): item is ContaAdmin =>
+        objeto(item) && contagem(item.id) && typeof item.email === "string" && typeof item.ativo === "boolean")
+        .map((item) => ({ id: item.id, email: item.email, perfil: typeof item.perfil === "string" ? item.perfil : "", ativo: item.ativo }));
     const ativosObjeto = objeto(ativos) ? ativos : {};
     const rotinasObjeto = objeto(rotinas) ? rotinas : {};
     const exerciciosObjeto = objeto(exercicios) ? exercicios : {};
-    const totalUsuarios = contasValidas.length;
-    const usuariosAtivos30Dias = typeof ativosObjeto.ativosNoPeriodo === "number" ? ativosObjeto.ativosNoPeriodo : 0;
-    const totalFichas = typeof rotinasObjeto.treinosAtivos === "number" ? rotinasObjeto.treinosAtivos : 0;
     const ranking = Array.isArray(exerciciosObjeto.ranking) ? exerciciosObjeto.ranking : [];
-    const totalExecucoes = ranking.reduce((total, item) =>
-        total + (objeto(item) && typeof item.execucoes === "number" ? item.execucoes : 0), 0);
     return {
         resumo: {
-            totalUsuarios,
-            totalFichas,
-            totalExecucoes,
-            usuariosComFichas: 0,
-            usuariosAtivos30Dias,
+            totalUsuarios: contasValidas.length,
+            usuariosAtivos: typeof ativosObjeto.ativosNoPeriodo === "number" ? ativosObjeto.ativosNoPeriodo : 0,
+            percentualAtivos: typeof ativosObjeto.percentualAtivos === "number" ? ativosObjeto.percentualAtivos : null,
+            treinosAtivos: typeof rotinasObjeto.treinosAtivos === "number" ? rotinasObjeto.treinosAtivos : 0,
+            // Soma apenas os exercícios do ranking: não há total global de execuções no contrato atual.
+            execucoesTopExercicios: ranking.reduce((total: number, item: unknown) =>
+                total + (objeto(item) && typeof item.execucoes === "number" ? item.execucoes : 0), 0),
         },
-        usuarios: contasValidas.slice(pagina * TAMANHO_PAGINA_ADMIN, (pagina + 1) * TAMANHO_PAGINA_ADMIN).map((conta) => ({
-            id: conta.id,
-            email: conta.email,
-            ativo: conta.ativo,
-            fichas: 0,
-            execucoes: 0,
-            ultimaExecucao: null,
-        })),
+        usuarios: contasValidas.slice(pagina * TAMANHO_PAGINA_ADMIN, (pagina + 1) * TAMANHO_PAGINA_ADMIN),
     };
 }
 export async function listarTreinosAdmin(pagina: number, signal?: AbortSignal): Promise<PaginaTreinosAdmin> {

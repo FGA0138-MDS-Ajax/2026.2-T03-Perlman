@@ -1,6 +1,6 @@
 # Integração com o backend
 
-A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login, restauração de sessão, logout, guardas por perfil, consulta do catálogo, CRUD de treinos, ficha de exercícios, cópia de treino público, registro de execução, histórico paginado e indicadores pessoais já estão conectados. Os demais clientes serão conectados às telas nas próximas tarefas de [integração](../../../docs/integracao-front-back.md).
+A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login (e-mail/senha e Google), restauração de sessão, logout, guardas por perfil, conta, preferências de tema, catálogo, CRUD de treinos, ficha de exercícios, cópia de treino público, registro de execução, histórico paginado, evolução pessoal, desafios, amizades, grupos, convites e métricas administrativas estão conectados à API. Nenhuma funcionalidade guarda dados de domínio no `localStorage` ou `sessionStorage`. Lacunas que dependem do backend estão listadas em "Pendências no backend".
 
 ## Desenvolvimento local
 
@@ -38,9 +38,12 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 - O cadastro envia somente e-mail e senha, exige a política do backend (mínimo de 6 caracteres, maiúscula, minúscula, número e símbolo) e encaminha ao login. O nome não é solicitado porque a API não o persiste.
 - O contexto inicia em carregamento e restaura a sessão pelo refresh; as guardas aguardam essa verificação. O e-mail identifica a conta na interface.
 - Os perfis `USUARIO`, `ADMINISTRADOR` e `SUPERUSUARIO` controlam menus e rotas. A área de superusuário é exclusiva desse perfil; autorização efetiva permanece no servidor.
-- Tokens e permissões não são persistidos no navegador. `motivafit_user` e `motivafit_banco_admins` do protótipo são descartados. Preferências de tema são mantidas.
+- Tokens e permissões não são persistidos no navegador. `motivafit_user` e `motivafit_banco_admins` do protótipo são descartados.
+- O tema da conta é lido e gravado em `GET/PUT /api/usuarios/me/preferencias`; visitantes escolhem o tema apenas em memória.
+- Login com Google: com `VITE_GOOGLE_CLIENT_ID` definido no build (o mesmo client ID de `GOOGLE_CLIENT_ID` no backend), login e cadastro exibem o botão oficial do Google Identity Services. O ID Token é enviado a `POST /api/auth/google`, que cria a conta quando o e-mail é novo. Sem a variável, o botão não aparece.
 - A sessão é renovada antes da expiração, além da renovação por 401. Alterações de perfil refletidas pelo refresh atualizam as guardas. Falha encerra a sessão local; falha de logout informa quando a revogação remota não pôde ser confirmada.
-- A promoção local de administradores foi removida. A tela de superusuário sinaliza que convites estarão disponíveis em entrega posterior. Recuperação de senha não possui implementação nesta entrega.
+- Convites de administrador: o superusuário gera o token em `/admin/superusuario` (`POST /api/admin/convites`); a pessoa convidada o informa em "Minha conta" (`POST /api/admin/convites/aceite`) e a sessão é renovada para refletir o novo perfil. Recuperação de senha não possui implementação nesta entrega.
+- "Minha conta" carrega `GET /api/conta/{id}` e exibe o ID da conta, usado para receber pedidos de amizade.
 
 ## Catálogo e treinos
 
@@ -48,17 +51,36 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 - `GET/POST /api/treinos` e `PUT/DELETE /api/treinos/{id}` substituem a lista local. A resposta inclui `meuTreino` e `podeEditar`. Ações de edição aparecem apenas quando `podeEditar` é verdadeiro. A exclusão pede confirmação e só altera a lista depois do sucesso.
 - Datas do servidor são formatadas em `America/Sao_Paulo`. `@motivafit:treinos` e `@motivafit:meus-exercicios` são removidas ao abrir a tela.
 - Na mesma tela, após criar ou atualizar o treino, a ficha envia inclusões, alterações de meta e remoções. O id da associação edita ou remove; `catalogoExercicioId` só identifica o item do catálogo. Falha no meio mantém o que já foi confirmado e a repetição não reenvia essa parte. A ordem exibida é a de inclusão.
-- Treino público de outra pessoa oferece “Adicionar aos meus treinos” (`POST /api/treinos/{id}/adicionar`). A cópia é outro treino privado, sem recordes nem histórico. Inscrição, descrição e frequência das fichas locais continuam só no navegador.
+- Treino público de outra pessoa oferece “Adicionar aos meus treinos”: abre um rascunho com nome e metas para revisão e, ao salvar, chama `POST /api/treinos/{id}/adicionar` (o que alimenta a métrica de treinos públicos mais adicionados). Em seguida o rascunho é associado aos exercícios copiados pelo servidor e só as diferenças são enviadas (alteração de meta, remoção ou inclusão). A cópia é outro treino privado, sem recordes nem histórico.
 - A tela de realizar treino envia cada exercício a `POST /api/registros`, com minutos convertidos para `tempoS`, carga em kg e distância em m. A chave de idempotência é reutilizada na repetição da mesma gravação. O histórico da página principal usa `GET /api/registros` com “Carregar mais”. Os indicadores percorrem todas as páginas e usam o fuso `America/Sao_Paulo`. Não há conclusão de sessão: cada linha é uma execução de exercício.
 
-## Funcionalidades existentes e próximas integrações
+## Histórico e evolução
 
-Os clientes existentes cobrem autenticação, CRUD de treinos, catálogo, ficha de exercícios, cópia de treino público e execuções. Perfil editável, inscrições, sessões concluídas e relatórios agregados ainda exigem contratos novos. Convites administrativos continuam na entrega própria. Os painéis administrativos ainda leem o histórico local antigo.
+- Em "Histórico", "Ver minha evolução" consulta `GET /api/metricas/evolucao` com exercício, período e agrupamento (dia, semana ou mês) e mostra execuções, carga máxima, volume, tempo, distância ou pace por período.
+
+## Social
+
+- **Amigos** (`/amigos`): `GET/POST /api/amizades` e `PATCH/DELETE /api/amizades/{id}`. Separa solicitações recebidas, enviadas e amizades aceitas. O envio usa o ID numérico da conta, pois não há busca de usuários.
+- **Desafios** (`/desafios`): CRUD em `/api/desafios`, metas por exercício do catálogo conforme a modalidade, prazo no fuso `America/Sao_Paulo` e visibilidade. O criador convida amigos (`POST /participantes`); convidados aceitam ou recusam (`PATCH /participantes/me`) e participantes podem sair (`DELETE /participantes/me`). A chave `@motivafit:desafios` do protótipo é descartada; o antigo chat local foi removido.
+- **Grupos** (`/grupos`): CRUD em `/api/grupos`, membros, convite de amigos e feed somente leitura. O convite gera o link `/grupos?convite=<token>`, que preenche o aceite (`POST /api/grupos/convites/aceite`).
+
+## Administração
+
+- Dashboard e Relatórios usam `GET /api/conta/exportacao` e os totais de `/api/admin/metricas/*`. Os rótulos indicam que "execuções" somam apenas os exercícios do ranking.
+- `/admin/metricas` mostra, por período, usuários ativos, frequência média, tempo de treino (o ranking é ocultado com menos de cinco usuários ativos), exercícios mais realizados, rotinas e retenção. Cada seção carrega e falha de forma independente.
+
+## Pendências no backend
+
+- `GET/PUT /api/usuarios/me/preferencias` ainda não existe: até lá a troca de tema mostra o aviso de que não foi salva na conta.
+- Busca de usuários por e-mail/nome (hoje amizades exigem o ID numérico).
+- Desafios: convidado de desafio **privado** não o enxerga (as consultas só retornam desafios criados pelo usuário ou públicos); não há entrada direta em desafio público nem cálculo de progresso.
+- Grupos: falta listar os convites recebidos e publicar no feed.
+- Admin: falta listar todos os treinos da plataforma com o dono e o total de execuções por usuário. `retencao` e a série de `usuarios-ativos` ainda retornam vazias.
 
 `readJwtUsuarioClaims` apenas decodifica o JWT para apresentação. A autorização efetiva é responsabilidade do backend.
 
 ## Validação
 
-No frontend (Node 22.18+ ou 24): `npm test`, `npm run build`, `npm run lint`. Os testes HTTP usam o runner nativo do Node; os testes de interface usam Vitest, Testing Library e jsdom. Ambos simulam respostas HTTP. `npm run test:http` e `npm run test:ui` permitem execução separada. Cobrem concorrência, isolamento, formulários, erros, expiração e guardas por perfil.
+No frontend (Node 22.18+ ou 24): `npm test`, `npm run build`, `npm run lint`. Os testes HTTP usam o runner nativo do Node; os testes de interface usam Vitest, Testing Library e jsdom. Ambos simulam respostas HTTP; `tests/suporte-api.tsx` concentra os auxiliares das telas integradas e `tests/setup.ts` amplia o tempo de espera do Testing Library para a execução paralela. `npm run test:http` e `npm run test:ui` permitem execução separada. Cobrem concorrência, isolamento, formulários, erros, expiração e guardas por perfil.
 
 No backend, com Maven e JDK 25: `mvn -Dtest=AuthControllerTest,SecurityConfigTest test`. Validar também no navegador o ciclo login → refresh → logout no ambiente de destino; testes unitários não comprovam atributos de cookies aplicados por um navegador real.

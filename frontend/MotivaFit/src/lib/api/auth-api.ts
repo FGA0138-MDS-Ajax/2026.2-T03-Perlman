@@ -1,4 +1,5 @@
 import type {
+    GoogleLoginRequestDTO,
     JwtUsuarioClaims,
     LoginRequestDTO,
     LoginResponseDTO,
@@ -60,12 +61,21 @@ export async function registerAccount(request: UsuarioRequestDTO): Promise<Usuar
 }
 
 export async function login(request: LoginRequestDTO): Promise<LoginResponseDTO> {
+    return iniciarSessao("/api/auth/login", request);
+}
+
+/** Troca o ID Token emitido pelo Google por uma sessão do MotivaFit. */
+export async function loginGoogle(request: GoogleLoginRequestDTO): Promise<LoginResponseDTO> {
+    return iniciarSessao("/api/auth/google", request);
+}
+
+async function iniciarSessao(caminho: string, body: object): Promise<LoginResponseDTO> {
     setAccessToken(null);
     await finishPendingRefresh();
-    const response = await apiRequest<LoginResponseDTO>("/api/auth/login", {
+    const response = await apiRequest<LoginResponseDTO>(caminho, {
         method: "POST",
         authenticated: false,
-        body: request,
+        body,
     });
     try {
         const claims = readJwtUsuarioClaims(response.token);

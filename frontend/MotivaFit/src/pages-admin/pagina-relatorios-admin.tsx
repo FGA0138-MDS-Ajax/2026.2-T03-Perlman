@@ -7,6 +7,7 @@ import { useConsultaAdmin } from "@/lib/use-consulta-admin";
 import { Button } from "@/components/ui/button";
 import { exportarContas } from "@/lib/api/conta-api";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function PaginaRelatoriosAdmin() {
     const { estado, pagina, setPagina, atualizar } = useConsultaAdmin(buscarRelatorioAdmin);
@@ -46,16 +47,16 @@ export default function PaginaRelatoriosAdmin() {
                 </CardHeader><CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {[
                             ["Usuários cadastrados", estado.dados.resumo.totalUsuarios],
-                            ["Execuções no ranking", estado.dados.resumo.totalExecucoes],
-                            ["Fichas vinculadas", estado.dados.resumo.totalFichas],
-                            ["Usuários ativos no período", estado.dados.resumo.usuariosAtivos30Dias],
+                            ["Execuções nos exercícios mais realizados", estado.dados.resumo.execucoesTopExercicios],
+                            ["Treinos ativos", estado.dados.resumo.treinosAtivos],
+                            ["Usuários ativos no período", estado.dados.resumo.usuariosAtivos],
                     ].map(([titulo, valor]) => <div key={titulo} className="rounded-lg border p-4"><span>{titulo}</span><div className="text-2xl font-bold">{valor}</div></div>)}
                 </CardContent></Card>
-                <Card><CardHeader><CardTitle>Contas cadastradas</CardTitle><CardDescription>Dados reais exportados pela API. Métricas individuais de fichas não estão disponíveis neste contrato.</CardDescription></CardHeader>
+                <Card><CardHeader><CardTitle>Contas cadastradas</CardTitle><CardDescription>Dados exportados pela API. Para frequência, retenção e rankings, consulte <Link to="/admin/metricas" className="underline">Métricas</Link>.</CardDescription></CardHeader>
                     <CardContent>{estado.dados.usuarios.length === 0 ? <p>Nenhum usuário encontrado.</p> : <Table>
-                        <TableHeader><TableRow><TableHead>Usuário</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+                        <TableHeader><TableRow><TableHead>Usuário</TableHead><TableHead>Perfil</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
                         <TableBody>{estado.dados.usuarios.map((item) => <TableRow key={item.id}>
-                            <TableCell>{item.email}</TableCell><TableCell>{item.ativo ? "Ativo" : "Inativo"}</TableCell>
+                            <TableCell>{item.email}</TableCell><TableCell>{item.perfil}</TableCell><TableCell>{item.ativo ? "Ativo" : "Inativo"}</TableCell>
                         </TableRow>)}</TableBody>
                     </Table>}</CardContent>
                 </Card>

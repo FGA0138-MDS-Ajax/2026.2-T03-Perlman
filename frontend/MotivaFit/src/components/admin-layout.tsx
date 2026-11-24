@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/lib/auth-context";
-import { Dumbbell, ExternalLink, FileText, LayoutDashboard, LogOut, Settings, Library } from "lucide-react";
+import { BarChart3, Dumbbell, ExternalLink, FileText, LayoutDashboard, LogOut, Settings, Library } from "lucide-react";
 
 interface AdminLayoutProps {
     title: string;
@@ -16,6 +16,7 @@ const navigationItems = [
     { label: "Treinos", to: "/admin/treinos", icon: Dumbbell },
     { label: "Catálogo", to: "/admin/catalogo", icon: Library },
     { label: "Relatórios", to: "/admin/relatorios", icon: FileText },
+    { label: "Métricas", to: "/admin/metricas", icon: BarChart3 },
     { label: "SuperUsuário", to: "/admin/superusuario", icon: Settings },
 ];
 

@@ -21,6 +21,7 @@ interface AuthContextType {
     aviso: string;
     limparAviso: () => void;
     login: (email: string, senha: string) => Promise<void>;
+    loginGoogle: (idToken: string) => Promise<void>;
     cadastro: (email: string, senha: string) => Promise<void>;
     logout: () => Promise<void>;
 }
@@ -107,6 +108,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
     }
 
+    async function loginGoogle(idToken: string): Promise<void> {
+        await executar(async () => {
+            await authApi.loginGoogle({ idToken });
+        });
+    }
+
     async function cadastro(email: string, senha: string): Promise<void> {
         await executar(async () => {
             await authApi.registerAccount({ email: email.trim().toLowerCase(), senha });
@@ -125,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const isAdmin = user?.perfil === "ADMINISTRADOR" || user?.perfil === "SUPERUSUARIO";
     return <AuthContext.Provider value={{ user, isAuthenticated: user !== null, isAdmin,
         isSuperusuario: user?.perfil === "SUPERUSUARIO", inicializando, enviando, aviso,
-        limparAviso, login, cadastro, logout }}>
+        limparAviso, login, loginGoogle, cadastro, logout }}>
         {aviso && <div role="alert" className="border-b bg-muted p-3 text-center text-sm">
             {aviso} <button type="button" onClick={limparAviso} className="ml-3 underline">Fechar</button>
         </div>}
@@ -170,7 +177,8 @@ export function RotaPublica({ children }: { children: React.ReactNode }) {
     if (!isAuthenticated) return <>{children}</>;
     if (enviando) return <AguardandoSessao />;
     const from = location.state?.from?.pathname;
-    const destinos = ["/principal", "/treinos", "/historico", ...(isAdmin ? ["/admin", "/admin/treinos", "/admin/relatorios"] : []),
+    const destinos = ["/principal", "/treinos", "/historico", "/desafios", "/amigos", "/grupos", "/conta",
+        ...(isAdmin ? ["/admin", "/admin/treinos", "/admin/relatorios", "/admin/metricas"] : []),
         ...(isSuperusuario ? ["/admin/superusuario"] : [])];
     return <Navigate to={destinos.includes(from) ? from : isAdmin ? "/admin" : "/principal"} replace />;
 }

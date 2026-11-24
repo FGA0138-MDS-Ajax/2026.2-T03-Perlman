@@ -114,3 +114,119 @@ export interface ApiErroResponse {
     mensagem: string;
     dataHora: string;
 }
+
+export interface GoogleLoginRequestDTO {
+    idToken: string;
+}
+
+// ---------------------------------------------------------------------------
+// Desafios
+// ---------------------------------------------------------------------------
+export type EstadoDesafio = "ATIVO" | "CANCELADO";
+export type EstadoParticipante = "CONVIDADO" | "ACEITO" | "RECUSADO";
+
+export interface DesafioItemRequestDTO {
+    catalogoId: number;
+    metaCargaKg?: number | null;
+    metaRepeticoes?: number | null;
+    metaSeries?: number | null;
+    metaTempoS?: number | null;
+    metaDistanciaM?: number | null;
+}
+
+export interface DesafioRequestDTO {
+    titulo: string;
+    prazo: string;
+    descricao?: string;
+    visibilidade?: VisibilidadeBackend;
+    itens: DesafioItemRequestDTO[];
+}
+
+export interface DesafioItemResponseDTO {
+    id: number;
+    catalogoId: number;
+    exercicioNome: string;
+    modalidade: ModalidadeBackend;
+    metaCargaKg: number | null;
+    metaRepeticoes: number | null;
+    metaSeries: number | null;
+    metaTempoS: number | null;
+    metaDistanciaM: number | null;
+}
+
+export interface DesafioResponseDTO {
+    id: number;
+    titulo: string;
+    prazo: string;
+    descricao: string | null;
+    visibilidade: VisibilidadeBackend;
+    estado: EstadoDesafio;
+    souCriador: boolean;
+    itens: DesafioItemResponseDTO[];
+}
+
+export interface DesafioParticipanteResponseDTO {
+    usuarioId: number;
+    email: string;
+    estado: EstadoParticipante;
+    aceitoEm: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Amizades
+// ---------------------------------------------------------------------------
+export type EstadoAmizade = "PENDENTE" | "ACEITA" | "RECUSADA";
+
+export interface AmizadeResponseDTO {
+    id: number;
+    solicitanteId: number;
+    solicitanteEmail: string;
+    destinatarioId: number;
+    destinatarioEmail: string;
+    estado: EstadoAmizade;
+    criadoEm: string;
+    atualizadoEm: string;
+}
+
+// ---------------------------------------------------------------------------
+// Grupos
+// ---------------------------------------------------------------------------
+export type PapelGrupo = "ADMIN" | "MEMBRO";
+
+export interface GrupoRequestDTO {
+    nome: string;
+    descricao?: string;
+}
+
+export interface GrupoResponseDTO {
+    id: number;
+    nome: string;
+    descricao: string | null;
+    criadorId: number;
+    papel: PapelGrupo;
+    criadoEm: string;
+    atualizadoEm: string;
+}
+
+export interface GrupoMembroResponseDTO {
+    usuarioId: number;
+    email: string;
+    papel: PapelGrupo;
+    entradaEm: string;
+}
+
+export interface ConviteGrupoResponseDTO {
+    id: number;
+    grupoId: number;
+    convidadoId: number;
+    token: string;
+    expiraEm: string;
+}
+
+export interface GrupoFeedResponseDTO {
+    id: number;
+    usuarioId: number;
+    tipo: string;
+    conteudo: string;
+    criadoEm: string;
+}
