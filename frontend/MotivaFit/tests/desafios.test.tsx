@@ -18,11 +18,13 @@ const desafio = (id: number, titulo: string, extra: Record<string, unknown> = {}
 const meu = desafio(7, 'Meu desafio', { souCriador: true, visibilidade: 'PRIVADO' });
 const convidado = desafio(8, 'Desafio com convite');
 const aberto = desafio(9, 'Desafio aberto');
+const meuPublico = desafio(6, 'Meu desafio público', { souCriador: true });
 const participantes: Record<number, unknown[]> = {
     7: [{ usuarioId: 42, email: 'aluno@example.com', estado: 'ACEITO', aceitoEm: null }],
     8: [{ usuarioId: 5, email: 'dono@example.com', estado: 'ACEITO', aceitoEm: null },
         { usuarioId: 42, email: 'aluno@example.com', estado: 'CONVIDADO', aceitoEm: null }],
     9: [{ usuarioId: 5, email: 'dono@example.com', estado: 'ACEITO', aceitoEm: null }],
+    6: [{ usuarioId: 42, email: 'aluno@example.com', estado: 'ACEITO', aceitoEm: null }],
 };
 
 function api(extra?: Responder): Responder {
@@ -36,7 +38,7 @@ function api(extra?: Responder): Responder {
         if (url.includes('/api/catalogo-exercicios')) return Response.json([supino, corrida]);
         if (url.includes('/api/amizades')) return Response.json([{ id: 3, solicitanteId: 42, solicitanteEmail: 'aluno@example.com',
             destinatarioId: 15, destinatarioEmail: 'amigo@example.com', estado: 'ACEITA', criadoEm: '2026-11-20T10:00:00Z', atualizadoEm: '2026-11-20T10:00:00Z' }]);
-        if (url === '/api/desafios') return Response.json([meu, convidado, aberto]);
+        if (url === '/api/desafios') return Response.json([meu, convidado, aberto, meuPublico]);
         return Response.json({}, { status: 404 });
     };
 }
@@ -55,7 +57,14 @@ describe('desafios integrados à API', () => {
         expect(screen.getByRole('heading', { name: 'Desafio com convite' })).toBeTruthy();
         fireEvent.click(screen.getByRole('tab', { name: 'Desafios públicos' }));
         expect(screen.getByRole('heading', { name: 'Desafio aberto' })).toBeTruthy();
-        expect(screen.getByText(/Abra um desafio público/)).toBeTruthy();
+        // O desafio público criado pelo próprio usuário também aparece, identificado; o privado não.
+        // Sobe do título até o cartão (o elemento que também contém o botão do próprio desafio).
+        let proprio = screen.getByRole('heading', { name: 'Meu desafio público' }).parentElement!;
+        while (!within(proprio).queryByRole('button', { name: 'Ver detalhes de Meu desafio público' })) proprio = proprio.parentElement!;
+        expect(within(proprio).getByText('Criado por você')).toBeTruthy();
+        expect(within(proprio).queryByText('Desafio aberto')).toBeNull();
+        expect(screen.queryByRole('heading', { name: 'Meu desafio' })).toBeNull();
+        expect(screen.getByText(/Desafios abertos a todos, inclusive os seus/)).toBeTruthy();
         expect(localStorage.getItem('@motivafit:desafios')).toBeNull();
         expect(gravar).not.toHaveBeenCalled();
     });

@@ -69,7 +69,7 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 O painel administrativo exibe somente métricas gerais: nenhuma tela lista contas, e-mails, treinos de usuários ou valores por pessoa.
 
 - Dashboard, Relatórios e Treinos usam apenas `/api/admin/metricas/usuarios-ativos`, `/rotinas` e `/exercicios-mais-realizados` (últimos 30 dias): contas cadastradas e ativas, treinos por tipo, percentuais de treinos públicos e de registros com treino, exercícios mais realizados e treinos públicos mais adicionados. "Execuções" somam apenas os exercícios do ranking.
-- Relatórios exporta essas métricas agregadas em CSV (`metricas-motivafit.csv`); a antiga exportação de contas foi removida da interface.
+- Relatórios exporta essas métricas agregadas em CSV (`metricas-motivafit.csv`); a exportação de contas foi removida da interface e do back-end.
 - `/admin/metricas` mostra, por período, usuários ativos (com série), frequência média, tempo de treino (total, média e mediana por usuário ativo, sem ranking individual), exercícios mais realizados, rotinas e retenção por coorte semanal (ativação em 7 dias e retenção na 2ª e na 5ª semana). Cada seção carrega e falha de forma independente.
 - Exercícios praticados por poucas pessoas são omitidos pelo backend para preservar a privacidade.
 

@@ -108,8 +108,9 @@ export default function PaginaDesafios() {
     const todos = consulta.status === "sucesso" ? consulta.dados : [];
     const meus = todos.filter((item) => item.desafio.souCriador || item.meuEstado === "ACEITO");
     const convites = todos.filter((item) => !item.desafio.souCriador && item.meuEstado === "CONVIDADO");
-    const publicos = todos.filter((item) => !item.desafio.souCriador && item.desafio.visibilidade === "PUBLICO"
-        && item.meuEstado !== "ACEITO" && item.meuEstado !== "CONVIDADO");
+    // Todos os desafios públicos, inclusive os criados pelo usuário e os de que ele já participa;
+    // o cartão indica "Criado por você" ou o estado da participação.
+    const publicos = todos.filter((item) => item.desafio.visibilidade === "PUBLICO");
     const aberto = todos.find((item) => item.desafio.id === abertoId) ?? null;
 
     function aoSalvar(desafio: DesafioResponseDTO) {
@@ -173,7 +174,7 @@ export default function PaginaDesafios() {
                                 </div>}
                                 {consulta.status === "sucesso" && <>
                                     {aba === "publicos" && <p className="text-sm text-muted-foreground">
-                                        Abra um desafio público para ver as metas e participar.
+                                        Desafios abertos a todos, inclusive os seus. Abra um desafio para ver as metas, o progresso e participar.
                                     </p>}
                                     <ListaDesafios itens={listas[aba].itens} vazio={listas[aba].vazio} onAbrir={setAbertoId} />
                                 </>}
