@@ -1,0 +1,73 @@
+\documentclass[a4paper, 12pt]{article}
+
+\usepackage{babel}
+\babelprovide[main,import]{portuguese}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{verbatim}
+\usepackage{textcomp}
+\usepackage{gensymb}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+
+% Suporte às tabelas transcritas do documento de visão.
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage[margin=2.5cm]{geometry}
+\setlength{\emergencystretch}{6em}
+
+% Títulos das seções e do sumário em 12 pontos.
+\usepackage{titlesec}
+\titleformat{\section}{\fontsize{12}{14.4}\selectfont\bfseries}{\thesection}{1em}{}
+\titleformat{name=\section,numberless}{\centering\fontsize{12}{14.4}\selectfont\bfseries}{}{0pt}{}
+\titleformat{\subsection}{\fontsize{12}{14.4}\selectfont\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\fontsize{12}{14.4}\selectfont\bfseries}{\thesubsubsection}{1em}{}
+\addto\captionsportuguese{\renewcommand{\contentsname}{SUMÁRIO}\renewcommand{\tablename}{Tabela}\renewcommand{\figurename}{Figura}}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+\DeclareCaptionFont{legendadez}{\fontsize{10}{12}\selectfont}
+\newcommand{\fontedez}{\fontsize{10}{12}\selectfont}
+\DeclareCaptionLabelSeparator{travessao}{\space\textendash\space}
+\captionsetup{font=legendadez,labelsep=travessao}
+
+% Número da página no canto superior direito, somente na parte textual.
+\usepackage{fancyhdr}
+\setlength{\headheight}{14pt}
+\fancypagestyle{texto}{%
+  \fancyhf{}
+  \fancyhead[R]{\fontsize{10}{12}\selectfont\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+\begin{document}
+
+\input{sections/1_capa}
+% A contagem começa na folha de rosto; a capa não é contada.
+\setcounter{page}{1}
+\pagestyle{empty}
+\input{sections/2_folha_rosto}
+\input{sections/3_integrantes}
+\input{sections/4_historico_revisoes}
+
+% Sumário
+\newpage
+\setcounter{tocdepth}{3}
+\tableofcontents
+\clearpage
+\pagestyle{texto}
+
+\input{sections/5_visao}
+\input{sections/6_visao_projeto}
+\input{sections/7_processo_desenvolvimento}
+\input{sections/8_escopo_projeto}
+\input{sections/9_metricas_medicoes}
+\input{sections/10_testes_software}
+\input{sections/11_referencias}
+
+\end{document}
