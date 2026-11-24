@@ -15,7 +15,6 @@ import br.com.motivafit.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -36,11 +35,6 @@ public class UsuarioService {
             throw new ConflitoException("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado");
         Usuario userEntity = repository.save(usuarioMapper.toEntity(body));
         return usuarioMapper.toDto(userEntity);
-    }
-
-    @Transactional(readOnly = true)
-    public List<UsuarioResponseDTO> findAll(){
-        return usuarioMapper.toDtos(repository.findAll());
     }
 
     @Transactional(readOnly = true)

@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/conta")
@@ -25,24 +24,6 @@ public class ContaController {
 
     public ContaController(UsuarioService service) {
         this.service = service;
-    }
-
-    @GetMapping("/exportacao")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'SUPERUSUARIO')")
-    @Operation(
-            summary = "Exportar contas",
-            description = "Retorna todas as contas cadastradas. Restrito aos perfis ADMINISTRADOR e SUPERUSUARIO."
-    )
-    @SecurityRequirement(name = "AccessToken")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Contas retornadas", content = @Content(schema = @Schema(type = "array", implementation = UsuarioResponseDTO.class))),
-            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Perfil sem permissão para exportar contas", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
-    })
-    public ResponseEntity<List<UsuarioResponseDTO>> findAll(){
-        List<UsuarioResponseDTO> response = service.findAll();
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource(properties = {
-        "JWT_SECRET=motivafit-tests-only-secret-key-with-more-than-32-bytes",
+        "JWT_SECRET=bW90aXZhZml0LXRlc3RzLW9ubHktc2VjcmV0LWtleS13aXRoLW1vcmUtdGhhbi0zMi1ieXRlcw==",
         "JWT_ISSUER=motivafit-test"
 })
 @AutoConfigureMockMvc
@@ -228,6 +228,16 @@ class IntegracaoFrontEndpointsTests {
         mockMvc.perform(get("/api/admin/treinos").with(user(admin)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codigo").value("ROTA_NAO_ENCONTRADA"));
+    }
+
+    @Test
+    void naoHaExportacaoDeContas() throws Exception {
+        Usuario admin = usuario("exportacao", "SUPERUSUARIO");
+
+        // Sem a rota própria, o caminho cai em /api/conta/{id} e é recusado como id inválido.
+        mockMvc.perform(get("/api/conta/exportacao").with(user(admin)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("PARAMETRO_INVALIDO"));
     }
 
     @Test

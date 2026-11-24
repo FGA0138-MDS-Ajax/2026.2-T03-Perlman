@@ -47,6 +47,13 @@ class JwtServiceTest {
     @Test
     void rejeitaConfiguracaoJwtInvalida() {
         assertThrows(RequisicaoInvalidaException.class, () -> new JwtService("curta", "issuer", 15, 7));
+        assertThrows(RequisicaoInvalidaException.class, () -> new JwtService("   ", "issuer", 15, 7));
+        // Tem mais de 32 caracteres, mas decodifica para menos de 32 bytes: seria recusada só no primeiro login.
+        assertThrows(RequisicaoInvalidaException.class,
+                () -> new JwtService("smoke-test-secret-key-with-more-than-32-bytes-ok", "issuer", 15, 7));
+        assertThrows(RequisicaoInvalidaException.class,
+                () -> new JwtService(Base64.getEncoder().encodeToString(new byte[31]), "issuer", 15, 7));
+        assertDoesNotThrow(() -> new JwtService(Base64.getEncoder().encodeToString(new byte[48]), "issuer", 15, 7));
         assertThrows(RequisicaoInvalidaException.class, () -> new JwtService(SECRET, "issuer", 0, 7));
         assertThrows(RequisicaoInvalidaException.class, () -> new JwtService(SECRET, "issuer", 15, 0));
     }

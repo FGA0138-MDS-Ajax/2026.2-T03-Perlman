@@ -3,8 +3,10 @@ package br.com.motivafit.security;
 import br.com.motivafit.entity.Usuario;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.WeakKeyException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ import br.com.motivafit.exception.RequisicaoInvalidaException;
 
 @Service
 public class JwtService {
-    private final String secretKey;
+    private final SecretKey signingKey;
     private final String issuer;
     private final long expirationMinutes;
     private final long expirationDays;
@@ -34,16 +36,13 @@ public class JwtService {
             @Value("${security.jwt.expiration-minutes}") long expirationMinutes,
             @Value("${security.jwt.refresh-expiration-days}") long expirationDays
     ) {
-        if (secretKey.length() < 32) {
-            throw new RequisicaoInvalidaException("CONFIGURACAO_JWT_INVALIDA", "A chave JWT deve possuir pelo menos 32 caracteres");
-        }
+        this.signingKey = criarChave(secretKey);
         if (expirationMinutes <= 0) {
             throw new RequisicaoInvalidaException("CONFIGURACAO_JWT_INVALIDA", "A validade do token de acesso deve ser maior que zero");
         }
         if (expirationDays <= 0) {
             throw new RequisicaoInvalidaException("CONFIGURACAO_JWT_INVALIDA", "A validade do token de renovação deve ser maior que zero");
         }
-        this.secretKey = secretKey;
         this.issuer = issuer;
         this.expirationMinutes = expirationMinutes;
         this.expirationDays = expirationDays;
@@ -85,9 +84,25 @@ public class JwtService {
         return Date.from(Instant.now().plus(expirationDays, ChronoUnit.DAYS));
     }
 
+    /**
+     * Monta a chave HS256 na inicialização, com o mesmo decodificador usado para assinar. Assim, uma
+     * JWT_SECRET inválida impede a aplicação de subir, em vez de falhar só no primeiro login.
+     */
+    private static SecretKey criarChave(String secretKey) {
+        String mensagem = "A chave JWT (JWT_SECRET) deve estar em Base64 e ter pelo menos 32 bytes (256 bits) "
+                + "depois de decodificada. Gere uma com: openssl rand -base64 48";
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new RequisicaoInvalidaException("CONFIGURACAO_JWT_INVALIDA", mensagem);
+        }
+        try {
+            return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey.trim()));
+        } catch (DecodingException | WeakKeyException erro) {
+            throw new RequisicaoInvalidaException("CONFIGURACAO_JWT_INVALIDA", mensagem);
+        }
+    }
+
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return signingKey;
     }
 
     public Date extractExpiration(String token){

@@ -28,24 +28,6 @@ class ContaControllerTest {
     }
 
     @Test
-    void findAllRetorna200ComContas() {
-        var contas = List.of(new UsuarioResponseDTO(1L, "usuario@motivafit.com", Perfil.USUARIO, true));
-        when(service.findAll()).thenReturn(contas);
-
-        var response = controller.findAll();
-
-        assertEquals(200, response.getStatusCode().value());
-        assertSame(contas, response.getBody());
-        verify(service).findAll();
-    }
-
-    @Test
-    void findAllExigePerfisAdministrativos() throws Exception {
-        var method = ContaController.class.getMethod("findAll");
-        assertEquals("hasAnyRole('ADMINISTRADOR', 'SUPERUSUARIO')", method.getAnnotation(PreAuthorize.class).value());
-    }
-
-    @Test
     void findByIdRetorna200EEncaminhaUsuarioAutenticado() {
         var usuario = new Usuario();
         var conta = new UsuarioResponseDTO(1L, "usuario@motivafit.com", Perfil.USUARIO, true);
@@ -70,8 +52,9 @@ class ContaControllerTest {
     @Test
     void controllerPossuiDocumentacaoOpenApiDosEndpoints() throws Exception {
         assertEquals("Conta", ContaController.class.getAnnotation(Tag.class).name());
+        // A exportação de todas as contas foi removida: nenhuma rota lista contas de outras pessoas.
+        assertThrows(NoSuchMethodException.class, () -> ContaController.class.getMethod("findAll"));
         for (var method : List.of(
-                ContaController.class.getMethod("findAll"),
                 ContaController.class.getMethod("findById", Long.class),
                 ContaController.class.getMethod("delete", Long.class))) {
             assertNotNull(method.getAnnotation(Operation.class));

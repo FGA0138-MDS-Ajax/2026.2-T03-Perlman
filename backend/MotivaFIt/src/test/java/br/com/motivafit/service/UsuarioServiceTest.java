@@ -59,20 +59,6 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void findAllRetornaTodosOsUsuariosMapeados() {
-        var primeiro = usuario("primeiro@test.com");
-        var segundo = usuario("segundo@test.com");
-        when(repository.findAll()).thenReturn(List.of(primeiro, segundo));
-
-        List<UsuarioResponseDTO> response = service.findAll();
-
-        assertEquals(2, response.size());
-        assertEquals("primeiro@test.com", response.get(0).email());
-        assertEquals("segundo@test.com", response.get(1).email());
-        verify(repository).findAll();
-    }
-
-    @Test
     void findByIdRetornaUsuarioEncontrado() {
         var usuario = usuario("encontrado@test.com");
         when(repository.findById(7L)).thenReturn(Optional.of(usuario));
