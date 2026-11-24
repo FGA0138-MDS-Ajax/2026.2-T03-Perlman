@@ -5,5 +5,5 @@ import path from 'node:path'
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': path.resolve(import.meta.dirname, './src') } },
-  test: { environment: 'jsdom', include: ['tests/**/*.test.tsx'], restoreMocks: true },
+  test: { environment: 'jsdom', include: ['tests/**/*.test.tsx'], setupFiles: ['tests/setup.ts'], restoreMocks: true },
 })

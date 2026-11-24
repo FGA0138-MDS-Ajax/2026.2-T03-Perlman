@@ -47,8 +47,9 @@ As chamadas usam o caminho `/api` na mesma origem do front-end. Em desenvolvimen
 | :-- | :-- | :-- |
 | `API_PROXY_TARGET` | Servidor do Vite | Endereço do back-end. Padrão: `http://localhost:8080` |
 | `VITE_API_BASE_URL` | Build | Endereço público da API. Vazio usa `/api` na mesma origem |
+| `VITE_GOOGLE_CLIENT_ID` | Build | Client ID OAuth do Google, o mesmo de `GOOGLE_CLIENT_ID` no back-end. Vazio oculta o botão "Entrar com Google" |
 
-O arquivo `.env.example` traz as duas variáveis. O back-end aceita por padrão a origem `http://localhost:3000`; se o front-end rodar em outro endereço, ajuste `CORS_ALLOWED_ORIGIN` no back-end.
+O arquivo `.env.example` traz as três variáveis. O back-end aceita por padrão a origem `http://localhost:3000`; se o front-end rodar em outro endereço, ajuste `CORS_ALLOWED_ORIGIN` no back-end.
 
 ## Scripts
 
@@ -74,12 +75,15 @@ O arquivo `.env.example` traz as duas variáveis. O back-end aceita por padrão 
 | `/realizar-treino` | Usuário logado | Página de treinos no modo de realização |
 | `/treinos/:treinoId/realizar` | Usuário logado | Realização de um treino |
 | `/historico` | Usuário logado | Histórico |
-| `/desafios` | Usuário logado | Desafios |
+| `/desafios` | Usuário logado | Desafios com metas, convites, participação e progresso |
+| `/amigos` | Usuário logado | Solicitações e lista de amigos |
+| `/grupos` | Usuário logado | Grupos, membros, convites e feed |
 | `/conta` | Usuário logado | Conta do usuário |
 | `/admin` | Administrador | Dashboard administrativo |
-| `/admin/treinos` | Administrador | Treinos (administração) |
+| `/admin/treinos` | Administrador | Totais de treinos e treinos públicos mais adicionados |
 | `/admin/catalogo` | Administrador | Catálogo de exercícios |
-| `/admin/relatorios` | Administrador | Relatórios |
+| `/admin/relatorios` | Administrador | Métricas gerais de uso e exportação em CSV |
+| `/admin/metricas` | Administrador | Métricas por período (ativos, frequência, tempo, retenção) |
 | `/admin/superusuario` | Superusuário | Página do superusuário |
 
 ## Estrutura do código
