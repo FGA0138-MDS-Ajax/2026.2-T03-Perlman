@@ -25,9 +25,9 @@ export default function PaginaDashboardAdmin() {
         </EstadoConsultaAdmin>
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
-                { titulo: "Treinos", descricao: "Consulte as fichas vinculadas aos usuários.", to: "/admin/treinos" },
+                { titulo: "Treinos", descricao: "Totais de treinos e os treinos públicos mais adicionados.", to: "/admin/treinos" },
                 { titulo: "Catálogo", descricao: "Cadastre e mantenha os exercícios disponíveis.", to: "/admin/catalogo" },
-                { titulo: "Relatórios", descricao: "Consulte as contas e os totais da plataforma.", to: "/admin/relatorios" },
+                { titulo: "Relatórios", descricao: "Métricas gerais de uso e exercícios mais realizados.", to: "/admin/relatorios" },
                 { titulo: "Métricas", descricao: "Frequência, retenção, tempo de treino e rankings por período.", to: "/admin/metricas" },
                 ...(isSuperusuario ? [{ titulo: "SuperUsuário", descricao: "Gerencie convites para administradores.", to: "/admin/superusuario" }] : []),
             ].map((item) => <Link key={item.to} to={item.to}><Card className="h-full"><CardHeader><CardTitle>{item.titulo}</CardTitle><CardDescription>{item.descricao}</CardDescription></CardHeader></Card></Link>)}

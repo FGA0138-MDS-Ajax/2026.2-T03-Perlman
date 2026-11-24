@@ -66,15 +66,16 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 
 ## Administração
 
-- Treinos (`/admin/treinos`) usa `GET /api/admin/treinos`, com paginação no servidor e o e-mail do dono de cada treino.
-- Dashboard e Relatórios usam `GET /api/conta/exportacao` e os totais de `/api/admin/metricas/*`. Os rótulos indicam que "execuções" somam apenas os exercícios do ranking.
-- `/admin/metricas` mostra, por período, usuários ativos (com série), frequência média, tempo de treino (o ranking é ocultado com menos de cinco usuários ativos), exercícios mais realizados, rotinas e retenção por coorte semanal (ativação em 7 dias e retenção na 2ª e na 5ª semana). Cada seção carrega e falha de forma independente.
+O painel administrativo exibe somente métricas gerais: nenhuma tela lista contas, e-mails, treinos de usuários ou valores por pessoa.
+
+- Dashboard, Relatórios e Treinos usam apenas `/api/admin/metricas/usuarios-ativos`, `/rotinas` e `/exercicios-mais-realizados` (últimos 30 dias): contas cadastradas e ativas, treinos por tipo, percentuais de treinos públicos e de registros com treino, exercícios mais realizados e treinos públicos mais adicionados. "Execuções" somam apenas os exercícios do ranking.
+- Relatórios exporta essas métricas agregadas em CSV (`metricas-motivafit.csv`); a antiga exportação de contas foi removida da interface.
+- `/admin/metricas` mostra, por período, usuários ativos (com série), frequência média, tempo de treino (total, média e mediana por usuário ativo, sem ranking individual), exercícios mais realizados, rotinas e retenção por coorte semanal (ativação em 7 dias e retenção na 2ª e na 5ª semana). Cada seção carrega e falha de forma independente.
+- Exercícios praticados por poucas pessoas são omitidos pelo backend para preservar a privacidade.
 
 ## Dependências do backend
 
-As telas acima dependem das rotas da branch `feature/backend/integracao-front`: preferências, busca por e-mail, entrada e progresso em desafios, convites recebidos e feed de grupos, treinos do admin e as métricas de série e coorte. Sem elas, essas ações retornam 404.
-
-A atividade individual por usuário (execuções e última execução de cada pessoa) não é exibida: as métricas administrativas são apenas agregadas, para não identificar usuários.
+As telas acima dependem das rotas da branch `feature/backend/integracao-front`: preferências, busca por e-mail, entrada e progresso em desafios, convites recebidos e feed de grupos e as métricas de série, coorte e rotinas corrigidas. Sem elas, essas ações retornam 404.
 
 `readJwtUsuarioClaims` apenas decodifica o JWT para apresentação. A autorização efetiva é responsabilidade do backend.
 

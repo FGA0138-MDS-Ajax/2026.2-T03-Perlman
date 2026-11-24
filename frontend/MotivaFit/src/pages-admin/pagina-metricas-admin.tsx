@@ -166,22 +166,13 @@ export default function PaginaMetricasAdmin() {
                     </>}
                 </BlocoSecao>
 
-                <BlocoSecao titulo="Tempo de treino" descricao="Valores agregados, sem identificar usuários." estado={metricas.tempo}>
+                <BlocoSecao titulo="Tempo de treino" descricao="Totais e valores por usuário ativo, sem identificar ninguém." estado={metricas.tempo}>
                     {(dados) => <>
                         <Indicadores itens={[
                             ["Tempo total", formatarDuracao(dados.tempoTotalS)],
                             ["Média por usuário ativo", formatarDuracao(dados.mediaPorUsuarioAtivoS)],
                             ["Mediana por usuário ativo", formatarDuracao(dados.medianaPorUsuarioAtivoS)],
                         ]} />
-                        {dados.ocultoPorPrivacidade
-                            ? <p className="text-muted-foreground">Ranking oculto: há menos de cinco usuários ativos no período.</p>
-                            : dados.ranking.length > 0 && <Table>
-                                <TableHeader><TableRow><TableHead>Posição</TableHead><TableHead>Tempo</TableHead><TableHead>Dias ativos</TableHead><TableHead>Execuções</TableHead></TableRow></TableHeader>
-                                <TableBody>{dados.ranking.map((item) => <TableRow key={item.posicao}>
-                                    <TableCell>{item.posicao}º</TableCell><TableCell>{formatarDuracao(item.tempoTotalS)}</TableCell>
-                                    <TableCell>{item.diasAtivos}</TableCell><TableCell>{item.execucoes}</TableCell>
-                                </TableRow>)}</TableBody>
-                            </Table>}
                     </>}
                 </BlocoSecao>
 

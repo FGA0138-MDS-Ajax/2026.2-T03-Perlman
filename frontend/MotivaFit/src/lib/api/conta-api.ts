@@ -1,5 +1,5 @@
 import type { UsuarioResponseDTO } from "@/lib/api/contracts";
-import { apiRequest, exigirLista, exigirValor } from "@/lib/api/http-client";
+import { apiRequest, exigirValor } from "@/lib/api/http-client";
 
 function usuarioValido(valor: unknown): valor is UsuarioResponseDTO {
     if (typeof valor !== "object" || valor === null) return false;
@@ -17,9 +17,4 @@ export async function buscarConta(id: number, signal?: AbortSignal): Promise<Usu
 
 export async function excluirConta(id: number): Promise<void> {
     await apiRequest<void>(`/api/conta/${id}`, { method: "DELETE" });
-}
-
-export async function exportarContas(signal?: AbortSignal): Promise<UsuarioResponseDTO[]> {
-    const dados = await apiRequest<unknown>("/api/conta/exportacao", { signal });
-    return exigirLista(dados, usuarioValido);
 }

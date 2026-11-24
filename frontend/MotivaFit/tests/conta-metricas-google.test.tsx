@@ -48,7 +48,7 @@ describe('login com Google', () => {
 });
 
 describe('métricas administrativas', () => {
-    it('mostra cada seção de forma independente e respeita o ranking oculto', async () => {
+    it('mostra cada seção de forma independente e sem ranking individual', async () => {
         vi.doMock('@/lib/auth-context', async (importOriginal) => ({
             ...await importOriginal<typeof import('@/lib/auth-context')>(),
             useAuth: () => ({ user: { id: '1', email: 'admin@example.com', nome: 'Admin', perfil: 'ADMINISTRADOR' }, isSuperusuario: false, logout: vi.fn(), enviando: false }),
@@ -70,7 +70,7 @@ describe('métricas administrativas', () => {
         expect(await screen.findByText('Supino reto')).toBeTruthy();
         expect(screen.getAllByText('25%')).toHaveLength(2);
         expect(screen.getByText('2 h 1 min')).toBeTruthy();
-        expect(screen.getByText(/Ranking oculto/)).toBeTruthy();
+        expect(screen.queryByRole('columnheader', { name: 'Posição' })).toBeNull();
         expect(screen.getByText('Full body')).toBeTruthy();
         expect(screen.getByText(/2 exercício\(s\) omitido\(s\)/)).toBeTruthy();
         expect(screen.getByText('16/11/2026')).toBeTruthy();
