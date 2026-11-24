@@ -16,12 +16,14 @@ import {
     convidarParaGrupo,
     criarGrupo,
     excluirGrupo,
+    listarConvitesRecebidos,
     listarFeed,
     listarGrupos,
     listarMembros,
+    publicarNoFeed,
     removerMembro,
 } from "@/lib/api/grupos-api";
-import type { ConviteGrupoResponseDTO, GrupoFeedResponseDTO, GrupoMembroResponseDTO, GrupoResponseDTO } from "@/lib/api/contracts";
+import type { ConviteGrupoRecebidoDTO, ConviteGrupoResponseDTO, GrupoFeedResponseDTO, GrupoMembroResponseDTO, GrupoResponseDTO } from "@/lib/api/contracts";
 import { formatarDataTreino } from "@/lib/treinos-apresentacao";
 import { linkDeConvite } from "@/lib/grupos-apresentacao";
 import Aside from "@/components/aside";
@@ -45,10 +47,18 @@ export default function PaginaGrupos() {
     const [erroConvite, setErroConvite] = useState("");
     const [avisoConvite, setAvisoConvite] = useState("");
     const [aceitando, setAceitando] = useState(false);
+    const [convites, setConvites] = useState<Consulta<ConviteGrupoRecebidoDTO[]>>({ status: "carregando" });
     const recarregar = useCallback(() => setVersao((valor) => valor + 1), []);
 
     useEffect(() => {
         const controller = new AbortController();
+        listarConvitesRecebidos(controller.signal).then(
+            (dados) => setConvites({ status: "sucesso", dados }),
+            (error: unknown) => {
+                if (controller.signal.aborted || ignorar(error)) return;
+                setConvites({ status: "erro", mensagem: mensagemAutenticacao(error) });
+            },
+        );
         listarGrupos(controller.signal).then(
             (dados) => setConsulta({ status: "sucesso", dados }),
             (error: unknown) => {
@@ -61,13 +71,17 @@ export default function PaginaGrupos() {
 
     async function aceitar(event: FormEvent) {
         event.preventDefault();
-        if (aceitando || !token.trim()) return;
+        await aceitarToken(token.trim());
+    }
+
+    async function aceitarToken(valor: string) {
+        if (aceitando || !valor) return;
         setAceitando(true);
         setErroConvite("");
         setAvisoConvite("");
         try {
-            await aceitarConviteGrupo(token.trim());
-            setToken("");
+            await aceitarConviteGrupo(valor);
+            if (valor === token.trim()) setToken("");
             if (params.has("convite")) setParams({}, { replace: true });
             setAvisoConvite("Convite aceito. Você agora faz parte do grupo.");
             recarregar();
@@ -98,6 +112,28 @@ export default function PaginaGrupos() {
                             <h2 className="font-heading text-lg font-bold">Meus grupos</h2>
                             <Button type="button" className="gap-2" onClick={() => setFormulario({ aberto: true, editando: null })}><Plus className="h-4 w-4" />Criar grupo</Button>
                         </div>
+
+                        {convites.status === "erro" && <p role="alert" className="text-sm text-destructive">{convites.mensagem}</p>}
+                        {convites.status === "sucesso" && convites.dados.length > 0 && <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Convites recebidos</CardTitle>
+                                <CardDescription>Convites pendentes para participar de grupos.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="divide-y rounded-lg border" aria-label="Convites recebidos">
+                                    {convites.dados.map((convite) => <li key={convite.id} className="flex flex-wrap items-center justify-between gap-2 p-3 text-sm">
+                                        <span>
+                                            <span className="font-medium">{convite.grupoNome}</span>
+                                            <span className="block text-xs text-muted-foreground">
+                                                {convite.convidanteEmail ? `Convite de ${convite.convidanteEmail} · ` : ""}válido até {formatarDataTreino(convite.expiraEm)}
+                                            </span>
+                                        </span>
+                                        <Button type="button" size="sm" disabled={aceitando} aria-label={`Aceitar convite para ${convite.grupoNome}`}
+                                            onClick={() => void aceitarToken(convite.token)}>Aceitar</Button>
+                                    </li>)}
+                                </ul>
+                            </CardContent>
+                        </Card>}
 
                         <Card>
                             <CardHeader>
@@ -216,6 +252,7 @@ function DetalheGrupo({ grupo, onVoltar, onEditar, onSaiu }: {
     const [aviso, setAviso] = useState("");
     const [enviando, setEnviando] = useState(false);
     const [confirmar, setConfirmar] = useState<null | "excluir" | "sair">(null);
+    const [publicacao, setPublicacao] = useState("");
 
     useEffect(() => {
         const controller = new AbortController();
@@ -300,6 +337,23 @@ function DetalheGrupo({ grupo, onVoltar, onEditar, onSaiu }: {
 
                 <section aria-labelledby="grupo-feed" className="space-y-2">
                     <h3 id="grupo-feed" className="font-semibold">Feed</h3>
+                    <form className="space-y-2" onSubmit={(event) => {
+                        event.preventDefault();
+                        const conteudo = publicacao.trim();
+                        if (!conteudo) return;
+                        void executar(() => publicarNoFeed(grupo.id, conteudo), "Publicação enviada.", () => {
+                            setPublicacao("");
+                            setVersao((valor) => valor + 1);
+                        });
+                    }}>
+                        <Label htmlFor="grupo-publicacao" className="sr-only">Nova publicação</Label>
+                        <textarea id="grupo-publicacao" rows={2} maxLength={1000} placeholder="Compartilhe algo com o grupo"
+                            className="w-full rounded-md border bg-background px-3 py-2 text-sm" value={publicacao} onChange={(event) => setPublicacao(event.target.value)} />
+                        <div className="flex items-center justify-between gap-2">
+                            <span className="text-xs text-muted-foreground">{publicacao.length}/1000</span>
+                            <Button type="submit" size="sm" disabled={enviando || !publicacao.trim()}>Publicar</Button>
+                        </div>
+                    </form>
                     {feed.status === "carregando" && <p role="status" className="text-sm">Carregando feed…</p>}
                     {feed.status === "erro" && <p role="alert" className="text-sm text-destructive">{feed.mensagem}</p>}
                     {feed.status === "sucesso" && (feed.dados.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma atividade ainda.</p>

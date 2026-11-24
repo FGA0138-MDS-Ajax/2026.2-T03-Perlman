@@ -32,6 +32,7 @@ function api(extra?: Responder): Responder {
         if (proprio) return proprio;
         const participantesDe = url.match(/\/api\/desafios\/(\d+)\/participantes$/);
         if (participantesDe) return Response.json(participantes[Number(participantesDe[1])] ?? []);
+        if (url.endsWith('/progresso')) return Response.json([]);
         if (url.includes('/api/catalogo-exercicios')) return Response.json([supino, corrida]);
         if (url.includes('/api/amizades')) return Response.json([{ id: 3, solicitanteId: 42, solicitanteEmail: 'aluno@example.com',
             destinatarioId: 15, destinatarioEmail: 'amigo@example.com', estado: 'ACEITA', criadoEm: '2026-11-20T10:00:00Z', atualizadoEm: '2026-11-20T10:00:00Z' }]);
@@ -54,7 +55,7 @@ describe('desafios integrados à API', () => {
         expect(screen.getByRole('heading', { name: 'Desafio com convite' })).toBeTruthy();
         fireEvent.click(screen.getByRole('tab', { name: 'Desafios públicos' }));
         expect(screen.getByRole('heading', { name: 'Desafio aberto' })).toBeTruthy();
-        expect(screen.getByText(/peça um convite/)).toBeTruthy();
+        expect(screen.getByText(/Abra um desafio público/)).toBeTruthy();
         expect(localStorage.getItem('@motivafit:desafios')).toBeNull();
         expect(gravar).not.toHaveBeenCalled();
     });
@@ -98,6 +99,27 @@ describe('desafios integrados à API', () => {
         expect(corpo(chamadas('POST').find(([url]) => url === '/api/desafios/7/participantes')!)).toEqual({ usuarioId: 15 });
     });
 
+    it('entra em desafio público e mostra o progresso dos participantes', async () => {
+        montar('/desafios', '/desafios', <PaginaDesafios />, api((url, init) => {
+            if (url === '/api/desafios/9/participantes/me' && init?.method === 'POST') return Response.json(
+                { usuarioId: 42, email: 'aluno@example.com', estado: 'ACEITO', aceitoEm: '2026-11-20T10:00:00Z' }, { status: 201 });
+            if (url === '/api/desafios/9/progresso') return Response.json([
+                { usuarioId: 5, email: 'dono@example.com', percentual: 60, concluido: false,
+                    itens: [{ itemId: 90, catalogoId: 1, cargaMaxKg: null, repeticoes: 60, series: 4, tempoS: 0, distanciaM: 0, percentual: 60, concluido: false }] },
+            ]);
+            return undefined;
+        }));
+        fireEvent.click(await screen.findByRole('tab', { name: 'Desafios públicos' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Ver detalhes de Desafio aberto' }));
+        const progresso = await screen.findByRole('list', { name: 'Progresso dos participantes' });
+        expect(within(progresso).getByText('dono@example.com')).toBeTruthy();
+        expect(within(progresso).getByText('Supino reto: 60/100 repetições (60%)')).toBeTruthy();
+        expect(within(progresso).getByRole('progressbar').getAttribute('aria-valuenow')).toBe('60');
+        fireEvent.click(screen.getByRole('button', { name: 'Participar do desafio' }));
+        await waitFor(() => expect(chamadas('POST').map(([url]) => url)).toContain('/api/desafios/9/participantes/me'));
+        expect(await screen.findByText('Você entrou no desafio.')).toBeTruthy();
+    });
+
     it('valida o pedido antes de enviar', () => {
         const base = { titulo: 'Desafio', descricao: '', prazo: '2026-11-25', visibilidade: 'PUBLICO' as const, itens: [] };
         const musculacao = { chave: 'a', catalogoId: 1, nome: 'Supino', modalidade: 'MUSCULACAO' as const,
@@ -106,6 +128,8 @@ describe('desafios integrados à API', () => {
         expect(montarPedidoDesafio(base, '2026-11-25')).toBe('Inclua ao menos um exercício.');
         expect(montarPedidoDesafio({ ...base, itens: [musculacao, { ...musculacao, chave: 'b' }] }, '2026-11-25')).toContain('duas vezes');
         expect(montarPedidoDesafio({ ...base, itens: [{ ...musculacao, metaSeries: '2.5' }] }, '2026-11-25')).toContain('inteiro');
+        expect(montarPedidoDesafio({ ...base, itens: [{ ...musculacao, metaSeries: '0' }] }, '2026-11-25')).toBe('Séries de Supino deve ser um número inteiro maior que zero.');
+        expect(montarPedidoDesafio({ ...base, itens: [{ ...musculacao, metaCargaKg: '0' }] }, '2026-11-25')).toMatchObject({ itens: [{ catalogoId: 1, metaSeries: 3, metaCargaKg: 0 }] });
         expect(montarPedidoDesafio({ ...base, itens: [musculacao] }, '2026-11-25')).toEqual({
             titulo: 'Desafio', prazo: '2026-11-25', visibilidade: 'PUBLICO', itens: [{ catalogoId: 1, metaSeries: 3, metaCargaKg: 80.5 }],
         });

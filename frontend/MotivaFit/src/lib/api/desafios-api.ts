@@ -1,6 +1,7 @@
 import type {
     DesafioItemResponseDTO,
     DesafioParticipanteResponseDTO,
+    DesafioProgressoDTO,
     DesafioRequestDTO,
     DesafioResponseDTO,
     EstadoParticipante,
@@ -68,4 +69,20 @@ export async function responderParticipacao(id: number, estado: Exclude<EstadoPa
 
 export async function sairDoDesafio(id: number): Promise<void> {
     await apiRequest<void>(`/api/desafios/${id}/participantes/me`, { method: "DELETE" });
+}
+
+/** Entrada direta em desafio público; um convite pendente vira participação aceita. */
+export async function entrarNoDesafio(id: number): Promise<DesafioParticipanteResponseDTO> {
+    return exigirValor(await apiRequest<unknown>(`/api/desafios/${id}/participantes/me`, { method: "POST" }), participanteValido);
+}
+
+function progressoValido(valor: unknown): valor is DesafioProgressoDTO {
+    return objeto(valor) && inteiro(valor.usuarioId) && textoOuNulo(valor.email)
+        && typeof valor.percentual === "number" && typeof valor.concluido === "boolean"
+        && Array.isArray(valor.itens) && valor.itens.every((item) => objeto(item) && inteiro(item.catalogoId)
+            && typeof item.percentual === "number" && typeof item.concluido === "boolean");
+}
+
+export async function buscarProgresso(id: number, signal?: AbortSignal): Promise<DesafioProgressoDTO[]> {
+    return exigirLista(await apiRequest<unknown>(`/api/desafios/${id}/progresso`, { signal }), progressoValido);
 }

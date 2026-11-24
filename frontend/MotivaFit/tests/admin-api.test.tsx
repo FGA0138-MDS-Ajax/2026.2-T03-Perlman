@@ -70,13 +70,15 @@ describe('administração pela API', () => {
         expect(await screen.findByText('Nenhum usuário encontrado.')).toBeTruthy();
     });
     it('lista fichas reais com proprietário e rejeita resposta inválida', async () => {
-        vi.stubGlobal('fetch', vi.fn().mockImplementationOnce(async () => Response.json({}))
-            .mockImplementation(async () => Response.json([{ id: 7, nome: 'Ficha real', tipo: 'MUSCULACAO', visibilidade: 'PRIVADO', meuTreino: false, podeEditar: false, createdAt: '2026-11-11T12:00:00Z', updatedAt: '2026-11-11T12:00:00Z' }])));
+        vi.stubGlobal('fetch', vi.fn().mockImplementationOnce(async () => Response.json([]))
+            .mockImplementation(async () => Response.json({ total: 1, pagina: 0, tamanho: 50, itens: [{ id: 7, nome: 'Ficha real', tipo: 'MUSCULACAO', visibilidade: 'PRIVADO',
+                usuarioId: 2, usuarioEmail: 'aluno@example.com', treinoOrigemId: 3, createdAt: '2026-11-11T12:00:00Z' }] })));
         render(<MemoryRouter><PaginaTreinosAdmin /></MemoryRouter>);
         await screen.findByRole('alert');
         fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
         expect(await screen.findByText('Ficha real')).toBeTruthy();
-        expect(screen.getByText('Fichas disponíveis nesta sessão')).toBeTruthy();
-        expect(screen.queryByText('Hipertrofia - Iniciante')).toBeNull();
+        expect(screen.getByText('aluno@example.com')).toBeTruthy();
+        expect(screen.getByText('Cópia de um treino público')).toBeTruthy();
+        expect(String(vi.mocked(fetch).mock.calls.at(-1)?.[0])).toBe('/api/admin/treinos?pagina=0&tamanho=50');
     });
 });

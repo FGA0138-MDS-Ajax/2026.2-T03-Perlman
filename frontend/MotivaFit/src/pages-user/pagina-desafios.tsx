@@ -10,11 +10,14 @@ import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
 import { amigosDe, listarAmizades, type Amigo } from "@/lib/api/amizades-api";
+import { buscarUsuarioPorEmail } from "@/lib/api/usuarios-api";
 import {
     atualizarDesafio,
     cancelarDesafio,
+    buscarProgresso,
     convidarParticipante,
     criarDesafio,
+    entrarNoDesafio,
     listarDesafios,
     listarParticipantes,
     responderParticipacao,
@@ -23,6 +26,8 @@ import {
 import type {
     CatalogoExercicioResponseDTO,
     DesafioParticipanteResponseDTO,
+    DesafioItemResponseDTO,
+    DesafioProgressoDTO,
     DesafioResponseDTO,
     EstadoParticipante,
     VisibilidadeBackend,
@@ -168,7 +173,7 @@ export default function PaginaDesafios() {
                                 </div>}
                                 {consulta.status === "sucesso" && <>
                                     {aba === "publicos" && <p className="text-sm text-muted-foreground">
-                                        Para participar de um desafio público, peça um convite a quem o criou.
+                                        Abra um desafio público para ver as metas e participar.
                                     </p>}
                                     <ListaDesafios itens={listas[aba].itens} vazio={listas[aba].vazio} onAbrir={setAbertoId} />
                                 </>}
@@ -188,6 +193,21 @@ export default function PaginaDesafios() {
             </Dialog>
         </div>
     );
+}
+
+function formatarPercentual(valor: number): string {
+    return valor.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+}
+
+/** Mostra só os valores realizados que correspondem às metas do exercício. */
+function resumoRealizado(progresso: DesafioProgressoDTO["itens"][number], meta: DesafioItemResponseDTO | undefined): string {
+    const partes: string[] = [];
+    if (meta?.metaSeries != null) partes.push(`${progresso.series}/${meta.metaSeries} séries`);
+    if (meta?.metaRepeticoes != null) partes.push(`${progresso.repeticoes}/${meta.metaRepeticoes} repetições`);
+    if (meta?.metaCargaKg != null) partes.push(`${progresso.cargaMaxKg ?? 0}/${meta.metaCargaKg} kg`);
+    if (meta?.metaTempoS != null) partes.push(`${progresso.tempoS}/${meta.metaTempoS} s`);
+    if (meta?.metaDistanciaM != null) partes.push(`${progresso.distanciaM}/${meta.metaDistanciaM} m`);
+    return partes.join(", ") || "sem registros";
 }
 
 // ---------------------------------------------------------------------------
@@ -242,6 +262,17 @@ function DetalheDesafio({ item, onVoltar, onEditar, onAlterado, onRemovido }: {
     const [confirmarCancelamento, setConfirmarCancelamento] = useState(false);
     const [amigos, setAmigos] = useState<Consulta<Amigo[]>>({ status: "carregando" });
     const [convidadoId, setConvidadoId] = useState("");
+    const [emailConvite, setEmailConvite] = useState("");
+    const [progresso, setProgresso] = useState<Consulta<DesafioProgressoDTO[]>>({ status: "carregando" });
+
+    useEffect(() => {
+        const controller = new AbortController();
+        buscarProgresso(desafio.id, controller.signal).then(
+            (dados) => setProgresso({ status: "sucesso", dados }),
+            (error: unknown) => { if (!ignorar(error)) setProgresso({ status: "erro", mensagem: mensagemAutenticacao(error) }); },
+        );
+        return () => controller.abort();
+    }, [desafio.id, participantes]);
 
     useEffect(() => {
         if (!desafio.souCriador || !user) return;
@@ -306,6 +337,35 @@ function DetalheDesafio({ item, onVoltar, onEditar, onAlterado, onRemovido }: {
                             </ul>}
                 </section>
 
+                <section aria-labelledby="desafio-progresso" className="space-y-2">
+                    <h3 id="desafio-progresso" className="font-semibold">Progresso</h3>
+                    <p className="text-xs text-muted-foreground">Soma dos registros feitos desde a criação do desafio até o fim do prazo. Carga considera o maior valor.</p>
+                    {progresso.status === "carregando" && <p role="status" className="text-sm">Carregando progresso…</p>}
+                    {progresso.status === "erro" && <p role="alert" className="text-sm text-destructive">{progresso.mensagem}</p>}
+                    {progresso.status === "sucesso" && (progresso.dados.length === 0
+                        ? <p className="text-sm text-muted-foreground">Nenhum participante confirmado ainda.</p>
+                        : <ol className="space-y-3" aria-label="Progresso dos participantes">
+                            {progresso.dados.map((linha) => <li key={linha.usuarioId} className="space-y-1.5 rounded-lg border p-3 text-sm">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <span className="break-all font-medium">{linha.email ?? `Usuário ${linha.usuarioId}`}{linha.usuarioId === Number(user?.id) && " (você)"}</span>
+                                    <span className="tabular-nums">{linha.concluido ? "Concluído" : `${formatarPercentual(linha.percentual)}%`}</span>
+                                </div>
+                                <div className="h-2 rounded-full bg-muted" role="progressbar" aria-valuemin={0} aria-valuemax={100}
+                                    aria-valuenow={linha.percentual} aria-label={`Progresso de ${linha.email ?? linha.usuarioId}`}>
+                                    <div className="h-2 rounded-full bg-primary" style={{ width: `${Math.min(100, linha.percentual)}%` }} />
+                                </div>
+                                <ul className="grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+                                    {linha.itens.map((itemProgresso) => {
+                                        const meta = desafio.itens.find((item) => item.catalogoId === itemProgresso.catalogoId);
+                                        return <li key={itemProgresso.catalogoId}>
+                                            {meta?.exercicioNome ?? "Exercício"}: {resumoRealizado(itemProgresso, meta)} ({formatarPercentual(itemProgresso.percentual)}%)
+                                        </li>;
+                                    })}
+                                </ul>
+                            </li>)}
+                        </ol>)}
+                </section>
+
                 {desafio.souCriador && <section aria-labelledby="desafio-convidar" className="space-y-2">
                     <h3 id="desafio-convidar" className="font-semibold">Convidar amigo</h3>
                     {amigos.status === "carregando" && <p role="status" className="text-sm">Carregando amigos…</p>}
@@ -326,6 +386,21 @@ function DetalheDesafio({ item, onVoltar, onEditar, onAlterado, onRemovido }: {
                             </div>
                             <Button type="submit" disabled={enviando || !convidadoId}>Convidar</Button>
                         </form>)}
+                    <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => {
+                        event.preventDefault();
+                        const email = emailConvite.trim();
+                        if (!email) return;
+                        void executar(async () => {
+                            const pessoa = await buscarUsuarioPorEmail(email);
+                            await convidarParticipante(desafio.id, pessoa.id);
+                        }, "Convite enviado.", () => { setEmailConvite(""); onAlterado(); });
+                    }}>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="desafio-convite-email">Ou convide pelo e-mail</Label>
+                            <Input id="desafio-convite-email" type="email" autoComplete="off" className="w-72 max-w-full" value={emailConvite} onChange={(event) => setEmailConvite(event.target.value)} />
+                        </div>
+                        <Button type="submit" variant="outline" disabled={enviando || !emailConvite.trim()}>Convidar por e-mail</Button>
+                    </form>
                 </section>}
 
                 {erro && <p role="alert" className="text-sm text-destructive">{erro}</p>}
@@ -338,6 +413,9 @@ function DetalheDesafio({ item, onVoltar, onEditar, onAlterado, onRemovido }: {
                             <Trash2 className="h-4 w-4" />Cancelar desafio
                         </Button>
                     </>}
+                    {!desafio.souCriador && desafio.visibilidade === "PUBLICO" && (meuEstado === null || meuEstado === "RECUSADO") && (
+                        <Button type="button" disabled={enviando} onClick={() => void executar(() => entrarNoDesafio(desafio.id), "Você entrou no desafio.")}>Participar do desafio</Button>
+                    )}
                     {!desafio.souCriador && meuEstado === "CONVIDADO" && <>
                         <Button type="button" disabled={enviando} onClick={() => void executar(() => responderParticipacao(desafio.id, "ACEITO"), "Você entrou no desafio.")}>Aceitar convite</Button>
                         <Button type="button" variant="outline" disabled={enviando} onClick={() => void executar(() => responderParticipacao(desafio.id, "RECUSADO"), "Convite recusado.")}>Recusar convite</Button>

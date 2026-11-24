@@ -9,12 +9,13 @@ export default function PaginaTreinosAdmin() {
     return <AdminLayout title="Gerenciamento de Treinos">
         <EstadoConsultaAdmin estado={estado} atualizar={atualizar}>
             {estado.status === "sucesso" && <>
-                <p>{estado.dados.total} fichas vinculadas na plataforma.</p>
+                <p>{estado.dados.total} treinos cadastrados em todas as contas, do mais recente ao mais antigo.</p>
                 {estado.dados.itens.length === 0 && <p>Nenhuma ficha encontrada.</p>}
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {estado.dados.itens.map((ficha) => <Card key={ficha.id}>
-                        <CardHeader><CardTitle>{ficha.nome}</CardTitle><CardDescription>Fichas disponíveis nesta sessão</CardDescription></CardHeader>
+                        <CardHeader><CardTitle>{ficha.nome}</CardTitle><CardDescription className="break-all">{ficha.usuarioEmail || "Dono indisponível"}</CardDescription></CardHeader>
                         <CardContent className="space-y-2 text-sm">
+                            {ficha.copiaDePublico && <p>Cópia de um treino público</p>}
                             <p>Modalidade: {ficha.tipo === "MUSCULACAO" ? "Musculação" : "Aeróbico"}</p>
                             <p>Visibilidade: {ficha.visibilidade === "PUBLICO" ? "Pública" : "Privada"}</p>
                         </CardContent>

@@ -1,4 +1,5 @@
 import type {
+    ConviteGrupoRecebidoDTO,
     ConviteGrupoResponseDTO,
     GrupoFeedResponseDTO,
     GrupoMembroResponseDTO,
@@ -69,4 +70,17 @@ export async function aceitarConviteGrupo(token: string): Promise<void> {
 
 export async function listarFeed(id: number, signal?: AbortSignal): Promise<GrupoFeedResponseDTO[]> {
     return exigirLista(await apiRequest<unknown>(`/api/grupos/${id}/feed`, { signal }), postValido);
+}
+
+function conviteRecebidoValido(valor: unknown): valor is ConviteGrupoRecebidoDTO {
+    return objeto(valor) && inteiro(valor.id) && inteiro(valor.grupoId) && texto(valor.grupoNome)
+        && textoOuNulo(valor.convidanteEmail) && texto(valor.token) && texto(valor.expiraEm);
+}
+
+export async function listarConvitesRecebidos(signal?: AbortSignal): Promise<ConviteGrupoRecebidoDTO[]> {
+    return exigirLista(await apiRequest<unknown>("/api/grupos/convites", { signal }), conviteRecebidoValido);
+}
+
+export async function publicarNoFeed(id: number, conteudo: string): Promise<GrupoFeedResponseDTO> {
+    return exigirValor(await apiRequest<unknown>(`/api/grupos/${id}/feed`, { method: "POST", body: { conteudo } }), postValido);
 }

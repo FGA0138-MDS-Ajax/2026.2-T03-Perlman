@@ -56,13 +56,14 @@ describe('métricas administrativas', () => {
         const { default: PaginaMetricasAdmin } = await import('@/pages-admin/pagina-metricas-admin');
         setAccessToken('teste');
         vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-            if (url.includes('/usuarios-ativos')) return Response.json({ totalContas: 20, ativosNoPeriodo: 5, percentualAtivos: 25, serie: [] });
+            if (url.includes('/usuarios-ativos')) return Response.json({ totalContas: 20, ativosNoPeriodo: 5, percentualAtivos: 25, serie: [{ periodo: '2026-11-16', ativos: 4 }] });
             if (url.includes('/frequencia-media')) return erro(500, 'Falha na frequência');
             if (url.includes('/ranking-tempo-treino')) return Response.json({ tempoTotalS: 7260, mediaPorUsuarioAtivoS: 3600, medianaPorUsuarioAtivoS: null, ocultoPorPrivacidade: true, ranking: [] });
             if (url.includes('/exercicios-mais-realizados')) return Response.json({ suprimidos: 2, ranking: [{ posicao: 1, catalogoId: 1, nome: 'Supino reto', modalidade: 'MUSCULACAO', grupoMuscular: 'Peito', execucoes: 30, usuariosDistintos: 6 }] });
             if (url.includes('/rotinas')) return Response.json({ treinosAtivos: 12, porTipo: [{ tipo: 'MUSCULACAO', treinos: 9 }], percentualTreinosPublicos: 25, percentualRegistrosComTreino: 80,
                 treinosPublicosMaisAdicionados: [{ posicao: 1, treinoId: 3, nome: 'Full body', adicoes: 4, usuariosDistintos: 4 }] });
-            if (url.includes('/retencao')) return Response.json({ ate: '2026-11-23', taxaAtivacao7Dias: 0, medianaDiasAtePrimeiroRegistro: null, coortes: [] });
+            if (url.includes('/retencao')) return Response.json({ ate: '2026-11-23', taxaAtivacao7Dias: 50, medianaDiasAtePrimeiroRegistro: 2,
+                coortes: [{ semana: '2026-11-09', cadastrados: 8, ativados7Dias: 4, retidosSemana2: 3, retidosSemana5: 0 }] });
             return Response.json({}, { status: 404 });
         }));
         render(<MemoryRouter><PaginaMetricasAdmin /></MemoryRouter>);
@@ -72,7 +73,10 @@ describe('métricas administrativas', () => {
         expect(screen.getByText(/Ranking oculto/)).toBeTruthy();
         expect(screen.getByText('Full body')).toBeTruthy();
         expect(screen.getByText(/2 exercício\(s\) omitido\(s\)/)).toBeTruthy();
-        expect(screen.getByText('Ainda não há coortes calculadas.')).toBeTruthy();
+        expect(screen.getByText('16/11/2026')).toBeTruthy();
+        expect(screen.getByRole('columnheader', { name: 'Retidos na 2ª semana' })).toBeTruthy();
+        expect(screen.getByText('09/11/2026')).toBeTruthy();
+        expect(screen.getByText('2 dia(s)')).toBeTruthy();
         expect(screen.getByRole('alert').textContent).toContain('Falha na frequência');
 
         fireEvent.change(screen.getByLabelText('De'), { target: { value: '2026-11-10' } });

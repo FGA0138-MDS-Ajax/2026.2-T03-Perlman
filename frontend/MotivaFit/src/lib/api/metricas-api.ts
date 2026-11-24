@@ -42,7 +42,10 @@ export async function buscarEvolucao(params: {
 export type Agrupamento = "DIA" | "SEMANA" | "MES";
 export interface Periodo { de?: string; ate?: string }
 
-export interface UsuariosAtivos { de: string; ate: string; totalContas: number; ativosNoPeriodo: number; percentualAtivos: number }
+export interface UsuariosAtivos {
+    de: string; ate: string; totalContas: number; ativosNoPeriodo: number; percentualAtivos: number;
+    serie: { periodo: string; ativos: number }[];
+}
 export interface FrequenciaMedia {
     de: string; ate: string;
     mediaDiasPorSemana: number | null; medianaDiasPorSemana: number | null;
@@ -66,8 +69,10 @@ export interface MetricasRotinas {
 }
 export interface Retencao {
     ate: string; taxaAtivacao7Dias: number | null; medianaDiasAtePrimeiroRegistro: number | null;
-    coortes: Record<string, unknown>[];
+    coortes: Coorte[];
 }
+/** Coorte semanal de cadastro: ativação nos 7 primeiros dias e retenção na 2ª e na 5ª semana. */
+export interface Coorte { semana: string; cadastrados: number; ativados7Dias: number; retidosSemana2: number; retidosSemana5: number }
 
 const obj = (valor: unknown): valor is Record<string, unknown> => typeof valor === "object" && valor !== null;
 const num = (valor: unknown): valor is number => typeof valor === "number" && Number.isFinite(valor);
@@ -92,7 +97,8 @@ async function buscarMetricaAdmin(caminho: string, params: Record<string, string
 
 export async function buscarUsuariosAtivos(params: Periodo & { agrupamento?: Agrupamento } = {}, signal?: AbortSignal): Promise<UsuariosAtivos> {
     return exigir(await buscarMetricaAdmin("usuarios-ativos", { ...params }, signal),
-        (v) => num(v.totalContas) && num(v.ativosNoPeriodo) && num(v.percentualAtivos));
+        (v) => num(v.totalContas) && num(v.ativosNoPeriodo) && num(v.percentualAtivos)
+            && (v.serie === undefined || lista(v.serie, (i) => obj(i) && typeof i.periodo === "string" && num(i.ativos))));
 }
 
 export async function buscarFrequenciaMedia(params: Periodo = {}, signal?: AbortSignal): Promise<FrequenciaMedia> {
@@ -121,5 +127,6 @@ export async function buscarMetricasRotinas(params: Periodo & { limite?: number 
 
 export async function buscarRetencao(params: { ate?: string; coortes?: number } = {}, signal?: AbortSignal): Promise<Retencao> {
     return exigir(await buscarMetricaAdmin("retencao", { ...params }, signal),
-        (v) => numOuNulo(v.taxaAtivacao7Dias) && numOuNulo(v.medianaDiasAtePrimeiroRegistro) && lista(v.coortes, obj));
+        (v) => numOuNulo(v.taxaAtivacao7Dias) && numOuNulo(v.medianaDiasAtePrimeiroRegistro)
+            && lista(v.coortes, (i) => obj(i) && typeof i.semana === "string" && num(i.cadastrados) && num(i.ativados7Dias)));
 }

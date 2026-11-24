@@ -39,12 +39,12 @@ export interface ItemFormulario {
     metaDistanciaM: string;
 }
 
-export const CAMPOS_META: { campo: keyof Pick<ItemFormulario, "metaSeries" | "metaRepeticoes" | "metaCargaKg" | "metaTempoS" | "metaDistanciaM">; rotulo: string; modalidades: ModalidadeBackend[]; inteiro: boolean }[] = [
-    { campo: "metaSeries", rotulo: "Séries", modalidades: ["MUSCULACAO"], inteiro: true },
-    { campo: "metaRepeticoes", rotulo: "Repetições", modalidades: ["MUSCULACAO"], inteiro: true },
-    { campo: "metaCargaKg", rotulo: "Carga (kg)", modalidades: ["MUSCULACAO"], inteiro: false },
-    { campo: "metaTempoS", rotulo: "Tempo (s)", modalidades: ["MUSCULACAO", "AEROBICO"], inteiro: true },
-    { campo: "metaDistanciaM", rotulo: "Distância (m)", modalidades: ["AEROBICO"], inteiro: false },
+export const CAMPOS_META: { campo: keyof Pick<ItemFormulario, "metaSeries" | "metaRepeticoes" | "metaCargaKg" | "metaTempoS" | "metaDistanciaM">; rotulo: string; modalidades: ModalidadeBackend[]; inteiro: boolean; aceitaZero: boolean }[] = [
+    { campo: "metaSeries", rotulo: "Séries", modalidades: ["MUSCULACAO"], inteiro: true, aceitaZero: false },
+    { campo: "metaRepeticoes", rotulo: "Repetições", modalidades: ["MUSCULACAO"], inteiro: true, aceitaZero: false },
+    { campo: "metaCargaKg", rotulo: "Carga (kg)", modalidades: ["MUSCULACAO"], inteiro: false, aceitaZero: true },
+    { campo: "metaTempoS", rotulo: "Tempo (s)", modalidades: ["MUSCULACAO", "AEROBICO"], inteiro: true, aceitaZero: false },
+    { campo: "metaDistanciaM", rotulo: "Distância (m)", modalidades: ["AEROBICO"], inteiro: false, aceitaZero: false },
 ];
 
 function texto(valor: number | null): string {
@@ -81,8 +81,10 @@ export function montarPedidoDesafio(dados: {
             const bruto = item[definicao.campo].trim().replace(",", ".");
             if (!bruto) continue;
             const valor = Number(bruto);
-            if (!Number.isFinite(valor) || valor < 0 || definicao.inteiro && !Number.isInteger(valor)) {
-                return `${definicao.rotulo} de ${item.nome} deve ser ${definicao.inteiro ? "um número inteiro" : "um número"} maior ou igual a zero.`;
+            // O backend aceita carga zero; as demais metas precisam ser positivas.
+            const foraDoLimite = definicao.aceitaZero ? valor < 0 : valor <= 0;
+            if (!Number.isFinite(valor) || foraDoLimite || definicao.inteiro && !Number.isInteger(valor)) {
+                return `${definicao.rotulo} de ${item.nome} deve ser ${definicao.inteiro ? "um número inteiro" : "um número"} ${definicao.aceitaZero ? "maior ou igual a zero" : "maior que zero"}.`;
             }
             pedido[definicao.campo] = valor;
             metas += 1;

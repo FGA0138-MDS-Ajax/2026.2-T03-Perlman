@@ -23,6 +23,7 @@ export interface TreinoAdmin {
     usuarioEmail: string;
     tipo: "MUSCULACAO" | "AEROBICO";
     visibilidade: "PRIVADO" | "PUBLICO";
+    copiaDePublico: boolean;
 }
 export interface PaginaTreinosAdmin { itens: TreinoAdmin[]; total: number }
 export const TAMANHO_PAGINA_ADMIN = 50;
@@ -61,21 +62,25 @@ export async function buscarRelatorioAdmin(pagina: number, signal?: AbortSignal)
         usuarios: contasValidas.slice(pagina * TAMANHO_PAGINA_ADMIN, (pagina + 1) * TAMANHO_PAGINA_ADMIN),
     };
 }
+/** Treinos de todas as contas, paginados pelo servidor (GET /api/admin/treinos). */
 export async function listarTreinosAdmin(pagina: number, signal?: AbortSignal): Promise<PaginaTreinosAdmin> {
-    const treinos = await apiRequest<unknown>("/api/treinos", { signal });
-    if (!Array.isArray(treinos)) throw new Error("O servidor retornou uma lista de treinos inválida.");
-    const itens = treinos.filter((item): item is TreinoAdmin => objeto(item)
+    const dados = await apiRequest<unknown>(`/api/admin/treinos?pagina=${pagina}&tamanho=${TAMANHO_PAGINA_ADMIN}`, { signal });
+    if (!objeto(dados) || !Array.isArray(dados.itens) || !contagem(dados.total)) {
+        throw new Error("O servidor retornou uma lista de treinos inválida.");
+    }
+    const itens = dados.itens.filter((item): item is TreinoAdmin => objeto(item)
         && contagem(item.id) && typeof item.nome === "string"
         && (item.tipo === "MUSCULACAO" || item.tipo === "AEROBICO")
         && (item.visibilidade === "PRIVADO" || item.visibilidade === "PUBLICO")
     ).map((item) => ({
         id: item.id,
         nome: item.nome,
-        usuarioEmail: "",
+        usuarioEmail: typeof item.usuarioEmail === "string" ? item.usuarioEmail : "",
         tipo: item.tipo,
         visibilidade: item.visibilidade,
+        copiaDePublico: contagem((item as unknown as Record<string, unknown>).treinoOrigemId),
     }));
-    return { itens: itens.slice(pagina * TAMANHO_PAGINA_ADMIN, (pagina + 1) * TAMANHO_PAGINA_ADMIN), total: itens.length };
+    return { itens, total: dados.total };
 }
 
 export interface ConviteCriado {

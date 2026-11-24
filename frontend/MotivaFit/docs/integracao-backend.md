@@ -1,6 +1,6 @@
 # Integração com o backend
 
-A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login (e-mail/senha e Google), restauração de sessão, logout, guardas por perfil, conta, preferências de tema, catálogo, CRUD de treinos, ficha de exercícios, cópia de treino público, registro de execução, histórico paginado, evolução pessoal, desafios, amizades, grupos, convites e métricas administrativas estão conectados à API. Nenhuma funcionalidade guarda dados de domínio no `localStorage` ou `sessionStorage`. Lacunas que dependem do backend estão listadas em "Pendências no backend".
+A base HTTP já suporta renovação coordenada de sessão, normalização de erros e descarte de respostas de uma sessão anterior. Cadastro, login (e-mail/senha e Google), restauração de sessão, logout, guardas por perfil, conta, preferências de tema, catálogo, CRUD de treinos, ficha de exercícios, cópia de treino público, registro de execução, histórico paginado, evolução pessoal, desafios, amizades, grupos, convites e métricas administrativas estão conectados à API. Nenhuma funcionalidade guarda dados de domínio no `localStorage` ou `sessionStorage`. As rotas que dependem da branch de backend estão listadas em "Dependências do backend".
 
 ## Desenvolvimento local
 
@@ -60,22 +60,21 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 
 ## Social
 
-- **Amigos** (`/amigos`): `GET/POST /api/amizades` e `PATCH/DELETE /api/amizades/{id}`. Separa solicitações recebidas, enviadas e amizades aceitas. O envio usa o ID numérico da conta, pois não há busca de usuários.
-- **Desafios** (`/desafios`): CRUD em `/api/desafios`, metas por exercício do catálogo conforme a modalidade, prazo no fuso `America/Sao_Paulo` e visibilidade. O criador convida amigos (`POST /participantes`); convidados aceitam ou recusam (`PATCH /participantes/me`) e participantes podem sair (`DELETE /participantes/me`). A chave `@motivafit:desafios` do protótipo é descartada; o antigo chat local foi removido.
-- **Grupos** (`/grupos`): CRUD em `/api/grupos`, membros, convite de amigos e feed somente leitura. O convite gera o link `/grupos?convite=<token>`, que preenche o aceite (`POST /api/grupos/convites/aceite`).
+- **Amigos** (`/amigos`): `GET/POST /api/amizades` e `PATCH/DELETE /api/amizades/{id}`. Separa solicitações recebidas, enviadas e amizades aceitas. O envio localiza a conta pelo e-mail exato (`GET /api/usuarios/busca?email=`) antes de chamar `POST /api/amizades`.
+- **Desafios** (`/desafios`): CRUD em `/api/desafios`, metas por exercício do catálogo conforme a modalidade (carga aceita zero; as demais metas precisam ser maiores que zero), prazo no fuso `America/Sao_Paulo` e visibilidade. O criador convida amigos ou qualquer conta pelo e-mail (`POST /participantes`); convidados aceitam ou recusam (`PATCH /participantes/me`); qualquer pessoa entra em desafio público (`POST /participantes/me`) e participantes podem sair (`DELETE /participantes/me`). O detalhe mostra o progresso de cada participante (`GET /progresso`). A chave `@motivafit:desafios` do protótipo é descartada; o antigo chat local foi removido.
+- **Grupos** (`/grupos`): CRUD em `/api/grupos`, membros, convite de amigos e feed com publicações de texto (`POST /api/grupos/{id}/feed`). Os convites pendentes aparecem na tela (`GET /api/grupos/convites`) e são aceitos com um clique; o link `/grupos?convite=<token>` continua preenchendo o aceite (`POST /api/grupos/convites/aceite`).
 
 ## Administração
 
+- Treinos (`/admin/treinos`) usa `GET /api/admin/treinos`, com paginação no servidor e o e-mail do dono de cada treino.
 - Dashboard e Relatórios usam `GET /api/conta/exportacao` e os totais de `/api/admin/metricas/*`. Os rótulos indicam que "execuções" somam apenas os exercícios do ranking.
-- `/admin/metricas` mostra, por período, usuários ativos, frequência média, tempo de treino (o ranking é ocultado com menos de cinco usuários ativos), exercícios mais realizados, rotinas e retenção. Cada seção carrega e falha de forma independente.
+- `/admin/metricas` mostra, por período, usuários ativos (com série), frequência média, tempo de treino (o ranking é ocultado com menos de cinco usuários ativos), exercícios mais realizados, rotinas e retenção por coorte semanal (ativação em 7 dias e retenção na 2ª e na 5ª semana). Cada seção carrega e falha de forma independente.
 
-## Pendências no backend
+## Dependências do backend
 
-- `GET/PUT /api/usuarios/me/preferencias` ainda não existe: até lá a troca de tema mostra o aviso de que não foi salva na conta.
-- Busca de usuários por e-mail/nome (hoje amizades exigem o ID numérico).
-- Desafios: convidado de desafio **privado** não o enxerga (as consultas só retornam desafios criados pelo usuário ou públicos); não há entrada direta em desafio público nem cálculo de progresso.
-- Grupos: falta listar os convites recebidos e publicar no feed.
-- Admin: falta listar todos os treinos da plataforma com o dono e o total de execuções por usuário. `retencao` e a série de `usuarios-ativos` ainda retornam vazias.
+As telas acima dependem das rotas da branch `feature/backend/integracao-front`: preferências, busca por e-mail, entrada e progresso em desafios, convites recebidos e feed de grupos, treinos do admin e as métricas de série e coorte. Sem elas, essas ações retornam 404.
+
+A atividade individual por usuário (execuções e última execução de cada pessoa) não é exibida: as métricas administrativas são apenas agregadas, para não identificar usuários.
 
 `readJwtUsuarioClaims` apenas decodifica o JWT para apresentação. A autorização efetiva é responsabilidade do backend.
 

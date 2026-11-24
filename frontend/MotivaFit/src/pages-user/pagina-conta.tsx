@@ -71,9 +71,9 @@ export default function PaginaConta() {
                             {carregando && !conta && <p role="status" className="text-sm text-muted-foreground">Carregando dados da conta…</p>}
                             {erroConsulta && <p role="alert" className="text-sm text-destructive">{erroConsulta}</p>}
                             {conta && <dl className="grid gap-3 text-sm sm:grid-cols-2">
-                                <div><dt className="text-muted-foreground">ID da conta</dt><dd className="font-medium">{conta.id}</dd>
-                                    <p className="mt-1 text-xs text-muted-foreground">Compartilhe este número para receber pedidos de amizade.</p></div>
-                                <div><dt className="text-muted-foreground">E-mail</dt><dd className="font-medium">{conta.email}</dd></div>
+                                <div><dt className="text-muted-foreground">ID da conta</dt><dd className="font-medium">{conta.id}</dd></div>
+                                <div><dt className="text-muted-foreground">E-mail</dt><dd className="font-medium">{conta.email}</dd>
+                                    <p className="mt-1 text-xs text-muted-foreground">Seus amigos usam este e-mail para enviar pedidos de amizade.</p></div>
                                 <div><dt className="text-muted-foreground">Perfil</dt><dd className="font-medium">{ROTULO_PERFIL[conta.perfil]}</dd></div>
                                 <div><dt className="text-muted-foreground">Situação</dt><dd className="font-medium">{conta.ativo ? "Ativa" : "Inativa"}</dd></div>
                             </dl>}

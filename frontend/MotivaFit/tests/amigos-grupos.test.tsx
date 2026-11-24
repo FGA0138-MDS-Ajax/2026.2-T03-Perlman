@@ -26,6 +26,8 @@ describe('amizades', () => {
     it('separa solicitações e envia, aceita e desfaz pela API', async () => {
         montar('/amigos', '/amigos', <PaginaAmigos />, (url, init) => {
             if (url.includes('/api/auth/refresh')) return sessao();
+            if (url.startsWith('/api/usuarios/busca')) return url.includes('novo%40example.com')
+                ? Response.json({ id: 15, email: 'novo@example.com' }) : erro(404, 'Nenhuma outra conta ativa com este e-mail', 'USUARIO_NAO_ENCONTRADO');
             if (init?.method === 'POST') return Response.json(amizade(4, eu, [15, 'novo@example.com'], 'PENDENTE'), { status: 201 });
             if (init?.method === 'PATCH') return Response.json({ ...amizades[0], estado: 'ACEITA' });
             if (init?.method === 'DELETE') return new Response(null, { status: 204 });
@@ -36,11 +38,14 @@ describe('amizades', () => {
         expect(within(screen.getByRole('list', { name: 'Solicitações enviadas' })).getByText('enviada@example.com')).toBeTruthy();
         expect(within(screen.getByRole('list', { name: 'Amigos' })).getByText('amiga@example.com')).toBeTruthy();
 
-        fireEvent.change(screen.getByLabelText('ID da conta'), { target: { value: '42' } });
+        fireEvent.change(screen.getByLabelText('E-mail do amigo'), { target: { value: 'Aluno@Example.com' } });
         fireEvent.click(screen.getByRole('button', { name: 'Enviar solicitação' }));
         expect((await screen.findByRole('alert')).textContent).toContain('si mesmo');
+        fireEvent.change(screen.getByLabelText('E-mail do amigo'), { target: { value: 'ninguem@example.com' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Enviar solicitação' }));
+        expect((await screen.findByRole('alert')).textContent).toContain('Nenhuma outra conta ativa');
         expect(chamadas('POST')).toHaveLength(0);
-        fireEvent.change(screen.getByLabelText('ID da conta'), { target: { value: '15' } });
+        fireEvent.change(screen.getByLabelText('E-mail do amigo'), { target: { value: ' novo@example.com ' } });
         fireEvent.click(screen.getByRole('button', { name: 'Enviar solicitação' }));
         await waitFor(() => expect(chamadas('POST')).toHaveLength(1));
         expect(corpo(chamadas('POST')[0])).toEqual({ destinatarioId: 15 });
@@ -61,6 +66,20 @@ describe('amizades', () => {
 
 describe('grupos', () => {
     const grupo = { id: 5, nome: 'Corredores', descricao: 'Corridas de domingo', criadorId: 42, papel: 'ADMIN', criadoEm: data, atualizadoEm: data };
+
+    it('lista convites recebidos e aceita pelo botão', async () => {
+        montar('/grupos', '/grupos', <PaginaGrupos />, (url, init) => {
+            if (url.includes('/api/auth/refresh')) return sessao();
+            if (url === '/api/grupos/convites') return Response.json([{ id: 9, grupoId: 5, grupoNome: 'Corredores', convidanteEmail: 'admin@example.com', token: 'tok-9', expiraEm: data }]);
+            if (url === '/api/grupos/convites/aceite') return new Response(null, { status: 204 });
+            return Response.json(init?.method ? {} : []);
+        });
+        const lista = await screen.findByRole('list', { name: 'Convites recebidos' });
+        expect(within(lista).getByText(/Convite de admin@example.com/)).toBeTruthy();
+        fireEvent.click(within(lista).getByRole('button', { name: 'Aceitar convite para Corredores' }));
+        expect(await screen.findByText(/Você agora faz parte do grupo/)).toBeTruthy();
+        expect(corpo(chamadas('POST')[0])).toEqual({ token: 'tok-9' });
+    });
 
     it('aceita convite recebido por link e mostra o erro da API', async () => {
         let falhar = true;
@@ -87,7 +106,10 @@ describe('grupos', () => {
                 { usuarioId: 42, email: 'aluno@example.com', papel: 'ADMIN', entradaEm: data },
                 { usuarioId: 13, email: 'membro@example.com', papel: 'MEMBRO', entradaEm: data },
             ]);
-            if (url === '/api/grupos/5/feed') return Response.json([{ id: 1, usuarioId: 13, tipo: 'MEMBRO_ENTROU', conteudo: 'Entrou no grupo', criadoEm: data }]);
+            if (url === '/api/grupos/5/feed') return init?.method === 'POST'
+                ? Response.json({ id: 2, usuarioId: 42, tipo: 'PUBLICACAO', conteudo: corpo([url, init]).conteudo, criadoEm: data }, { status: 201 })
+                : Response.json([{ id: 1, usuarioId: 13, tipo: 'MEMBRO_ENTROU', conteudo: 'Entrou no grupo', criadoEm: data }]);
+            if (url === '/api/grupos/convites') return Response.json([]);
             if (url === '/api/grupos/5/convites') return Response.json({ id: 9, grupoId: 5, convidadoId: 12, token: 'tok-9', expiraEm: data }, { status: 201 });
             if (url.includes('/api/amizades')) return Response.json(amizades);
             if (url === '/api/grupos' && !init?.method) return Response.json([grupo]);
@@ -101,5 +123,10 @@ describe('grupos', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Gerar convite' }));
         expect(await screen.findByText(linkDeConvite('tok-9'))).toBeTruthy();
         expect(corpo(chamadas('POST')[0])).toEqual({ usuarioId: 12 });
+        fireEvent.change(screen.getByLabelText('Nova publicação'), { target: { value: '  Treino feito!  ' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Publicar' }));
+        await waitFor(() => expect(chamadas('POST').some(([url]) => url === '/api/grupos/5/feed')).toBe(true));
+        expect(corpo(chamadas('POST').find(([url]) => url === '/api/grupos/5/feed')!)).toEqual({ conteudo: 'Treino feito!' });
+        expect(await screen.findByText('Publicação enviada.')).toBeTruthy();
     });
 });

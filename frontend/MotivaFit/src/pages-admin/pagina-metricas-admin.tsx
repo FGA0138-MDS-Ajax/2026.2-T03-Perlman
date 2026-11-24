@@ -53,6 +53,11 @@ function formatarDuracao(segundos: number | null | undefined): string {
     return horas > 0 ? `${horas} h ${minutos} min` : `${minutos} min`;
 }
 
+function formatarData(iso: string): string {
+    const [ano, mes, dia] = iso.split("-");
+    return ano && mes && dia ? `${dia}/${mes}/${ano}` : iso;
+}
+
 function numero(valor: number | null | undefined, sufixo = ""): string {
     return valor == null ? "—" : `${valor.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}${sufixo}`;
 }
@@ -133,11 +138,19 @@ export default function PaginaMetricasAdmin() {
 
             <div className="grid gap-4 xl:grid-cols-2">
                 <BlocoSecao titulo="Usuários ativos" descricao="Contas com ao menos um registro no período." estado={metricas.ativos}>
-                    {(dados) => <Indicadores itens={[
-                        ["Contas", numero(dados.totalContas)],
-                        ["Ativos no período", numero(dados.ativosNoPeriodo)],
-                        ["Percentual ativo", numero(dados.percentualAtivos, "%")],
-                    ]} />}
+                    {(dados) => <>
+                        <Indicadores itens={[
+                            ["Contas", numero(dados.totalContas)],
+                            ["Ativos no período", numero(dados.ativosNoPeriodo)],
+                            ["Percentual ativo", numero(dados.percentualAtivos, "%")],
+                        ]} />
+                        {(dados.serie ?? []).length > 0 && <Table>
+                            <TableHeader><TableRow><TableHead>Período</TableHead><TableHead>Usuários ativos</TableHead></TableRow></TableHeader>
+                            <TableBody>{dados.serie.map((ponto) => <TableRow key={ponto.periodo}>
+                                <TableCell>{formatarData(ponto.periodo)}</TableCell><TableCell>{ponto.ativos}</TableCell>
+                            </TableRow>)}</TableBody>
+                        </Table>}
+                    </>}
                 </BlocoSecao>
 
                 <BlocoSecao titulo="Frequência média" descricao="Dias distintos com treino por usuário e semana." estado={metricas.frequencia}>
@@ -212,11 +225,16 @@ export default function PaginaMetricasAdmin() {
                             ["Mediana até o 1º registro", dados.medianaDiasAtePrimeiroRegistro == null ? "—" : `${dados.medianaDiasAtePrimeiroRegistro} dia(s)`],
                         ]} />
                         {dados.coortes.length === 0 ? <p className="text-muted-foreground">Ainda não há coortes calculadas.</p> : <Table>
-                            <TableHeader><TableRow>{Object.keys(dados.coortes[0]).map((chave) => <TableHead key={chave}>{chave}</TableHead>)}</TableRow></TableHeader>
-                            <TableBody>{dados.coortes.map((coorte, indice) => <TableRow key={indice}>
-                                {Object.keys(dados.coortes[0]).map((chave) => <TableCell key={chave}>{String(coorte[chave] ?? "—")}</TableCell>)}
+                            <TableHeader><TableRow>
+                                <TableHead>Semana de cadastro</TableHead><TableHead>Cadastros</TableHead>
+                                <TableHead>Ativos em 7 dias</TableHead><TableHead>Retidos na 2ª semana</TableHead><TableHead>Retidos na 5ª semana</TableHead>
+                            </TableRow></TableHeader>
+                            <TableBody>{dados.coortes.map((coorte) => <TableRow key={coorte.semana}>
+                                <TableCell>{formatarData(coorte.semana)}</TableCell><TableCell>{coorte.cadastrados}</TableCell>
+                                <TableCell>{coorte.ativados7Dias}</TableCell><TableCell>{coorte.retidosSemana2}</TableCell><TableCell>{coorte.retidosSemana5}</TableCell>
                             </TableRow>)}</TableBody>
                         </Table>}
+                        <p className="text-xs text-muted-foreground">Semanas que ainda não terminaram aparecem com zero retidos.</p>
                     </>}
                 </BlocoSecao>
             </div>

@@ -230,3 +230,37 @@ export interface GrupoFeedResponseDTO {
     conteudo: string;
     criadoEm: string;
 }
+
+export interface UsuarioResumoDTO {
+    id: number;
+    email: string;
+}
+
+export interface DesafioProgressoItemDTO {
+    itemId: number;
+    catalogoId: number;
+    cargaMaxKg: number | null;
+    repeticoes: number;
+    series: number;
+    tempoS: number;
+    distanciaM: number;
+    percentual: number;
+    concluido: boolean;
+}
+
+export interface DesafioProgressoDTO {
+    usuarioId: number;
+    email: string | null;
+    percentual: number;
+    concluido: boolean;
+    itens: DesafioProgressoItemDTO[];
+}
+
+export interface ConviteGrupoRecebidoDTO {
+    id: number;
+    grupoId: number;
+    grupoNome: string;
+    convidanteEmail: string | null;
+    token: string;
+    expiraEm: string;
+}

@@ -13,6 +13,7 @@ import {
     responderSolicitacao,
 } from "@/lib/api/amizades-api";
 import type { AmizadeResponseDTO } from "@/lib/api/contracts";
+import { buscarUsuarioPorEmail } from "@/lib/api/usuarios-api";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
 
@@ -84,16 +85,20 @@ export default function PaginaAmigos() {
 
     function enviar(event: FormEvent) {
         event.preventDefault();
-        const id = Number(destinatario.trim());
-        if (!Number.isSafeInteger(id) || id <= 0) {
-            setErro("Informe o ID numérico da conta do seu amigo.");
+        const email = destinatario.trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setErro("Informe o e-mail da conta do seu amigo.");
             return;
         }
-        if (id === usuarioId) {
+        if (email === user?.email.toLowerCase()) {
             setErro("Você não pode enviar uma solicitação para si mesmo.");
             return;
         }
-        void executar("envio", async () => { await enviarSolicitacao(id); setDestinatario(""); }, "Solicitação enviada.");
+        void executar("envio", async () => {
+            const amigo = await buscarUsuarioPorEmail(email);
+            await enviarSolicitacao(amigo.id);
+            setDestinatario("");
+        }, "Solicitação enviada.");
     }
 
     const amizades = consulta.status === "sucesso" ? consulta.dados : [];
@@ -115,13 +120,13 @@ export default function PaginaAmigos() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-lg">Adicionar amigo</CardTitle>
-                            <CardDescription>Informe o ID da conta do seu amigo (ele encontra o número em "Minha conta"). Seu ID é {user?.id}.</CardDescription>
+                            <CardDescription>Informe o e-mail exato da conta do seu amigo.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={enviar} className="flex flex-wrap items-end gap-2">
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="amigo-id">ID da conta</Label>
-                                    <Input id="amigo-id" inputMode="numeric" value={destinatario} onChange={(event) => setDestinatario(event.target.value)} className="w-40" />
+                                    <Label htmlFor="amigo-email">E-mail do amigo</Label>
+                                    <Input id="amigo-email" type="email" autoComplete="off" value={destinatario} onChange={(event) => setDestinatario(event.target.value)} className="w-72 max-w-full" />
                                 </div>
                                 <Button type="submit" className="gap-1.5" disabled={operando !== null || !destinatario.trim()}>
                                     <UserPlus className="h-4 w-4" />{operando === "envio" ? "Enviando…" : "Enviar solicitação"}
