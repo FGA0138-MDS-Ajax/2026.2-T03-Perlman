@@ -222,18 +222,24 @@ class IntegracaoFrontEndpointsTests {
     }
 
     @Test
-    void administradorListaTreinosComDonoEUsuarioNao() throws Exception {
+    void naoHaRotaQueListeTreinosDeOutrasContasParaAdministradores() throws Exception {
         Usuario admin = usuario("admin", "ADMINISTRADOR");
-        Usuario aluno = usuario("dono-treino", "USUARIO");
-        jdbc.update("INSERT INTO treino (usuario_id, nome, tipo) VALUES (?, ?, 'MUSCULACAO')", aluno.getId(), "Ficha " + sufixo);
 
-        mockMvc.perform(get("/api/admin/treinos").param("tamanho", "100").with(user(admin)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.itens[?(@.nome == 'Ficha " + sufixo + "')].usuarioEmail").value(hasItem(aluno.getEmail())));
-        mockMvc.perform(get("/api/admin/treinos").param("tamanho", "500").with(user(admin)))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(get("/api/admin/treinos").with(user(aluno)))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/admin/treinos").with(user(admin)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.codigo").value("ROTA_NAO_ENCONTRADA"));
+    }
+
+    @Test
+    void parametroAusenteEMetodoErradoNaoViramErroInterno() throws Exception {
+        Usuario aluno = usuario("erros", "USUARIO");
+
+        mockMvc.perform(get("/api/usuarios/busca").with(user(aluno)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("PARAMETRO_OBRIGATORIO"));
+        mockMvc.perform(delete("/api/usuarios/me/preferencias").with(user(aluno)))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.codigo").value("METODO_NAO_SUPORTADO"));
     }
 
     @Test

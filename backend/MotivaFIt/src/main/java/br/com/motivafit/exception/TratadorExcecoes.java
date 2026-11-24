@@ -7,7 +7,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class TratadorExcecoes {
@@ -36,6 +39,22 @@ public class TratadorExcecoes {
                 "O parâmetro '" + erro.getName() + "' é inválido");
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiErroResponse> tratarParametroAusente(MissingServletRequestParameterException erro) {
+        return responder(HttpStatus.BAD_REQUEST, "PARAMETRO_OBRIGATORIO",
+                "O parâmetro '" + erro.getParameterName() + "' é obrigatório");
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiErroResponse> tratarRotaInexistente(NoResourceFoundException erro) {
+        return responder(HttpStatus.NOT_FOUND, "ROTA_NAO_ENCONTRADA", "Rota não encontrada");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiErroResponse> tratarMetodoNaoSuportado(HttpRequestMethodNotSupportedException erro) {
+        return responder(HttpStatus.METHOD_NOT_ALLOWED, "METODO_NAO_SUPORTADO",
+                "O método " + erro.getMethod() + " não é suportado nesta rota");
+    }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiErroResponse> tratarAcessoNegado(AccessDeniedException erro) {
