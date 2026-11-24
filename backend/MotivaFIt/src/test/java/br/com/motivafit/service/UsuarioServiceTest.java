@@ -120,4 +120,34 @@ class UsuarioServiceTest {
         usuario.setAtivo(true);
         return usuario;
     }
+
+    @Test
+    void salvaEConsultaTemaDaConta() {
+        Usuario usuario = new Usuario();
+        usuario.setId(3L);
+        when(repository.findById(3L)).thenReturn(java.util.Optional.of(usuario));
+        when(repository.save(usuario)).thenReturn(usuario);
+
+        assertEquals("system", service.buscarPreferencias(3L).tema());
+        assertEquals("dark", service.salvarPreferencias(3L, new br.com.motivafit.dto.request.PreferenciasRequestDTO("dark")).tema());
+        assertEquals("dark", usuario.getTema());
+    }
+
+    @Test
+    void buscaPorEmailIgnoraContaInativaEPropria() {
+        Usuario ativo = new Usuario();
+        ativo.setId(8L);
+        ativo.setEmail("amigo@test.com");
+        ativo.setAtivo(true);
+        Usuario inativo = new Usuario();
+        inativo.setId(9L);
+        inativo.setAtivo(false);
+        when(repository.findByEmailIgnoreCase("amigo@test.com")).thenReturn(java.util.Optional.of(ativo));
+        when(repository.findByEmailIgnoreCase("inativo@test.com")).thenReturn(java.util.Optional.of(inativo));
+
+        assertEquals(8L, service.buscarPorEmail(1L, " Amigo@Test.com ").id());
+        assertThrows(br.com.motivafit.exception.NaoEncontradoException.class, () -> service.buscarPorEmail(8L, "amigo@test.com"));
+        assertThrows(br.com.motivafit.exception.NaoEncontradoException.class, () -> service.buscarPorEmail(1L, "inativo@test.com"));
+        assertThrows(br.com.motivafit.exception.RequisicaoInvalidaException.class, () -> service.buscarPorEmail(1L, "  "));
+    }
 }

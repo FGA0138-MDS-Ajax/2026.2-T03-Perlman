@@ -2,9 +2,12 @@ package br.com.motivafit.service;
 
 import br.com.motivafit.dto.request.AceitarConviteGrupoRequestDTO;
 import br.com.motivafit.dto.request.ConviteGrupoRequestDTO;
+import br.com.motivafit.dto.request.GrupoFeedPostRequestDTO;
 import br.com.motivafit.dto.request.GrupoRequestDTO;
 import br.com.motivafit.dto.response.*;
+import br.com.motivafit.dto.response.ConviteGrupoRecebidoDTO;
 import br.com.motivafit.entity.*;
+import br.com.motivafit.entity.Usuario;
 import br.com.motivafit.enums.EstadoConviteGrupo;
 import br.com.motivafit.enums.PapelGrupo;
 import br.com.motivafit.exception.AcessoNegadoException;
@@ -17,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class GrupoService {
@@ -171,6 +176,37 @@ public class GrupoService {
         getMembro(id, usuarioId);
         return feedRepository.findByGrupoIdOrderByCriadoEmDesc(id).stream()
                 .map(p -> new GrupoFeedResponseDTO(p.getId(), p.getUsuarioId(), p.getTipo(), p.getConteudo(), p.getCriadoEm()))
+                .toList();
+    }
+
+    @Transactional
+    public GrupoFeedResponseDTO publicar(Long usuarioId, Long id, GrupoFeedPostRequestDTO request) {
+        getGrupo(id);
+        getMembro(id, usuarioId);
+        GrupoFeedPost post = new GrupoFeedPost();
+        post.setGrupoId(id);
+        post.setUsuarioId(usuarioId);
+        post.setTipo("PUBLICACAO");
+        post.setConteudo(request.conteudo().trim());
+        post = feedRepository.save(post);
+        return new GrupoFeedResponseDTO(post.getId(), post.getUsuarioId(), post.getTipo(), post.getConteudo(), post.getCriadoEm());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ConviteGrupoRecebidoDTO> convitesRecebidos(Long usuarioId) {
+        List<ConviteGrupo> convites = conviteRepository.findByConvidadoIdAndEstadoAndExpiraEmAfterOrderByCriadoEmDesc(
+                usuarioId, EstadoConviteGrupo.PENDENTE, OffsetDateTime.now());
+        if (convites.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, String> grupos = grupoRepository.findAllById(convites.stream().map(ConviteGrupo::getGrupoId).toList())
+                .stream().collect(Collectors.toMap(Grupo::getId, Grupo::getNome));
+        Map<Long, String> convidantes = usuarioRepository.findAllById(convites.stream().map(ConviteGrupo::getConvidanteId).toList())
+                .stream().collect(Collectors.toMap(Usuario::getId, Usuario::getEmail));
+        return convites.stream()
+                .filter(convite -> grupos.containsKey(convite.getGrupoId()))
+                .map(convite -> new ConviteGrupoRecebidoDTO(convite.getId(), convite.getGrupoId(), grupos.get(convite.getGrupoId()),
+                        convidantes.get(convite.getConvidanteId()), convite.getToken(), convite.getExpiraEm()))
                 .toList();
     }
 

@@ -4,6 +4,7 @@ import br.com.motivafit.dto.request.AdicionarParticipanteRequestDTO;
 import br.com.motivafit.dto.request.DesafioRequestDTO;
 import br.com.motivafit.dto.request.ParticipanteUpdateRequestDTO;
 import br.com.motivafit.dto.response.DesafioParticipanteResponseDTO;
+import br.com.motivafit.dto.response.DesafioProgressoDTO;
 import br.com.motivafit.dto.response.DesafioResponseDTO;
 import br.com.motivafit.entity.Usuario;
 import br.com.motivafit.exception.ApiErroResponse;
@@ -54,7 +55,7 @@ public class DesafioController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar desafios", description = "Lista os desafios ativos criados pelo usuário autenticado e os desafios públicos ativos, do prazo mais próximo para o mais distante.")
+    @Operation(summary = "Listar desafios", description = "Lista os desafios ativos criados pelo usuário autenticado, os públicos e aqueles em que ele participa ou foi convidado (exceto convites recusados), do prazo mais próximo para o mais distante.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Desafios visíveis (lista vazia se não houver)", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DesafioResponseDTO.class)))),
             @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
@@ -66,7 +67,7 @@ public class DesafioController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Obter desafio", description = "Retorna um desafio específico se for criado pelo usuário autenticado ou for público.")
+    @Operation(summary = "Obter desafio", description = "Retorna um desafio criado pelo usuário autenticado, público ou em que ele participa ou foi convidado.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Desafio encontrado", content = @Content(schema = @Schema(implementation = DesafioResponseDTO.class))),
             @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
@@ -80,7 +81,7 @@ public class DesafioController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar desafio", description = "Atualiza um desafio criado pelo usuário autenticado. Somente o criador pode atualizar.")
+    @Operation(summary = "Atualizar desafio", description = "Atualiza título, descrição, prazo, visibilidade e itens de um desafio. Os itens enviados substituem os anteriores. Somente o criador pode atualizar.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Desafio atualizado", content = @Content(schema = @Schema(implementation = DesafioResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
@@ -145,6 +146,37 @@ public class DesafioController {
             @Valid @RequestBody AdicionarParticipanteRequestDTO request) {
         var dto = service.addParticipante(usuario.getId(), id, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }
+
+    @PostMapping("/{id}/participantes/me")
+    @Operation(summary = "Entrar em desafio público",
+            description = "O usuário autenticado passa a participar de um desafio público. Um convite pendente ou recusado é convertido em participação aceita. Desafios privados exigem convite do criador.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Participação registrada", content = @Content(schema = @Schema(implementation = DesafioParticipanteResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Desafio não encontrado, cancelado ou privado", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "409", description = "O usuário já participa do desafio", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<DesafioParticipanteResponseDTO> entrar(
+            @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario,
+            @Parameter(description = "Identificador do desafio", example = "7") @PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.entrar(usuario.getId(), id));
+    }
+
+    @GetMapping("/{id}/progresso")
+    @Operation(summary = "Consultar progresso",
+            description = "Progresso de cada participante que aceitou o desafio, do maior para o menor percentual. Soma os registros feitos desde a criação do desafio até o fim do prazo (America/Sao_Paulo): carga usa o máximo; repetições (repetições × séries), séries, tempo e distância são acumulados.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Progresso dos participantes", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DesafioProgressoDTO.class)))),
+            @ApiResponse(responseCode = "401", description = "Autenticação necessária", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Desafio não encontrado ou não visível", content = @Content(schema = @Schema(implementation = ApiErroResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(schema = @Schema(implementation = ApiErroResponse.class)))
+    })
+    public ResponseEntity<List<DesafioProgressoDTO>> progresso(
+            @Parameter(hidden = true) @AuthenticationPrincipal Usuario usuario,
+            @Parameter(description = "Identificador do desafio", example = "7") @PathVariable Long id) {
+        return ResponseEntity.ok(service.progresso(usuario.getId(), id));
     }
 
     @PatchMapping("/{id}/participantes/me")

@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/metricas")
-@Tag(name = "Métricas")
+@Tag(name = "Métricas", description = "Evolução pessoal do usuário autenticado")
 @SecurityRequirement(name = "AccessToken")
 public class MetricasController {
     private final MetricasService service;

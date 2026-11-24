@@ -6,6 +6,7 @@ import br.com.motivafit.dto.request.DesafioItemRequestDTO;
 import br.com.motivafit.dto.request.DesafioRequestDTO;
 import br.com.motivafit.dto.request.ParticipanteUpdateRequestDTO;
 import br.com.motivafit.dto.response.DesafioParticipanteResponseDTO;
+import br.com.motivafit.dto.response.DesafioProgressoDTO;
 import br.com.motivafit.dto.response.DesafioResponseDTO;
 import br.com.motivafit.entity.CatalogoExercicio;
 import br.com.motivafit.entity.Desafio;
@@ -24,13 +25,18 @@ import br.com.motivafit.repository.CatalogoExercicioRepository;
 import br.com.motivafit.repository.DesafioItemRepository;
 import br.com.motivafit.repository.DesafioParticipanteRepository;
 import br.com.motivafit.repository.DesafioRepository;
+import br.com.motivafit.repository.RegistroDiarioRepository;
 import br.com.motivafit.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,32 +55,26 @@ public class DesafioService {
     private final DesafioParticipanteRepository participanteRepository;
     private final CatalogoExercicioRepository catalogoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final RegistroDiarioRepository registroRepository;
 
     public DesafioService(DesafioRepository desafioRepository,
                           DesafioItemRepository itemRepository,
                           DesafioParticipanteRepository participanteRepository,
                           CatalogoExercicioRepository catalogoRepository,
-                          UsuarioRepository usuarioRepository) {
+                          UsuarioRepository usuarioRepository,
+                          RegistroDiarioRepository registroRepository) {
         this.desafioRepository = desafioRepository;
         this.itemRepository = itemRepository;
         this.participanteRepository = participanteRepository;
         this.catalogoRepository = catalogoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.registroRepository = registroRepository;
     }
 
     @Transactional
     public DesafioResponseDTO create(Long usuarioId, DesafioRequestDTO request) {
         validarPrazo(request.prazo());
-        validarItensRepetidos(request.itens());
-
-        Map<Long, CatalogoExercicio> catalogos = new HashMap<>();
-        for (DesafioItemRequestDTO item : request.itens()) {
-            CatalogoExercicio catalogo = catalogoRepository.findByIdAndAtivoTrue(item.catalogoId())
-                    .orElseThrow(() -> new NaoEncontradoException(
-                            "EXERCICIO_NAO_ENCONTRADO", "Exercício não encontrado"));
-            validarMetas(catalogo.getModalidade(), item);
-            catalogos.put(catalogo.getId(), catalogo);
-        }
+        Map<Long, CatalogoExercicio> catalogos = validarItens(request.itens());
 
         Visibilidade visibilidade = request.visibilidade() != null ? request.visibilidade() : Visibilidade.PRIVADO;
         Desafio desafio = desafioRepository.saveAndFlush(
@@ -89,7 +89,7 @@ public class DesafioService {
 
     @Transactional(readOnly = true)
     public List<DesafioResponseDTO> findAll(Long usuarioId) {
-        List<Desafio> desafios = desafioRepository.findCriadosOuPublicos(
+        List<Desafio> desafios = desafioRepository.findVisiveis(
                 usuarioId, EstadoDesafio.ATIVO, Visibilidade.PUBLICO);
         if (desafios.isEmpty()) {
             return List.of();
@@ -100,7 +100,7 @@ public class DesafioService {
 
     @Transactional(readOnly = true)
     public DesafioResponseDTO findById(Long usuarioId, Long id) {
-        Desafio desafio = desafioRepository.findCriadoOuPublicoPorId(
+        Desafio desafio = desafioRepository.findVisivelPorId(
                 id, usuarioId, EstadoDesafio.ATIVO, Visibilidade.PUBLICO)
                 .orElseThrow(this::desafioNaoEncontrado);
 
@@ -127,13 +127,16 @@ public class DesafioService {
         }
 
         validarPrazo(request.prazo());
+        Map<Long, CatalogoExercicio> catalogos = validarItens(request.itens());
         desafio.atualizar(request.titulo().trim(), request.prazo(), request.descricao(), request.visibilidade());
         desafioRepository.save(desafio);
 
-        List<DesafioItem> itens = itemRepository.findAllByDesafioIdIn(List.of(id));
-        Set<Long> catalogoIds = itens.stream().map(DesafioItem::getCatalogoId).collect(Collectors.toSet());
-        Map<Long, CatalogoExercicio> catalogos = catalogoRepository.findAllById(catalogoIds).stream()
-                .collect(Collectors.toMap(CatalogoExercicio::getId, Function.identity()));
+        // Os itens enviados substituem os anteriores; registros de execução não dependem deles.
+        itemRepository.deleteAllByDesafioId(id);
+        itemRepository.flush();
+        List<DesafioItem> itens = itemRepository.saveAll(request.itens().stream()
+                .map(item -> DesafioMapper.toItemEntity(id, item))
+                .toList());
 
         return DesafioMapper.toResponse(desafio, itens, catalogos, usuarioId);
     }
@@ -177,7 +180,7 @@ public class DesafioService {
 
     @Transactional(readOnly = true)
     public List<DesafioParticipanteResponseDTO> findParticipantes(Long usuarioId, Long desafioId) {
-        Desafio desafio = desafioRepository.findCriadoOuPublicoPorId(
+        Desafio desafio = desafioRepository.findVisivelPorId(
                 desafioId, usuarioId, EstadoDesafio.ATIVO, Visibilidade.PUBLICO)
                 .orElseThrow(this::desafioNaoEncontrado);
 
@@ -278,6 +281,128 @@ public class DesafioService {
                         "NAO_PARTICIPANTE", "Você não participa deste desafio"));
 
         participanteRepository.delete(participante);
+    }
+
+    /**
+     * Entrada direta em desafio público. Um convite pendente ou recusado passa a aceito.
+     */
+    @Transactional
+    public DesafioParticipanteResponseDTO entrar(Long usuarioId, Long desafioId) {
+        Desafio desafio = desafioRepository.findByIdAndEstado(desafioId, EstadoDesafio.ATIVO)
+                .orElseThrow(this::desafioNaoEncontrado);
+        if (desafio.getVisibilidade() != Visibilidade.PUBLICO) {
+            throw desafioNaoEncontrado();
+        }
+        DesafioParticipante participante = participanteRepository.findByDesafioIdAndUsuarioId(desafioId, usuarioId)
+                .orElseGet(() -> {
+                    DesafioParticipante novo = new DesafioParticipante();
+                    novo.setDesafioId(desafioId);
+                    novo.setUsuarioId(usuarioId);
+                    return novo;
+                });
+        if (participante.getEstado() == EstadoParticipante.ACEITO) {
+            throw new ConflitoException("PARTICIPANTE_JA_EXISTE", "Você já participa deste desafio");
+        }
+        participante.setEstado(EstadoParticipante.ACEITO);
+        participante.setAceitoEm(OffsetDateTime.now());
+        participante = participanteRepository.save(participante);
+
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new NaoEncontradoException("USUARIO_NAO_ENCONTRADO", "Usuário não encontrado"));
+        return new DesafioParticipanteResponseDTO(
+                participante.getUsuarioId(), usuario.getEmail(), participante.getEstado(), participante.getAceitoEm());
+    }
+
+    /**
+     * Progresso dos participantes que aceitaram o desafio, somando os registros feitos desde a criação
+     * do desafio até o fim do último dia do prazo (fuso America/Sao_Paulo). Carga usa o máximo; os demais
+     * valores são acumulados.
+     */
+    @Transactional(readOnly = true)
+    public List<DesafioProgressoDTO> progresso(Long usuarioId, Long desafioId) {
+        Desafio desafio = desafioRepository.findVisivelPorId(
+                desafioId, usuarioId, EstadoDesafio.ATIVO, Visibilidade.PUBLICO)
+                .orElseThrow(this::desafioNaoEncontrado);
+        List<DesafioItem> itens = itemRepository.findAllByDesafioId(desafioId);
+        List<DesafioParticipante> aceitos = participanteRepository.findAllByDesafioId(desafioId).stream()
+                .filter(p -> p.getEstado() == EstadoParticipante.ACEITO)
+                .toList();
+        if (itens.isEmpty() || aceitos.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> usuarioIds = aceitos.stream().map(DesafioParticipante::getUsuarioId).toList();
+        List<Long> catalogoIds = itens.stream().map(DesafioItem::getCatalogoId).toList();
+        OffsetDateTime inicio = desafio.getCreatedAt() != null ? desafio.getCreatedAt()
+                : desafio.getPrazo().atStartOfDay(FUSO).toOffsetDateTime();
+        OffsetDateTime fim = desafio.getPrazo().plusDays(1).atStartOfDay(FUSO).toOffsetDateTime();
+
+        Map<String, Object[]> somas = new HashMap<>();
+        for (Object[] linha : registroRepository.somarPorUsuarioECatalogo(usuarioIds, catalogoIds, inicio, fim)) {
+            somas.put(linha[0] + ":" + linha[1], linha);
+        }
+        Map<Long, String> emails = usuarioRepository.findAllById(usuarioIds).stream()
+                .collect(Collectors.toMap(Usuario::getId, Usuario::getEmail));
+
+        return aceitos.stream().map(participante -> {
+            List<DesafioProgressoDTO.Item> progressoItens = itens.stream()
+                    .map(item -> progressoDoItem(item, somas.get(participante.getUsuarioId() + ":" + item.getCatalogoId())))
+                    .toList();
+            BigDecimal percentual = media(progressoItens.stream().map(DesafioProgressoDTO.Item::percentual).toList());
+            boolean concluido = progressoItens.stream().allMatch(DesafioProgressoDTO.Item::concluido);
+            return new DesafioProgressoDTO(participante.getUsuarioId(), emails.get(participante.getUsuarioId()),
+                    percentual, concluido, progressoItens);
+        }).sorted(Comparator.comparing(DesafioProgressoDTO::percentual).reversed()
+                .thenComparing(DesafioProgressoDTO::usuarioId)).toList();
+    }
+
+    private DesafioProgressoDTO.Item progressoDoItem(DesafioItem item, Object[] soma) {
+        BigDecimal carga = soma == null || soma[2] == null ? null : new BigDecimal(soma[2].toString());
+        long repeticoes = soma == null ? 0 : ((Number) soma[3]).longValue();
+        long series = soma == null ? 0 : ((Number) soma[4]).longValue();
+        long tempo = soma == null ? 0 : ((Number) soma[5]).longValue();
+        BigDecimal distancia = soma == null || soma[6] == null ? BigDecimal.ZERO : new BigDecimal(soma[6].toString());
+
+        List<BigDecimal> percentuais = new ArrayList<>();
+        if (item.getMetaCargaKg() != null) percentuais.add(percentual(carga == null ? BigDecimal.ZERO : carga, item.getMetaCargaKg()));
+        if (item.getMetaRepeticoes() != null) percentuais.add(percentual(BigDecimal.valueOf(repeticoes), BigDecimal.valueOf(item.getMetaRepeticoes())));
+        if (item.getMetaSeries() != null) percentuais.add(percentual(BigDecimal.valueOf(series), BigDecimal.valueOf(item.getMetaSeries())));
+        if (item.getMetaTempoS() != null) percentuais.add(percentual(BigDecimal.valueOf(tempo), BigDecimal.valueOf(item.getMetaTempoS())));
+        if (item.getMetaDistanciaM() != null) percentuais.add(percentual(distancia, item.getMetaDistanciaM()));
+
+        boolean concluido = !percentuais.isEmpty() && percentuais.stream().allMatch(p -> p.compareTo(CEM) >= 0);
+        return new DesafioProgressoDTO.Item(item.getId(), item.getCatalogoId(), carga, repeticoes, series, tempo,
+                distancia, media(percentuais), concluido);
+    }
+
+    private static final BigDecimal CEM = BigDecimal.valueOf(100);
+
+    private static BigDecimal percentual(BigDecimal atual, BigDecimal meta) {
+        if (meta.signum() <= 0) {
+            return CEM;
+        }
+        return atual.multiply(CEM).divide(meta, 2, RoundingMode.HALF_UP).min(CEM);
+    }
+
+    private static BigDecimal media(List<BigDecimal> valores) {
+        if (valores.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return valores.stream().reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(valores.size()), 2, RoundingMode.HALF_UP);
+    }
+
+    private Map<Long, CatalogoExercicio> validarItens(List<DesafioItemRequestDTO> itens) {
+        validarItensRepetidos(itens);
+        Map<Long, CatalogoExercicio> catalogos = new HashMap<>();
+        for (DesafioItemRequestDTO item : itens) {
+            CatalogoExercicio catalogo = catalogoRepository.findByIdAndAtivoTrue(item.catalogoId())
+                    .orElseThrow(() -> new NaoEncontradoException(
+                            "EXERCICIO_NAO_ENCONTRADO", "Exercício não encontrado"));
+            validarMetas(catalogo.getModalidade(), item);
+            catalogos.put(catalogo.getId(), catalogo);
+        }
+        return catalogos;
     }
 
     private DesafioParticipante criadorComoParticipante(Long desafioId, Long usuarioId) {
