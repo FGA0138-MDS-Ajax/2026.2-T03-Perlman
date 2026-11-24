@@ -1,5 +1,7 @@
 package br.com.motivafit.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,6 +16,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class TratadorExcecoes {
+    private static final Logger log = LoggerFactory.getLogger(TratadorExcecoes.class);
+
     @ExceptionHandler(ErroAplicacaoException.class)
     public ResponseEntity<ApiErroResponse> tratarErroAplicacao(ErroAplicacaoException erro) {
         return ResponseEntity.status(erro.getStatus()).body(ApiErroResponse.de(erro));
@@ -65,6 +69,8 @@ public class TratadorExcecoes {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErroResponse> tratarErroInesperado(Exception erro) {
+        // A resposta não expõe detalhes; o log guarda a causa para diagnóstico.
+        log.error("Erro inesperado ao processar a requisição", erro);
         ErroInternoException erroApi = new ErroInternoException(
                 "ERRO_INTERNO", "Ocorreu um erro interno. Tente novamente mais tarde");
         return ResponseEntity.status(erroApi.getStatus()).body(ApiErroResponse.de(erroApi));

@@ -24,7 +24,7 @@ Variáveis sem valor padrão no `docker-compose.yml`, que precisam estar no `.en
 | :-- | :-- |
 | `DB_USER`, `DB_PASSWORD`, `DB_DATABASE` | Usuário, senha e nome do banco criado pelo contêiner do PostgreSQL |
 | `DB_URL_CONTEINER` | URL JDBC do banco usada pela API dentro do Docker. No Compose, o serviço do PostgreSQL se chama `db` e usa a porta 5432 |
-| `JWT_SECRET`, `JWT_ISSUER` | Chave de assinatura e emissor dos tokens |
+| `JWT_SECRET`, `JWT_ISSUER` | Chave de assinatura (em **Base64**, com pelo menos 32 bytes; gere com `openssl rand -base64 48`) e emissor dos tokens. Uma chave que não seja Base64 válida só falha no primeiro login, com erro 500 |
 | `JWT_EXPIRATION_MINUTES` | Validade do token de acesso, em minutos |
 | `JWT_REFRESH_EXPIRATION_DAYS` | Validade do refresh token, em dias |
 
