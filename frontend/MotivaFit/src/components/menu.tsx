@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Dumbbell, History, Home, LogOut, Play, Shield, Trophy, UserRound } from "lucide-react";
+import { Dumbbell, History, Home, LogOut, Play, Shield, Trophy, UserPlus, UserRound, Users } from "lucide-react";
 import { Separator } from "@base-ui/react";
 
 export default function HeaderMenu({ isAdmin, setMenuAberto, logout, saindo }: { isAdmin: boolean, setMenuAberto: (aberto: boolean) => void, logout: () => Promise<void>, saindo: boolean }) {
@@ -23,6 +23,12 @@ export default function HeaderMenu({ isAdmin, setMenuAberto, logout, saindo }: {
                 </Button>
                 <Button variant={pathname === "/desafios" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
                     <Link to="/desafios" aria-current={pathname === "/desafios" ? "page" : undefined}><Trophy className="h-4 w-4" />Desafios</Link>
+                </Button>
+                <Button variant={pathname === "/amigos" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
+                    <Link to="/amigos" aria-current={pathname === "/amigos" ? "page" : undefined}><UserPlus className="h-4 w-4" />Amigos</Link>
+                </Button>
+                <Button variant={pathname === "/grupos" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
+                    <Link to="/grupos" aria-current={pathname === "/grupos" ? "page" : undefined}><Users className="h-4 w-4" />Grupos</Link>
                 </Button>
                 <Button variant={pathname === "/conta" ? "secondary" : "ghost"} className="justify-start gap-2.5" asChild>
                     <Link to="/conta" aria-current={pathname === "/conta" ? "page" : undefined}><UserRound className="h-4 w-4" />Minha conta</Link>

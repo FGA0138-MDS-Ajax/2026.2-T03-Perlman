@@ -16,6 +16,9 @@ import PaginaTermosDeUso from "@/pages-user/pagina-termos-de-uso";
 import PaginaDesafios from "@/pages-user/pagina-desafios";
 import PaginaConta from "@/pages-user/pagina-conta";
 import PaginaCatalogoAdmin from "@/pages-admin/pagina-catalogo-admin";
+import PaginaMetricasAdmin from "@/pages-admin/pagina-metricas-admin";
+import PaginaAmigos from "@/pages-user/pagina-amigos";
+import PaginaGrupos from "@/pages-user/pagina-grupos";
 
 function App() {
     return (
@@ -92,6 +95,22 @@ function App() {
                             }
                         />
                         <Route
+                            path="/amigos"
+                            element={
+                                <RotaProtegida>
+                                    <PaginaAmigos />
+                                </RotaProtegida>
+                            }
+                        />
+                        <Route
+                            path="/grupos"
+                            element={
+                                <RotaProtegida>
+                                    <PaginaGrupos />
+                                </RotaProtegida>
+                            }
+                        />
+                        <Route
                             path="/conta"
                             element={
                                 <RotaProtegida>
@@ -130,6 +149,14 @@ function App() {
                             element={
                                 <RotaAdmin>
                                     <PaginaRelatoriosAdmin />
+                                </RotaAdmin>
+                            }
+                        />
+                        <Route
+                            path="/admin/metricas"
+                            element={
+                                <RotaAdmin>
+                                    <PaginaMetricasAdmin />
                                 </RotaAdmin>
                             }
                         />

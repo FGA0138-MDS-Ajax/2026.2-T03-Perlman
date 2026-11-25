@@ -392,7 +392,8 @@ describe('catálogo e treinos', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
         expect(await screen.findByRole('heading', { name: 'Minha ficha' })).toBeTruthy();
         expect(chamadas('POST')).toHaveLength(2);
-        expect(JSON.parse(String(chamadas('POST')[1][1]?.body))).toEqual({ nome: 'Minha ficha', tipo: 'MUSCULACAO', visibilidade: 'PRIVADO' });
+        expect(chamadas('POST').map(([url]) => String(url))).toEqual(['/api/treinos/8/adicionar', '/api/treinos/8/adicionar']);
+        expect(chamadas('PUT')).toHaveLength(0);
         expect(gravarLocal).not.toHaveBeenCalled();
         gravarLocal.mockRestore();
     });
@@ -411,7 +412,7 @@ describe('catálogo e treinos', () => {
                 ]);
                 return Response.json([]);
             }
-            if (init?.method === 'POST') return Response.json(treino({ id: 15, nome: 'Minha ficha', meuTreino: true, podeEditar: true }));
+            if (init?.method === 'POST' || init?.method === 'PUT') return Response.json(treino({ id: 15, nome: 'Treino público', meuTreino: true, podeEditar: true }));
             return Response.json([alheio]);
         });
         fireEvent.click(await screen.findByRole('button', { name: 'Treinos públicos' }));
@@ -469,6 +470,36 @@ describe('catálogo e treinos', () => {
         expect((screen.getByLabelText('Carga de Supino reto (kg)') as HTMLInputElement).value).toBe('20');
         expect((screen.getByLabelText('Tempo de Corrida (s)') as HTMLInputElement).value).toBe('600');
         expect(chamadas('POST')).toHaveLength(0);
+    });
+
+    it('copia o treino público pelo servidor e só sincroniza o que mudou no rascunho', async () => {
+        mount((url, init) => {
+            if (url.includes('/api/auth/refresh')) return sessao();
+            if (url.includes('/api/catalogo-exercicios')) return Response.json([supino, corrida]);
+            if (url === '/api/treinos/8/adicionar') return Response.json(treino({ id: 15, nome: 'Treino público', meuTreino: true, podeEditar: true }), { status: 201 });
+            if (url.includes('/api/treinos/15/exercicios/')) return init?.method === 'DELETE' ? new Response(null, { status: 204 })
+                : Response.json({ ...JSON.parse(String(init?.body)), id: 31, metaRecorde: null });
+            if (url.includes('/api/treinos/15/exercicios')) return Response.json([
+                { id: 31, meta: '3 séries, 12 repetições, 20 kg', metaRecorde: null, treinoId: 15, catalogoExercicioId: supino.id },
+                { id: 32, meta: '600 s, 5000 m', metaRecorde: null, treinoId: 15, catalogoExercicioId: corrida.id },
+            ]);
+            if (url.includes('/exercicios')) return Response.json([
+                { id: 21, meta: '3 séries, 12 repetições, 20 kg', metaRecorde: null, treinoId: 8, catalogoExercicioId: supino.id },
+                { id: 22, meta: '600 s, 5000 m', metaRecorde: null, treinoId: 8, catalogoExercicioId: corrida.id },
+            ]);
+            return Response.json([alheio]);
+        });
+        fireEvent.click(await screen.findByRole('button', { name: 'Treinos públicos' }));
+        fireEvent.click(await screen.findByRole('button', { name: 'Adicionar aos meus treinos' }));
+        fireEvent.change(await screen.findByLabelText('Carga de Supino reto (kg)'), { target: { value: '25' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Remover Corrida' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
+        await waitFor(() => expect(screen.queryByLabelText('Nome do treino')).toBeNull());
+        expect(chamadas('POST').map(([url]) => String(url))).toEqual(['/api/treinos/8/adicionar']);
+        expect(chamadas('PUT').map(([url, init]) => [String(url), JSON.parse(String(init?.body)).meta])).toEqual([
+            ['/api/treinos/15/exercicios/31', '3 séries, 12 repetições, 25 kg'],
+        ]);
+        expect(chamadas('DELETE').map(([url]) => String(url))).toEqual(['/api/treinos/15/exercicios/32']);
     });
 
     it('abre o menu pelo header e fecha ao navegar ou pressionar Escape', async () => {

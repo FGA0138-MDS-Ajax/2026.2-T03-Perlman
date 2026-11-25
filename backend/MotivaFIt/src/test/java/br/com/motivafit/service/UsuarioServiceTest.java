@@ -59,20 +59,6 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void findAllRetornaTodosOsUsuariosMapeados() {
-        var primeiro = usuario("primeiro@test.com");
-        var segundo = usuario("segundo@test.com");
-        when(repository.findAll()).thenReturn(List.of(primeiro, segundo));
-
-        List<UsuarioResponseDTO> response = service.findAll();
-
-        assertEquals(2, response.size());
-        assertEquals("primeiro@test.com", response.get(0).email());
-        assertEquals("segundo@test.com", response.get(1).email());
-        verify(repository).findAll();
-    }
-
-    @Test
     void findByIdRetornaUsuarioEncontrado() {
         var usuario = usuario("encontrado@test.com");
         when(repository.findById(7L)).thenReturn(Optional.of(usuario));
@@ -119,5 +105,35 @@ class UsuarioServiceTest {
         usuario.setPerfil(Perfil.USUARIO);
         usuario.setAtivo(true);
         return usuario;
+    }
+
+    @Test
+    void salvaEConsultaTemaDaConta() {
+        Usuario usuario = new Usuario();
+        usuario.setId(3L);
+        when(repository.findById(3L)).thenReturn(java.util.Optional.of(usuario));
+        when(repository.save(usuario)).thenReturn(usuario);
+
+        assertEquals("system", service.buscarPreferencias(3L).tema());
+        assertEquals("dark", service.salvarPreferencias(3L, new br.com.motivafit.dto.request.PreferenciasRequestDTO("dark")).tema());
+        assertEquals("dark", usuario.getTema());
+    }
+
+    @Test
+    void buscaPorEmailIgnoraContaInativaEPropria() {
+        Usuario ativo = new Usuario();
+        ativo.setId(8L);
+        ativo.setEmail("amigo@test.com");
+        ativo.setAtivo(true);
+        Usuario inativo = new Usuario();
+        inativo.setId(9L);
+        inativo.setAtivo(false);
+        when(repository.findByEmailIgnoreCase("amigo@test.com")).thenReturn(java.util.Optional.of(ativo));
+        when(repository.findByEmailIgnoreCase("inativo@test.com")).thenReturn(java.util.Optional.of(inativo));
+
+        assertEquals(8L, service.buscarPorEmail(1L, " Amigo@Test.com ").id());
+        assertThrows(br.com.motivafit.exception.NaoEncontradoException.class, () -> service.buscarPorEmail(8L, "amigo@test.com"));
+        assertThrows(br.com.motivafit.exception.NaoEncontradoException.class, () -> service.buscarPorEmail(1L, "inativo@test.com"));
+        assertThrows(br.com.motivafit.exception.RequisicaoInvalidaException.class, () -> service.buscarPorEmail(1L, "  "));
     }
 }

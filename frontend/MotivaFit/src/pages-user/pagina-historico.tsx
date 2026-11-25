@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import Aside from "@/components/aside";
 import Header from "@/components/header";
 import ImagemExercicio from "@/components/imagem-exercicio";
+import EvolucaoPessoal from "@/components/evolucao-pessoal";
 import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import type { RegistroDiarioResponseDTO } from "@/lib/api/contracts";
@@ -80,6 +81,7 @@ function ExecucaoItem({ registro, editar, excluir }: { registro: RegistroDiarioR
 export default function PaginaHistorico() {
     const { user, logout, isAdmin, enviando } = useAuth();
     const [menuAberto, setMenuAberto] = useState(false);
+    const [evolucaoAberta, setEvolucaoAberta] = useState(false);
     const [visao, setVisao] = useState<VisaoHistorico>("lista");
     const [registroEditando, setRegistroEditando] = useState<RegistroDiarioResponseDTO | null>(null);
     const [registroExcluindo, setRegistroExcluindo] = useState<RegistroDiarioResponseDTO | null>(null);
@@ -199,6 +201,12 @@ export default function PaginaHistorico() {
                     subtitle="Exercícios registrados na sua conta, do mais recente ao mais antigo."
                 />
                 <main className="min-w-0 flex-1 space-y-6 p-4 sm:p-6">
+                    <div className="flex justify-end">
+                        <Button type="button" variant="outline" aria-expanded={evolucaoAberta} onClick={() => setEvolucaoAberta((aberta) => !aberta)}>
+                            {evolucaoAberta ? "Ocultar evolução" : "Ver minha evolução"}
+                        </Button>
+                    </div>
+                    {evolucaoAberta && <EvolucaoPessoal />}
                     <Card className="shadow-sm">
                         <CardHeader>
                             <CardTitle className="text-lg font-heading">Histórico de exercícios</CardTitle>

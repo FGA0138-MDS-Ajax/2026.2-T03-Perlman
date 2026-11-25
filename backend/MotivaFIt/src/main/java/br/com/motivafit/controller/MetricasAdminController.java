@@ -19,7 +19,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/admin/metricas")
-@Tag(name = "Administração: métricas")
+@Tag(name = "Administração: métricas", description = "Indicadores agregados da plataforma. Restrito aos perfis ADMINISTRADOR e SUPERUSUARIO.")
 @SecurityRequirement(name = "AccessToken")
 @PreAuthorize("hasAnyRole('ADMINISTRADOR','SUPERUSUARIO')")
 @ApiResponses({

@@ -78,4 +78,40 @@ class GrupoServiceTest {
         assertThrows(br.com.motivafit.exception.ConflitoException.class,
                 () -> service.removerMembro(5L, 10L, 5L));
     }
+
+    @Test
+    void naoMembroNaoPublicaNoFeed() {
+        Grupo grupo = new Grupo();
+        grupo.setId(10L);
+        when(grupoRepository.findById(10L)).thenReturn(Optional.of(grupo));
+        when(membroRepository.findByGrupoIdAndUsuarioId(10L, 5L)).thenReturn(Optional.empty());
+
+        assertThrows(AcessoNegadoException.class,
+                () -> service.publicar(5L, 10L, new br.com.motivafit.dto.request.GrupoFeedPostRequestDTO("Oi")));
+        verify(feedRepository, never()).save(any());
+    }
+
+    @Test
+    void membroPublicaTextoSemEspacosNasPontas() {
+        Grupo grupo = new Grupo();
+        grupo.setId(10L);
+        when(grupoRepository.findById(10L)).thenReturn(Optional.of(grupo));
+        when(membroRepository.findByGrupoIdAndUsuarioId(10L, 5L)).thenReturn(Optional.of(new GrupoMembro()));
+        when(feedRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var post = service.publicar(5L, 10L, new br.com.motivafit.dto.request.GrupoFeedPostRequestDTO("  Treino feito  "));
+
+        assertEquals("PUBLICACAO", post.tipo());
+        assertEquals("Treino feito", post.conteudo());
+        assertEquals(5L, post.usuarioId());
+    }
+
+    @Test
+    void semConvitesPendentesRetornaListaVazia() {
+        when(conviteRepository.findByConvidadoIdAndEstadoAndExpiraEmAfterOrderByCriadoEmDesc(eq(5L), any(), any()))
+                .thenReturn(java.util.List.of());
+
+        assertTrue(service.convitesRecebidos(5L).isEmpty());
+        verifyNoInteractions(grupoRepository);
+    }
 }

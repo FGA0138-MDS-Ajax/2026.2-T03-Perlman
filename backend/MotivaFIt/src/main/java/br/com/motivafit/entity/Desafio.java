@@ -52,7 +52,9 @@ public class Desafio {
         this.titulo = titulo;
         this.prazo = prazo;
         this.descricao = descricao;
-        this.visibilidade = visibilidade;
+        if (visibilidade != null) {
+            this.visibilidade = visibilidade;
+        }
     }
 
     public void cancelar() {
@@ -63,7 +65,10 @@ public class Desafio {
         this.titulo = titulo;
         this.prazo = prazo;
         this.descricao = descricao;
-        this.visibilidade = visibilidade;
+        // Visibilidade é opcional na atualização: sem valor, mantém a atual.
+        if (visibilidade != null) {
+            this.visibilidade = visibilidade;
+        }
     }
 
     public Long getId() {

@@ -7,9 +7,12 @@ import br.com.motivafit.metricas.PeriodoMetricas;
 import br.com.motivafit.repository.MetricasRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -28,13 +31,16 @@ public class MetricasService {
     public List<EvolucaoPontoDTO> evolucao(Long usuarioId, Long catalogoId, LocalDate de, LocalDate ate,
                                            AgrupamentoEvolucao agrupamento) {
         PeriodoMetricas periodo = PeriodoMetricas.validar(de, ate, clock);
-        String grupo = switch (agrupamento) {
+        return repository.evolucao(usuarioId, periodo.inicio(), periodo.fim(), catalogoId, truncamento(agrupamento))
+                .stream().map(this::mapearEvolucao).toList();
+    }
+
+    private static String truncamento(AgrupamentoEvolucao agrupamento) {
+        return switch (agrupamento) {
             case DIA -> "day";
             case SEMANA -> "week";
             case MES -> "month";
         };
-        return repository.evolucao(usuarioId, periodo.inicio(), periodo.fim(), catalogoId, grupo)
-                .stream().map(this::mapearEvolucao).toList();
     }
 
     public UsuariosAtivosDTO ativos(LocalDate de, LocalDate ate, AgrupamentoEvolucao agrupamento) {
@@ -42,8 +48,10 @@ public class MetricasService {
         long total = repository.totalUsuarios();
         long ativos = repository.ativos(periodo.inicio(), periodo.fim());
         double percentual = total == 0 ? 0 : arredondar(ativos * 100.0 / total, 1);
+        List<SerieAtivosDTO> serie = repository.ativosSerie(periodo.inicio(), periodo.fim(), truncamento(agrupamento)).stream()
+                .map(row -> new SerieAtivosDTO((String) get(row, 0), longValue(get(row, 1)))).toList();
         return new UsuariosAtivosDTO(periodo.de(), periodo.ate(), agrupamento, total,
-                ativos, percentual, List.of());
+                ativos, percentual, serie);
     }
 
     public FrequenciaMediaDTO frequenciaMedia(LocalDate de, LocalDate ate) {
@@ -84,6 +92,10 @@ public class MetricasService {
     }
 
     private static Object get(Object[] row, int index) {
+        // Consultas nativas de linha única declaradas como Object[] chegam embrulhadas: Object[]{Object[]{...}}.
+        if (row != null && row.length == 1 && row[0] instanceof Object[] linha) {
+            row = linha;
+        }
         if (row == null || index >= row.length) return null;
         return row[index];
     }
@@ -125,7 +137,8 @@ public class MetricasService {
         return Math.round(value * fator) / fator;
     }
 
-    public record UsuariosAtivosDTO(LocalDate de, LocalDate ate, AgrupamentoEvolucao agrupamento, long totalContas, long ativosNoPeriodo, double percentualAtivos, List<Object> serie) {}
+    public record UsuariosAtivosDTO(LocalDate de, LocalDate ate, AgrupamentoEvolucao agrupamento, long totalContas, long ativosNoPeriodo, double percentualAtivos, List<SerieAtivosDTO> serie) {}
+    public record SerieAtivosDTO(String periodo, long ativos) {}
     public record FaixaDTO(String faixa, long usuarios) {}
     public record SerieFrequenciaDTO(String semana, BigDecimal mediaDiasAtivos) {}
     public record FrequenciaMediaDTO(LocalDate de, LocalDate ate, BigDecimal mediaDiasPorSemana,
@@ -139,15 +152,15 @@ public class MetricasService {
     public ExerciciosDTO exerciciosMaisRealizados(LocalDate de, LocalDate ate, int limite) {
         validarLimite(limite);
         PeriodoMetricas periodo = PeriodoMetricas.validar(de, ate, clock);
-        List<ExercicioItemDTO> itens = repository.exerciciosMaisRealizados(
+        List<ExercicioItemDTO> todos = repository.exerciciosMaisRealizados(
                         periodo.inicio(), periodo.fim(), limite).stream()
                 .map(row -> new ExercicioItemDTO(0, longValue(get(row, 0)), (String) get(row, 1),
                         (String) get(row, 2), (String) get(row, 3), longValue(get(row, 4)), longValue(get(row, 5))))
-                .filter(item -> item.usuariosDistintos() >= kMinimo)
                 .toList();
+        List<ExercicioItemDTO> itens = todos.stream().filter(item -> item.usuariosDistintos() >= kMinimo).toList();
         List<ExercicioItemDTO> ranking = java.util.stream.IntStream.range(0, itens.size())
                 .mapToObj(index -> itens.get(index).comPosicao(index + 1)).toList();
-        return new ExerciciosDTO(periodo.de(), periodo.ate(), 0, ranking);
+        return new ExerciciosDTO(periodo.de(), periodo.ate(), todos.size() - itens.size(), ranking);
     }
 
     public RotinasDTO rotinas(LocalDate de, LocalDate ate, int limite) {
@@ -156,12 +169,16 @@ public class MetricasService {
         Object[] resumo = repository.rotinasResumo(periodo.inicio(), periodo.fim());
         List<TipoRotinaDTO> tipos = repository.rotinasPorTipo().stream()
                 .map(row -> new TipoRotinaDTO((String) get(row, 0), longValue(get(row, 1)))).toList();
-        List<AdicaoRotinaDTO> adicoes = repository.rotinasMaisAdicionadas(
-                        periodo.inicio(), periodo.fim(), limite).stream()
-                .map(row -> new AdicaoRotinaDTO(0, longValue(get(row, 0)), (String) get(row, 1),
-                        longValue(get(row, 2)), longValue(get(row, 3)))).toList();
+        List<Object[]> linhas = repository.rotinasMaisAdicionadas(periodo.inicio(), periodo.fim(), limite);
+        List<AdicaoRotinaDTO> adicoes = java.util.stream.IntStream.range(0, linhas.size())
+                .mapToObj(index -> {
+                    Object[] row = linhas.get(index);
+                    return new AdicaoRotinaDTO(index + 1, longValue(get(row, 0)), (String) get(row, 1),
+                            longValue(get(row, 2)), longValue(get(row, 3)));
+                }).toList();
+        Object[] registros = repository.registrosComTreino(periodo.inicio(), periodo.fim());
         return new RotinasDTO(periodo.de(), periodo.ate(), longValue(get(resumo, 0)), tipos,
-                percentual(get(resumo, 1), get(resumo, 0)), BigDecimal.ZERO, adicoes);
+                percentual(get(resumo, 1), get(resumo, 0)), percentual(get(registros, 1), get(registros, 0)), adicoes);
     }
 
     public RetencaoDTO retencao(LocalDate ate, int coortes) {
@@ -169,7 +186,22 @@ public class MetricasService {
             throw new RequisicaoInvalidaException("PARAMETRO_INVALIDO", "Coortes deve estar entre 1 e 26");
         }
         LocalDate data = ate == null ? LocalDate.now(clock) : ate;
-        return new RetencaoDTO(data, BigDecimal.ZERO, null, List.of());
+        ZoneId zona = clock.getZone();
+        LocalDate primeiraSemana = data.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+                .minusWeeks(coortes - 1L);
+        Instant inicio = primeiraSemana.atStartOfDay(zona).toInstant();
+        Instant fim = data.plusDays(1).atStartOfDay(zona).toInstant();
+
+        List<CoorteDTO> lista = repository.coortesRetencao(inicio, fim).stream()
+                .map(row -> new CoorteDTO((String) get(row, 0), longValue(get(row, 1)), longValue(get(row, 2)),
+                        longValue(get(row, 3)), longValue(get(row, 4))))
+                .toList();
+        long cadastrados = lista.stream().mapToLong(CoorteDTO::cadastrados).sum();
+        long ativados = lista.stream().mapToLong(CoorteDTO::ativados7Dias).sum();
+        BigDecimal taxa = cadastrados == 0 ? BigDecimal.ZERO
+                : BigDecimal.valueOf(ativados * 100.0 / cadastrados).setScale(1, java.math.RoundingMode.HALF_UP);
+        Double mediana = repository.medianaDiasAtePrimeiroRegistro(inicio, fim);
+        return new RetencaoDTO(data, taxa, mediana == null ? null : (int) Math.round(mediana), lista);
     }
 
     private void validarLimite(int limite) {
@@ -205,5 +237,9 @@ public class MetricasService {
                              List<AdicaoRotinaDTO> treinosPublicosMaisAdicionados) {}
 
     public record RetencaoDTO(LocalDate ate, BigDecimal taxaAtivacao7Dias,
-                              Integer medianaDiasAtePrimeiroRegistro, List<Object> coortes) {}
+                              Integer medianaDiasAtePrimeiroRegistro, List<CoorteDTO> coortes) {}
+
+    /** Coorte semanal de cadastro; semanas ainda não decorridas aparecem com zero retidos. */
+    public record CoorteDTO(String semana, long cadastrados, long ativados7Dias, long retidosSemana2,
+                            long retidosSemana5) {}
 }

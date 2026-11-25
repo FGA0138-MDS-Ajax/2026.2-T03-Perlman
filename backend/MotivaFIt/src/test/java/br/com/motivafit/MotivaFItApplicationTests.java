@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource(properties = {
-        "JWT_SECRET=motivafit-tests-only-secret-key-with-more-than-32-bytes",
+        "JWT_SECRET=bW90aXZhZml0LXRlc3RzLW9ubHktc2VjcmV0LWtleS13aXRoLW1vcmUtdGhhbi0zMi1ieXRlcw==",
         "JWT_ISSUER=motivafit-test"
 })
 @AutoConfigureMockMvc

@@ -36,6 +36,9 @@ public class Usuario implements UserDetails {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
+    @Column(nullable = false, length = 10)
+    private String tema = "system";
+
     public Usuario() {
     }
 
@@ -77,6 +80,14 @@ public class Usuario implements UserDetails {
 
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
+    }
+
+    public String getTema() {
+        return tema;
+    }
+
+    public void setTema(String tema) {
+        this.tema = tema;
     }
 
     public void promoverParaAdministrador(){

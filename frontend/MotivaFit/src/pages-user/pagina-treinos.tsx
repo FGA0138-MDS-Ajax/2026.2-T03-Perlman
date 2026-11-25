@@ -11,7 +11,7 @@ import { mensagemAutenticacao, useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api/http-client";
 import { listarCatalogoExercicios } from "@/lib/api/catalogo-exercicios-api";
 import { adicionarExercicioAoTreino, atualizarExercicioDoTreino, listarExerciciosDoTreino, removerExercicioDoTreino } from "@/lib/api/exercicios-api";
-import { atualizarTreino, criarTreino, excluirTreino, listarTreinos } from "@/lib/api/treinos-api";
+import { atualizarTreino, copiarTreinoPublico, criarTreino, excluirTreino, listarTreinos } from "@/lib/api/treinos-api";
 import type { CatalogoExercicioResponseDTO, ExercicioResponseDTO, ModalidadeBackend, TipoTreinoBackend, TreinoResponseDTO, VisibilidadeBackend } from "@/lib/api/contracts";
 import { camposPadrao, formatarMetaVisivel, lerMeta, paceDosCampos, serializarMeta, validarMeta, type CamposMeta } from "@/lib/meta-exercicio";
 import {
@@ -122,6 +122,33 @@ function confirmarExercicio(item: ExercicioSelecionado, resposta: ExercicioRespo
     };
 }
 
+// Associa os exercícios copiados pelo servidor aos itens do rascunho, para que a
+// sincronização altere, remova ou inclua apenas o que o usuário mudou.
+function vincularCopia(itens: ExercicioSelecionado[], copiados: ExercicioResponseDTO[]): ExercicioSelecionado[] {
+    const livres = [...copiados];
+    const vinculados = itens.map((item) => {
+        if (item.persistidoId !== null || !item.chave.startsWith("rascunho-")) return item;
+        const indice = livres.findIndex((copia) => copia.catalogoExercicioId === item.catalogoExercicioId);
+        if (indice < 0) return item;
+        const [copia] = livres.splice(indice, 1);
+        return { ...item, persistidoId: copia.id, metaOriginal: copia.meta, metaRecorde: copia.metaRecorde ?? "" };
+    });
+    const sobras = livres.map((copia): ExercicioSelecionado => {
+        const modalidade = itens.find((item) => item.catalogoExercicioId === copia.catalogoExercicioId)?.modalidade ?? "MUSCULACAO";
+        return {
+            chave: `copia-${copia.id}`,
+            catalogoExercicioId: copia.catalogoExercicioId,
+            modalidade,
+            campos: camposPadrao(modalidade, copia.meta),
+            metaOriginal: copia.meta,
+            metaRecorde: copia.metaRecorde ?? "",
+            persistidoId: copia.id,
+            removido: true,
+        };
+    });
+    return [...vinculados, ...sobras];
+}
+
 async function sincronizarExercicios(
     treinoId: number,
     itens: ExercicioSelecionado[],
@@ -179,6 +206,7 @@ export default function PaginaTreinos({ modo = "gerenciar" }: { modo?: "gerencia
     const [excluindo, setExcluindo] = useState(false);
     const [selecionados, setSelecionados] = useState<ExercicioSelecionado[]>([]);
     const [copiandoId, setCopiandoId] = useState<number | null>(null);
+    const [origemPublica, setOrigemPublica] = useState<TreinoResponseDTO | null>(null);
     const [erroCopia, setErroCopia] = useState("");
     const [menuAberto, setMenuAberto] = useState(false);
     const [treinoDetalhado, setTreinoDetalhado] = useState<TreinoResponseDTO | null>(null);
@@ -236,6 +264,7 @@ export default function PaginaTreinos({ modo = "gerenciar" }: { modo?: "gerencia
         setVisibilidade("PRIVADO");
         setSelecionados([]);
         setErroForm("");
+        setOrigemPublica(null);
         setFormularioAberto(true);
     }
 
@@ -250,6 +279,7 @@ export default function PaginaTreinos({ modo = "gerenciar" }: { modo?: "gerencia
         setVisibilidade(treino.visibilidade);
         setSelecionados([]);
         setErroForm("");
+        setOrigemPublica(null);
         setFormularioAberto(true);
         void listarExerciciosDoTreino(treino.id).then(
             (lista) => {
@@ -312,13 +342,27 @@ export default function PaginaTreinos({ modo = "gerenciar" }: { modo?: "gerencia
         setErroForm("");
         const pedido = { nome: nome.trim(), tipo, visibilidade };
         try {
-            const salvo = editando
-                ? await atualizarTreino(editando.id, pedido)
-                : await criarTreino(pedido);
+            let itens = selecionados;
+            let salvo: TreinoResponseDTO;
+            if (editando) {
+                salvo = await atualizarTreino(editando.id, pedido);
+            } else if (origemPublica) {
+                // A cópia pelo servidor registra a adição do treino público nas métricas.
+                salvo = await copiarTreinoPublico(origemPublica.id);
+                if (!montado.current) return;
+                setOrigemPublica(null);
+                setEditando(salvo);
+                if (salvo.nome !== pedido.nome || salvo.tipo !== pedido.tipo || salvo.visibilidade !== pedido.visibilidade) {
+                    salvo = await atualizarTreino(salvo.id, pedido);
+                }
+                itens = vincularCopia(itens, await listarExerciciosDoTreino(salvo.id));
+            } else {
+                salvo = await criarTreino(pedido);
+            }
             if (!montado.current) return;
             publicar(salvo);
             setEditando(salvo);
-            const ficha = await sincronizarExercicios(salvo.id, selecionados, nomeDoCatalogo);
+            const ficha = await sincronizarExercicios(salvo.id, itens, nomeDoCatalogo);
             if (!montado.current) return;
             setSelecionados(ficha.itens);
             if (ficha.erro) {
@@ -370,6 +414,7 @@ export default function PaginaTreinos({ modo = "gerenciar" }: { modo?: "gerencia
             ]);
             if (!montado.current) return;
             abrirCriacao();
+            setOrigemPublica(treino);
             setNome(treino.nome);
             setTipo(treino.tipo);
             setSelecionados(lista.map((item) => {

@@ -22,7 +22,7 @@ public record CatalogoExercicioRequestDTO(
         @Schema(description = "Grupo muscular trabalhado (máximo de 50 caracteres)", example = "Costas")
         String grupoMuscular,
         @Size(max = 1_500_000, message = "A imagem é muito grande")
-        @Schema(description = "Imagem do exercício em formato data URL", nullable = true)
+        @Schema(description = "Imagem do exercício em formato data URL. Obrigatória no cadastro; na alteração, pode ser omitida para manter a imagem atual.", nullable = true)
         String imagemUrl
 ) {
     public CatalogoExercicioRequestDTO(String nome, Modalidade modalidade, String grupoMuscular) {

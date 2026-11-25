@@ -12,5 +12,7 @@ public interface DesafioItemRepository extends JpaRepository<DesafioItem, Long> 
 
     List<DesafioItem> findAllByDesafioId(Long desafioId);
 
+    void deleteAllByDesafioId(Long desafioId);
+
     void deleteByDesafioId(Long desafioId);
 }
