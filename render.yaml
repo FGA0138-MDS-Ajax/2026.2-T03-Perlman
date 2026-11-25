@@ -1,0 +1,85 @@
+# Render Dashboard > New > Blueprint: selecione o repositório e a branch
+# que contém este arquivo. Os planos abaixo são pagos.
+# CORS_ALLOWED_ORIGIN: URL HTTPS exata do frontend, sem barra final.
+# Após a primeira criação, confira a URL atribuída ao frontend e atualize
+# essa variável no backend antes de usar login/refresh/logout.
+# Google: informe o mesmo Client ID OAuth Web nas duas variáveis e cadastre
+# a URL do frontend nas origens JavaScript autorizadas do Google Cloud.
+# A funcionalidade Google depende de estar presente na branch publicada.
+services:
+  - type: web
+    name: motivafit-frontend
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./deploy/render/frontend.Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: API_UPSTREAM
+        fromService:
+          type: pserv
+          name: motivafit-backend
+          property: hostport
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false
+
+  - type: pserv
+    name: motivafit-backend
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./deploy/render/backend.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SERVER_PORT
+        value: "10000"
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=65
+      - key: DB_HOST
+        fromDatabase:
+          name: motivafit-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: motivafit-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: motivafit-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: motivafit-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: motivafit-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ISSUER
+        value: motivafit
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: CORS_ALLOWED_ORIGIN
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: SUPERUSUARIO_EMAIL
+        sync: false
+      - key: SUPERUSUARIO_SENHA
+        sync: false
+
+databases:
+  - name: motivafit-db
+    plan: basic-256mb
+    region: oregon
+    databaseName: motivafit
+    user: motivafit
+    postgresMajorVersion: "16"
+    ipAllowList: []
