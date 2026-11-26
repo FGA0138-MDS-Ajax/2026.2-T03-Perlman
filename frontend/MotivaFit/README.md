@@ -6,27 +6,14 @@ A aplicação consome a API do back-end em `http://localhost:8080`. Suba o back-
 
 ## Como executar com Docker
 
-### Desenvolvimento
-
-O contêiner usa Node.js 22 e recarrega a página a cada alteração no código.
-
-```bash
-docker compose -f docker-compose.dev.yml up
-```
-
-- **Endereço:** <http://localhost:3000>
-- **Parar:** `Ctrl + C`, ou `docker compose -f docker-compose.dev.yml down`
-
-### Produção
-
-A aplicação é compilada e servida pelo Nginx, com compressão Gzip e suporte às rotas da SPA.
+Na raiz do repositório, configure `.env` conforme o [guia Docker](../../DOCKER.md) e execute:
 
 ```bash
 docker compose up -d --build
 ```
 
-- **Endereço:** <http://localhost:4173>
-- **Parar:** `docker compose down`
+A aplicação compilada fica em <http://localhost:8080>. O Compose único também
+inicia o banco, o backend e o proxy nginx. Para parar: `docker compose down`.
 
 ## Como executar sem Docker
 

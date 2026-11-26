@@ -16,33 +16,21 @@ Código em desenvolvimento do MotivaFit, aplicativo web de organização de trei
 
 Pré-requisitos: Docker com Docker Compose. Para rodar sem Docker, Java 25 com Maven e Node.js 22 ou superior.
 
-1. **Back-end** (porta 8080): crie o arquivo `.env` e suba a API e o banco, conforme o [README do back-end](backend/MotivaFIt/README.md).
+Na raiz, copie `.env.production.example` para `.env` e preencha as variáveis
+conforme o [guia Docker](DOCKER.md). Para HTTP local, use
+`CORS_ALLOWED_ORIGIN=http://localhost:8080` e `COOKIE_SECURE=false`.
 
-    ```bash
-    cd backend/MotivaFIt
-    docker compose up
-    ```
+```bash
+docker compose up -d --build
+```
 
-2. **Front-end** (porta 3000): em outro terminal, suba a aplicação, conforme o [README do front-end](frontend/MotivaFit/README.md).
-
-    ```bash
-    cd frontend/MotivaFit
-    docker compose -f docker-compose.dev.yml up
-    ```
-
-3. Abra <http://localhost:3000>. O front-end encaminha as chamadas de `/api` para o back-end em `http://localhost:8080`.
-
-| Serviço | Endereço |
-| :-- | :-- |
-| Aplicação web | <http://localhost:3000> |
-| API | <http://localhost:8080> |
-| Swagger UI | <http://localhost:8080/swagger-ui.html> |
-| PostgreSQL | `localhost:5432` |
+O Compose inicia PostgreSQL → backend → frontend → nginx com `depends_on`.
+A aplicação fica em <http://localhost:8080> e o Swagger em
+<http://localhost:8080/swagger-ui.html>. O banco mantém os dados em volume.
 
 ## Testes
 
 | Onde | Comando | O que roda |
 | :-- | :-- | :-- |
-| `backend/MotivaFIt` | `docker compose --profile testing run --rm test` | Testes do back-end (JUnit) |
 | `backend/MotivaFIt` | `mvn verify` | Testes e relatório de cobertura do JaCoCo, com mínimo de 70% das linhas |
 | `frontend/MotivaFit` | `npm test` | Testes do cliente HTTP e da interface (Vitest) |

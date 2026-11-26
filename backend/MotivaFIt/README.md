@@ -2,73 +2,42 @@
 
 API REST do MotivaFit, em **Java 25** e **Spring Boot 4**, com **Spring Security** (JWT e cookies de sessão), **Flyway** e **PostgreSQL 16**.
 
-## Configuração
+## Configuração e execução
 
-Crie um arquivo `.env` nesta pasta. Ele é ignorado pelo Git e não deve ser enviado ao repositório.
-
-```env
-DB_USER=
-DB_PASSWORD=
-DB_DATABASE=
-DB_URL_CONTEINER=
-
-JWT_SECRET=
-JWT_ISSUER=
-JWT_EXPIRATION_MINUTES=
-JWT_REFRESH_EXPIRATION_DAYS=
-```
-
-Variáveis sem valor padrão no `docker-compose.yml`, que precisam estar no `.env`:
-
-| Variável | Para que serve |
-| :-- | :-- |
-| `DB_USER`, `DB_PASSWORD`, `DB_DATABASE` | Usuário, senha e nome do banco criado pelo contêiner do PostgreSQL |
-| `DB_URL_CONTEINER` | URL JDBC do banco usada pela API dentro do Docker. No Compose, o serviço do PostgreSQL se chama `db` e usa a porta 5432 |
-| `JWT_SECRET`, `JWT_ISSUER` | Chave de assinatura (em **Base64**, com pelo menos 32 bytes; gere com `openssl rand -base64 48`) e emissor dos tokens. Uma chave inválida impede a aplicação de iniciar, com a mensagem de como gerá-la |
-| `JWT_EXPIRATION_MINUTES` | Validade do token de acesso, em minutos |
-| `JWT_REFRESH_EXPIRATION_DAYS` | Validade do refresh token, em dias |
-
-Variáveis opcionais, com valor padrão no `docker-compose.yml`:
-
-| Variável | Para que serve | Padrão |
-| :-- | :-- | :-- |
-| `CORS_ALLOWED_ORIGIN` | Origem do front-end aceita pela API | `http://localhost:3000` |
-| `COOKIE_SECURE` | Envio dos cookies somente por HTTPS | `false` |
-| `SUPERUSUARIO_EMAIL`, `SUPERUSUARIO_SENHA` | Conta de superusuário criada na inicialização | Definido no `docker-compose.yml` |
-
-`GOOGLE_CLIENT_ID`, sem valor padrão, é o ID do cliente OAuth do Google e só é necessária para o login com Google.
-
-## Como executar
+O [Compose único na raiz](../../compose.yaml) inicia PostgreSQL, backend,
+frontend e nginx. Configure o `.env` da raiz seguindo o [guia Docker](../../DOCKER.md).
 
 ```bash
-docker compose up
+# Na raiz do repositório
+docker compose up -d --build
+docker compose logs -f backend
 ```
 
-Sobe o PostgreSQL (porta 5432) e a API (porta 8080), com a porta 5005 aberta para depuração remota. As tabelas são criadas pelas migrations do Flyway em `src/main/resources/db/migration`.
+A API usa o banco `db:5432` na rede interna. O proxy publica a API em
+`http://localhost:8080/api/`, o Swagger em `http://localhost:8080/swagger-ui.html`
+e a especificação em `http://localhost:8080/v3/api-docs`.
+O perfil `prod` não carrega os dados de demonstração. As migrations Flyway
+criam e atualizam as tabelas. Para parar: `docker compose down`.
 
-- **API:** <http://localhost:8080>
-- **Swagger UI:** <http://localhost:8080/swagger-ui.html>
-- **Especificação OpenAPI:** <http://localhost:8080/v3/api-docs>
-
-Para parar: `docker compose down`. Para apagar também os dados do banco: `docker compose down -v`.
-
-### Dados de demonstração
-
-O Docker Compose ativa o perfil `dev`, que cria um superusuário e usuários de teste (`usuario-teste-01@motivafit.com` em diante) com treinos e registros. As credenciais padrão estão em `DadosDemonstracaoBootstrap.java` e servem apenas para o ambiente local.
+Para rodar sem Docker, configure `DB_URL`, `DB_USER`, `DB_PASSWORD`,
+`JWT_SECRET` e `JWT_ISSUER` no ambiente e execute `mvn spring-boot:run`.
+O segredo JWT deve ser Base64 com pelo menos 32 bytes
+(`openssl rand -base64 32`). Configure também `CORS_ALLOWED_ORIGIN`,
+`COOKIE_SECURE`, `SUPERUSUARIO_EMAIL` e `SUPERUSUARIO_SENHA` para seu ambiente.
+`GOOGLE_CLIENT_ID` é opcional; `JWT_EXPIRATION_MINUTES` e
+`JWT_REFRESH_EXPIRATION_DAYS` têm padrões de 15 minutos e 7 dias.
 
 ## Testes
 
-```bash
-docker compose --profile testing run --rm test
-```
-
-Com Java 25, Maven e Docker instalados, também é possível rodar direto na máquina:
+Com Java 25, Maven e Docker instalados, execute nesta pasta:
 
 ```bash
 mvn verify
 ```
 
-O `mvn verify` gera o relatório de cobertura em `target/site/jacoco/index.html` e falha se a cobertura de linhas ficar abaixo de 70%. Parte dos testes usa Testcontainers e precisa do Docker em execução.
+O comando gera o relatório em `target/site/jacoco/index.html` e exige pelo
+menos 70% de cobertura de linhas. Os testes com Testcontainers precisam do
+Docker em execução.
 
 ## Endpoints
 

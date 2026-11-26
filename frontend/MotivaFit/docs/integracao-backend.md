@@ -5,18 +5,18 @@ A base HTTP já suporta renovação coordenada de sessão, normalização de err
 ## Desenvolvimento local
 
 1. Copie `.env.example` para `.env.local` no frontend. Deixe `VITE_API_BASE_URL` vazio: o navegador chama `/api` na mesma origem.
-2. Execute o backend na porta 8080 com suas variáveis de banco/JWT e `CORS_ALLOWED_ORIGIN=http://localhost:3000`. Para HTTP **somente no ambiente local**, configure `COOKIE_SECURE=false`. O Compose de desenvolvimento do backend já usa esse padrão; fora dele o padrão é `true`.
+2. Execute o backend na porta 8080 com suas variáveis de banco/JWT e `CORS_ALLOWED_ORIGIN=http://localhost:3000`. Para HTTP **somente no ambiente local**, configure `COOKIE_SECURE=false`. O padrão de `COOKIE_SECURE` é `true`.
 3. Execute `npm run dev` no frontend (porta 3000). O proxy Vite encaminha `/api` para `API_PROXY_TARGET`, cujo padrão é `http://localhost:8080`, preservando a origem enviada pelo navegador.
-4. Alternativamente, `docker compose -f docker-compose.dev.yml up` usa a mesma porta 3000 e encaminha a API para a porta 8080 do host via `host.docker.internal`.
+4. Para executar o build com Docker, use o Compose único na raiz conforme [DOCKER.md](../../../DOCKER.md); a aplicação fica na porta 8080.
 
 Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaScript público. Ao migrar uma sessão antiga, apague uma vez os cookies anteriores de `localhost`, pois o caminho do cookie CSRF mudou.
 
 ## Build e ambiente compartilhado
 
 - `VITE_API_BASE_URL` é uma configuração de **build**, com padrão vazio. O Dockerfile/Compose aceitam esse argumento; mudar apenas uma variável no container já compilado não altera o bundle.
-- O Nginx encaminha `/api/` para `host.docker.internal:8080`; o Compose configura esse nome no Linux. Essa topologia pressupõe backend publicado na porta 8080 do mesmo host Docker. Para outro destino, ajuste `proxy_pass`.
+- O proxy nginx encaminha `/api/` para `backend:8080` e as páginas para `frontend:80` na rede do Compose.
 - Coloque o frontend atrás do terminador HTTPS do ambiente e configure no backend `COOKIE_SECURE=true` e `CORS_ALLOWED_ORIGIN=https://<host-publico>` (origem exata, sem caminho ou barra final). Preserve o cabeçalho `Origin` através dos proxies. O container Nginx serve HTTP interno; certificados e DNS pertencem à infraestrutura do ambiente.
-- O Compose do frontend publica HTTP em `http://localhost:4173` para inspeção local do build. Para autenticar nesse endereço, o backend local deve usar essa origem e `COOKIE_SECURE=false`.
+- O Compose da raiz publica HTTP em `http://localhost:8080`. Para autenticar localmente, use essa origem em `CORS_ALLOWED_ORIGIN` e `COOKIE_SECURE=false`.
 - Refresh e CSRF usam `SameSite=Lax`. O refresh é `HttpOnly`, com `Path=/api/auth`; CSRF é legível, com `Path=/`. O logout expira cada cookie no respectivo caminho.
 - Evite API em outro host: CORS não torna o cookie CSRF acessível ao JavaScript do frontend. Prefira o proxy sob a mesma origem.
 

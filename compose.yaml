@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-motivafit}
+      POSTGRES_USER: ${DB_USER:-motivafit}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend/MotivaFIt
+    restart: unless-stopped
+    stop_grace_period: 40s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/${DB_DATABASE:-motivafit}
+      DB_USER: ${DB_USER:-motivafit}
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER:-motivafit}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-15}
+      JWT_REFRESH_EXPIRATION_DAYS: ${JWT_REFRESH_EXPIRATION_DAYS:-7}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:?Defina CORS_ALLOWED_ORIGIN}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      SUPERUSUARIO_EMAIL: ${SUPERUSUARIO_EMAIL:?Defina SUPERUSUARIO_EMAIL}
+      SUPERUSUARIO_SENHA: ${SUPERUSUARIO_SENHA:?Defina SUPERUSUARIO_SENHA}
+      OPENAPI_SERVER_URL: ${CORS_ALLOWED_ORIGIN:?Defina CORS_ALLOWED_ORIGIN}
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend/MotivaFit
+      args:
+        VITE_API_BASE_URL: ""
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+
+volumes:
+  postgres_data:
