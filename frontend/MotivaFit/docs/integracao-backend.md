@@ -14,7 +14,7 @@ Não coloque credenciais em variáveis `VITE_*`: elas são incorporadas ao JavaS
 ## Build e ambiente compartilhado
 
 - `VITE_API_BASE_URL` é uma configuração de **build**, com padrão vazio. O Dockerfile/Compose aceitam esse argumento; mudar apenas uma variável no container já compilado não altera o bundle.
-- O proxy nginx encaminha `/api/` para `backend:8080` e as páginas para `frontend:80` na rede do Compose.
+- Na imagem unificada, o nginx serve o frontend estático e encaminha `/api/` para `127.0.0.1:8081`, onde roda o backend.
 - Coloque o frontend atrás do terminador HTTPS do ambiente e configure no backend `COOKIE_SECURE=true` e `CORS_ALLOWED_ORIGIN=https://<host-publico>` (origem exata, sem caminho ou barra final). Preserve o cabeçalho `Origin` através dos proxies. O container Nginx serve HTTP interno; certificados e DNS pertencem à infraestrutura do ambiente.
 - O Compose da raiz publica HTTP em `http://localhost:8080`. Para autenticar localmente, use essa origem em `CORS_ALLOWED_ORIGIN` e `COOKIE_SECURE=false`.
 - Refresh e CSRF usam `SameSite=Lax`. O refresh é `HttpOnly`, com `Path=/api/auth`; CSRF é legível, com `Path=/`. O logout expira cada cookie no respectivo caminho.

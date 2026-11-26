@@ -24,7 +24,8 @@ conforme o [guia Docker](DOCKER.md). Para HTTP local, use
 docker compose up -d --build
 ```
 
-O Compose inicia PostgreSQL → backend → frontend → nginx com `depends_on`.
+O Dockerfile da raiz reúne frontend, backend e nginx em uma imagem.
+O Compose inicia PostgreSQL → app com `depends_on`.
 A aplicação fica em <http://localhost:8080> e o Swagger em
 <http://localhost:8080/swagger-ui.html>. O banco mantém os dados em volume.
 

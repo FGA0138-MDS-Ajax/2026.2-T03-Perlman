@@ -12,8 +12,8 @@ Na raiz do repositório, configure `.env` conforme o [guia Docker](../../DOCKER.
 docker compose up -d --build
 ```
 
-A aplicação compilada fica em <http://localhost:8080>. O Compose único também
-inicia o banco, o backend e o proxy nginx. Para parar: `docker compose down`.
+A aplicação compilada fica em <http://localhost:8080>. O Dockerfile da raiz
+reúne frontend, backend e nginx; o Compose inicia essa imagem e o PostgreSQL. Para parar: `docker compose down`.
 
 ## Como executar sem Docker
 

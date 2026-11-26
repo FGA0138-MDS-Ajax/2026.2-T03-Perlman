@@ -4,13 +4,13 @@ API REST do MotivaFit, em **Java 25** e **Spring Boot 4**, com **Spring Security
 
 ## Configuração e execução
 
-O [Compose único na raiz](../../compose.yaml) inicia PostgreSQL, backend,
-frontend e nginx. Configure o `.env` da raiz seguindo o [guia Docker](../../DOCKER.md).
+O [Dockerfile da raiz](../../Dockerfile) reúne backend, frontend e nginx.
+O [Compose](../../compose.yaml) inicia essa aplicação e o PostgreSQL separado. Configure o `.env` da raiz seguindo o [guia Docker](../../DOCKER.md).
 
 ```bash
 # Na raiz do repositório
 docker compose up -d --build
-docker compose logs -f backend
+docker compose logs -f app
 ```
 
 A API usa o banco `db:5432` na rede interna. O proxy publica a API em
