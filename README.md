@@ -1,42 +1,48 @@
-# MotivaFit
+# MotivaFit — branch `developer`
 
-Aplicativo web para praticantes de exercícios físicos que buscam organização e constância. O MotivaFit simplifica a montagem de treinos e usa gamificação, com conquistas e recompensas, para dar visibilidade à evolução do usuário e combater a desmotivação.
+Código em desenvolvimento do MotivaFit, aplicativo web de organização de treinos com gamificação. Esta branch reúne o back-end e o front-end antes de irem para a `main`.
 
-Projeto do **Grupo Perlman — T03**, da disciplina de Métodos de Desenvolvimento de Software (MDS), Universidade de Brasília, 2026.2, com o professor Ricardo Ajax.
+**Documentação do projeto:** <https://fga0138-mds-ajax.github.io/2026.2-T03-Perlman/>
 
-**Documentação:** <https://fga0138-mds-ajax.github.io/2026.2-T03-Perlman/>
+## Estrutura
 
-## Branches
-
-| Branch | Para que serve |
+| Pasta | Conteúdo |
 | :-- | :-- |
-| `main` | Versão de produção do software. Ainda não recebeu código: o desenvolvimento está na `developer`. |
-| [`developer`](https://github.com/FGA0138-MDS-Ajax/2026.2-T03-Perlman/tree/developer) | Código em desenvolvimento: back-end (`backend/MotivaFIt`) e front-end (`frontend/MotivaFit`). |
-| [`docs`](https://github.com/FGA0138-MDS-Ajax/2026.2-T03-Perlman/tree/docs) | Fontes da documentação em Markdown (MkDocs). Cada push publica o site. |
-| `gh-pages` | Site gerado automaticamente a partir da `docs`. Não deve ser editada à mão. |
+| [`backend/MotivaFIt`](backend/MotivaFIt) | API REST em Java 25 e Spring Boot 4, com PostgreSQL |
+| [`frontend/MotivaFit`](frontend/MotivaFit) | Aplicação web em React, TypeScript e Vite |
+| [`docs`](docs) | Plano de integração entre front-end e back-end e fontes da revisão dos documentos de visão e de arquitetura. A documentação publicada fica na branch `docs`. |
 
-Para rodar o software, siga o README da branch `developer`. Para editar a documentação, siga o README da branch `docs`.
+## Como rodar
 
-## Tecnologias
+Pré-requisitos: Docker com Docker Compose. Para rodar sem Docker, Java 25 com Maven e Node.js 22 ou superior.
 
-| Camada | Tecnologias |
+1. **Back-end** (porta 8080): crie o arquivo `.env` e suba a API e o banco, conforme o [README do back-end](backend/MotivaFIt/README.md).
+
+    ```bash
+    cd backend/MotivaFIt
+    docker compose up
+    ```
+
+2. **Front-end** (porta 3000): em outro terminal, suba a aplicação, conforme o [README do front-end](frontend/MotivaFit/README.md).
+
+    ```bash
+    cd frontend/MotivaFit
+    docker compose -f docker-compose.dev.yml up
+    ```
+
+3. Abra <http://localhost:3000>. O front-end encaminha as chamadas de `/api` para o back-end em `http://localhost:8080`.
+
+| Serviço | Endereço |
 | :-- | :-- |
-| Back-end | Java 25, Spring Boot 4, Spring Security com JWT, Flyway, PostgreSQL 16 |
-| Front-end | React 19, TypeScript, Vite, Tailwind CSS, shadcn/ui |
-| Testes | JUnit e JaCoCo (back-end), Vitest e Testing Library (front-end) |
-| Infraestrutura | Docker Compose, GitHub Actions (publicação da documentação), GitHub Pages |
-| Documentação | MkDocs com o tema Material |
+| Aplicação web | <http://localhost:3000> |
+| API | <http://localhost:8080> |
+| Swagger UI | <http://localhost:8080/swagger-ui.html> |
+| PostgreSQL | `localhost:5432` |
 
-## Equipe
+## Testes
 
-| Integrante | Função | GitHub |
+| Onde | Comando | O que roda |
 | :-- | :-- | :-- |
-| Mateus Fernandes Dantas | Front-end (líder) | [@teuszindls](https://github.com/teuszindls) |
-| Bernardo Campos Caxito Silveira | GQM / Analista de Qualidade | [@bernardoccs1](https://github.com/bernardoccs1) |
-| Bruno Cruvinel Barros da Silva | Documentação | [@brunocruvinell](https://github.com/brunocruvinell) |
-| Lucas Venâncio Pereira | Back-end | [@LucasVP2007](https://github.com/LucasVP2007) |
-| Luís Felipe Pontes Vieira Andrade | Back-end | [@andradluis](https://github.com/andradluis) |
-| Matheus Estevam Ferreira | Back-end | [@TheuxZn16](https://github.com/TheuxZn16) |
-| Rafael Souto Lopes Laube | Front-end | [@laube-developer](https://github.com/laube-developer) |
-
-Dono do Produto: monitor Daniel. Cliente: professor Ricardo Ajax.
+| `backend/MotivaFIt` | `docker compose --profile testing run --rm test` | Testes do back-end (JUnit) |
+| `backend/MotivaFIt` | `mvn verify` | Testes e relatório de cobertura do JaCoCo, com mínimo de 70% das linhas |
+| `frontend/MotivaFit` | `npm test` | Testes do cliente HTTP e da interface (Vitest) |

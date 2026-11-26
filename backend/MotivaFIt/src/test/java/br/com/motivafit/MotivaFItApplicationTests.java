@@ -1,0 +1,80 @@
+package br.com.motivafit;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.TestPropertySource;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.http.MediaType;
+
+@Import(TestcontainersConfiguration.class)
+@TestPropertySource(properties = {
+        "JWT_SECRET=bW90aXZhZml0LXRlc3RzLW9ubHktc2VjcmV0LWtleS13aXRoLW1vcmUtdGhhbi0zMi1ieXRlcw==",
+        "JWT_ISSUER=motivafit-test"
+})
+@AutoConfigureMockMvc
+@SpringBootTest
+class MotivaFItApplicationTests {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void contextLoads() {
+    }
+
+    @Test
+    void publicaDocumentacaoOpenApiComTodasAsRotasDeAutenticacao() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info.title").value("MotivaFit API"))
+                .andExpect(jsonPath("$.paths['/api/auth/cadastro']").exists())
+                .andExpect(jsonPath("$.paths['/api/auth/login']").exists())
+                .andExpect(jsonPath("$.paths['/api/auth/refresh']").exists())
+                .andExpect(jsonPath("$.paths['/api/auth/logout']").exists())
+                .andExpect(jsonPath("$.components.securitySchemes.RefreshTokenCookie").exists());
+    }
+
+    @Test
+    void cadastroCodificaSenhaAtravésDoMapperInjetado() throws Exception {
+        mockMvc.perform(post("/api/auth/cadastro")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"cadastro-test@motivafit.com\",\"senha\":\"SenhaSegura123!\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.email").value("cadastro-test@motivafit.com"))
+                .andExpect(jsonPath("$.perfil").value("USUARIO"))
+                .andExpect(jsonPath("$.ativo").value(true));
+    }
+
+    @Test
+    void apiProtegidaRejeitaRequisicaoSemSessao() throws Exception {
+        mockMvc.perform(get("/api/treinos")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void usuarioNaoPodeManterCatalogoDiretamente() throws Exception {
+        mockMvc.perform(post("/api/admin/catalogo-exercicios")
+                        .with(user("aluno@test.com").roles("USUARIO"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Supino\",\"modalidade\":\"MUSCULACAO\",\"grupoMuscular\":\"Peitoral\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void administradorNaoPodeEmitirConviteDeSuperusuario() throws Exception {
+        mockMvc.perform(post("/api/admin/convites")
+                        .with(user("admin@test.com").roles("ADMINISTRADOR"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"convidadorId\":1,\"email\":\"convidado@test.com\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+}
