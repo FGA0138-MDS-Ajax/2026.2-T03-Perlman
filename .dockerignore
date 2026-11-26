@@ -1,6 +1,11 @@
 .git
+.agents
+.codex
+.aws
 **/node_modules
 **/dist
 **/target
 **/.env
 **/.env.*
+**/*.log
+docs

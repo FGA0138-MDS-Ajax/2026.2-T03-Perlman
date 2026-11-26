@@ -1,0 +1,41 @@
+services:
+  app:
+    image: motivafit:production
+    build:
+      context: .
+      args:
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    restart: unless-stopped
+    stop_grace_period: 40s
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/motivafit
+      DB_USER: motivafit
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET}
+      JWT_ISSUER: motivafit
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:?Defina CORS_ALLOWED_ORIGIN}
+      COOKIE_SECURE: "true"
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      SUPERUSUARIO_EMAIL: ${SUPERUSUARIO_EMAIL:?Defina SUPERUSUARIO_EMAIL}
+      SUPERUSUARIO_SENHA: ${SUPERUSUARIO_SENHA:?Defina SUPERUSUARIO_SENHA}
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: motivafit
+      POSTGRES_USER: motivafit
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U motivafit -d motivafit"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  postgres_data:
